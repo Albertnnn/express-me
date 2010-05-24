@@ -21,7 +21,7 @@ def handle_widget(module_name):
     Handle url using specified widget module.
     '''
     try:
-        m = __import__('widget.' + module_name, globals(), locals(), ['Widget'])
+        m = __import__('widget.' + module_name, fromlist=['Widget'])
     except ImportError:
         raise HttpNotFoundError()
     w = m.Widget()

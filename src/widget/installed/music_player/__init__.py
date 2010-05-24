@@ -7,8 +7,10 @@ Music Widget that play music online.
 
 import widget
 
-title = 'Music Box'
+name = 'Music Player'
+author = 'Michael Liao'
 description = 'Play MP3 online'
+url = 'http://michael.liaoxuefeng.com/'
 
 class Widget(widget.WidgetModel):
     '''

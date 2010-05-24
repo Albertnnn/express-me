@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Adsense Widget that display Google Adsense.
+Feed Widget that display rss or atom feed.
 '''
 
 import manage
@@ -13,8 +13,10 @@ description = 'Display a subscribe link to subscribe the feed'
 
 class Widget(widget.WidgetModel):
     '''
-    Show rss feed
+    Show rss or atom feed
     '''
+    title = 'Subscribe'
+    description = 'Display a subscribe link to subscribe the feed'
 
     def load(self):
         url = manage.get_setting('blog_setting', 'feed_proxy', '/blog/feed')

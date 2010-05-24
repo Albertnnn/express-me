@@ -11,15 +11,11 @@ import widget
 
 from exweb import context
 
-from manage import AppMenuItem
-from manage import USER_ROLE_ADMINISTRATOR
-from manage import USER_ROLE_CONTRIBUTOR
-
 import manage
 
 appmenus = [
         ('Widget', [
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Edit', 'edit_widget')
+                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_widget')
         ])
 ]
 
@@ -39,21 +35,31 @@ def manage_app(user, action, **args):
 
 def __handle_get_edit_widget():
     ' list all widgets '
-    dict = widget.get_widgets()
-    widgets = []
+    dict = widget.get_installed_widgets()
+    installed_widgets = []
     for mod_name in dict:
         mod = dict[mod_name]
         w = {
-                'id' : mod.__name__,
-                'title' : getattr(mod, 'title', ''),
-                'description' : getattr(mod, 'description', ''),
+                'id' : mod_name,
+                'name' : getattr(mod, 'name', mod_name),
+                'author' : getattr(mod, 'author', '(unknown)'),
+                'description' : getattr(mod, 'description', '(no description)'),
+                'url' : getattr(mod, 'url', ''),
                 'enabled' : True
         }
-        widgets.append(w)
+        installed_widgets.append(w)
     return {
-            'template' : 'widget_edit.html',
-            'widgets' : widgets
+            'template' : 'widget_edit_list.html',
+            'installed_widgets' : installed_widgets
     }
+
+def __handle_post_add_widget():
+    ' add a new widget instance '
+    form = context.form
+    name = form.get_escape('name')
+    group = form.get_escape('group')
+    widget.create_widget_instance(name, group)
+    return __handle_get_list_widget()
 
 def __handle_post_edit_widget():
     form = context.form

@@ -14,6 +14,7 @@ from exweb import HttpNotFoundError
 
 import widget
 
+author = 'Michael Liao'
 title = 'Recent Tweets'
 description = 'Display recent tweets of specified twitter account'
 
