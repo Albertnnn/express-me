@@ -14,6 +14,7 @@ from exweb import context
 from google.appengine.api import memcache
 from google.appengine.ext import db
 import random
+import yaml
 
 class GeneralCounterShardConfig(db.Model):
     '''
@@ -85,4 +86,4 @@ def make_proxy(url):
     '''
     us = urlparse.urlparse(url)
     uus = (us[0], us[1].replace('.', '_'), us[2], us[3], us[4], us[5])
-    return '/util/proxy/' + urlparse.urlunparse(uus)
+    return 'http://' + context.appid + 'appspot.com/util/proxy/' + urlparse.urlunparse(uus)
