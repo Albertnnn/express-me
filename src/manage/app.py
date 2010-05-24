@@ -250,7 +250,7 @@ def __get_visible_menu(role, appname, menuname, menuitems):
 
 def get_default_role():
     return int(manage.get_setting(
-            manage.const.SETTING_GLOBAL,
-            manage.const.SETTING_GLOBAL_DEFAULT_ROLE,
+            manage.SETTING_GLOBAL,
+            manage.SETTING_GLOBAL_DEFAULT_ROLE,
             `manage.USER_ROLE_SUBSCRIBER`
     ))

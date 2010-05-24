@@ -126,6 +126,9 @@ COOKIE_AUTO_SIGN_ON = '_auto_signon_'
 COOKIE_EXPIRES_MIN = 86400
 COOKIE_EXPIRES_MAX = 31536000
 
+SETTING_GLOBAL = 'global'
+SETTING_GLOBAL_DEFAULT_ROLE = 'default-role'
+
 def save_setting(group, key, value):
     '''
     Save a stting's value by its group and key.
@@ -186,7 +189,8 @@ def get_navigations():
     '''
     navs = get_settings('navigation')
     if not navs:
-        return [('Home', '/')]
+        import appconfig
+        return [(x, '/' + x) for x in appconfig.apps]
     navigations = []
     for i in range(NAV_MAX):
         title = ''
