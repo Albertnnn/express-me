@@ -16,6 +16,8 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from exweb import context
 from exweb.dispatcher import Dispatcher
 
+import widget
+
 def load_template(selected=''):
     '''
     Load template and return its path.
@@ -43,21 +45,25 @@ def update_model(rootpath, appname, model):
         manage.save_setting('theme', 'selected', theme)
     model['theme'] = theme
     # add widgets:
-    import widget.recent_tweets
-    import widget.google_adsense
-    import widget.music_box
-    import widget.subscribe
-    import widget.html
-    ws = [
-          widget.subscribe.Widget(),
-          widget.html.Widget(),
-          widget.music_box.Widget(),
-          widget.recent_tweets.Widget(),
-          widget.google_adsense.Widget(),
-    ]
-    for w in ws:
-        w.widget_model = w.load()
-    model['widgets'] = ws
+    #wd = widget.get_installed_widgets()
+    #w_list = [x for x in widget.get_widget_instances('default') if x.widget_name in wd]
+    
+    #if widget_list:
+    #    widget.
+    #import widget.google_adsense
+    #import widget.music_box
+    #import widget.subscribe
+    #import widget.html
+    #ws = [
+    #      widget.subscribe.Widget(),
+    #      widget.html.Widget(),
+    #      widget.music_box.Widget(),
+    #      widget.recent_tweets.Widget(),
+    #      widget.google_adsense.Widget(),
+    #]
+    #for w in ws:
+    #    w.widget_model = w.load()
+    model['widgets'] = []
     # set app_main to path:
     app_main = os.path.join(rootpath, 'theme', theme, appname + '.main.html')
     if not os.path.exists(app_main):
