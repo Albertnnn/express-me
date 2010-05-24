@@ -8,8 +8,8 @@ from manage import User
 
 from exweb import HttpNotFoundError
 
-class PostMeta(db.Model):
-    'meta info for post'
+class BlogPostMeta(db.Model):
+    'meta info for BlogPost'
     meta_key = db.StringProperty(required=True)
     meta_values = db.StringListProperty()
 
