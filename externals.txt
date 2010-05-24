@@ -1,2 +1,0 @@
-atom http://gdata-python-client.googlecode.com/svn/trunk/src/atom
-gdata http://gdata-python-client.googlecode.com/svn/trunk/src/gdata
