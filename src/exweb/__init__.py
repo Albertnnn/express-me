@@ -4,11 +4,12 @@
 '''
 Containing classes of exweb mvc framework:
 context: thread local object which has properties:
+  appid: application id
   method: 'get' or 'post'
   request: http request object
   response: http response object
   query: query object that contains key-value(s) pair from http request
-  form: the same as query
+  form: alias of query
   set_cookie: function to set cookie
   remove_cookie: function to remove cookie
 

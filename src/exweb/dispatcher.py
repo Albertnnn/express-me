@@ -122,6 +122,7 @@ class Dispatcher(webapp.RequestHandler):
         method: http request method as string, only be 'get' or 'post'
         '''
         # bind request and response to thread local:
+        context.appid = os.environ['APPLICATION_ID']
         context.method = method
         context.request = self.request
         context.response = self.response
@@ -131,20 +132,23 @@ class Dispatcher(webapp.RequestHandler):
         context.set_cookie = set_cookie
         context.remove_cookie = remove_cookie
         try:
+            apps = list(appconfig.apps)
+            apps.extend(['widget', 'manage', 'util'])
             path = context.request.path
             if path=='/':
-                return self.__handle_index()
+                return self.__render_string('redirect:/' + apps[0])
             n = path.find('/', 1)
             if n==(-1):
                 n = len(path)
             appname = path[1:n]
-            if not appname in appconfig.apps:
+            if not appname in apps:
                 raise HttpNotFoundError()
             apppath = path[len(appname)+1:]
             if not apppath.startswith('/'):
                 apppath = '/' + apppath
             self.__handle_internal(appname, apppath)
         finally:
+            del context.appid
             del context.method
             del context.request
             del context.response
@@ -205,18 +209,6 @@ class Dispatcher(webapp.RequestHandler):
             self.response.out.write(s[5:])
         else:
             self.response.out.write(s)
-
-    def __handle_index(self):
-        'handle index page "/"'
-        try:
-            index = __import__('index')
-            self.__handle_result('', index.index())
-        except ImportError:
-            # show default index page which list all apps:
-            list = ['<h2><a href="/' + app + '/">' + app + '</a></h2>' for app in appconfig.apps]
-            self.response.out.write('<h1>Default Index Page: Installed Apps</h1>')
-            self.response.out.write(''.join(list))
-            self.response.out.write('<p>To customize your index page, go to <a href="/manage/">the management console</a>, select "Setting", "Index Page".</p>')
 
     def __matches(self, url, apppath, raw_mapping):
         '''
