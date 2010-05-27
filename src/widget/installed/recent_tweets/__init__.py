@@ -43,13 +43,13 @@ class Widget(widget.WidgetModel):
 #    recent_tweets = widget.WidgetSetting()
 #    show_follow_me = widget.WidgetSetting()
 
-    def load(self):
+    def get_content(self):
         self.user = 'liaoxuefeng'
         self.count = '5'
         self.cache = '600'
         id = 'id_' + str(randint(0, 100000))
         url = 'http://api_twitter_com/1/statuses/user_timeline/%s.json%%3Fcount=%s?__cache__=%s' % (self.user, self.count, self.cache)
-        html = r'''<div id="%s"><em>Loading...</em></div>
+        return r'''<div id="%s"><em>Loading...</em></div>
 <script type="text/javascript">
 if (typeof(g_widget_recent_tweets) == "undefined") {
 
@@ -200,7 +200,3 @@ if (typeof(g_widget_recent_tweets) == "undefined") {
 g_widget_recent_tweets.get_tweets("%s", "%s", "%s");
 </script>
         ''' % (id, url, self.user, id)
-        return {
-                'title' : 'Recent Tweets',
-                'content' : html
-        }

@@ -15,7 +15,8 @@ import manage
 
 appmenus = [
         ('Widget', [
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_widget')
+                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'List', 'list_widget'),
+                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_instance')
         ])
 ]
 
@@ -33,8 +34,16 @@ def manage_app(user, action, **args):
     # we are going to call function by name '__handle_' + (get or post) + _ + action
     return eval(f)
 
-def __handle_get_edit_widget():
-    ' list all widgets '
+def get_default_settings(w):
+    attr_list = dir(w)
+    setting_dict = {}
+    for attr in attr_list:
+        setting = getattr(w, attr)
+        if isinstance(setting, widget.WidgetSetting):
+            setting_dict[attr] = setting
+    return setting_dict
+
+def get_installed_widgets_details():
     dict = widget.get_installed_widgets()
     installed_widgets = []
     for mod_name in dict:
@@ -45,35 +54,75 @@ def __handle_get_edit_widget():
                 'author' : getattr(mod, 'author', '(unknown)'),
                 'description' : getattr(mod, 'description', '(no description)'),
                 'url' : getattr(mod, 'url', ''),
-                'enabled' : True
+                'class' : mod.Widget,
+                'settings' : get_default_settings(mod.Widget)
         }
         installed_widgets.append(w)
+    return installed_widgets
+
+def __handle_get_edit_instance():
+    # get widget instances of default group:
+    instances = widget.get_widget_instances()
+    all_settings = widget.get_all_instances_settings()
+    widget.bind_instance_model(instances, all_settings)
+    for instance in instances:
+        wclass = widget.get_installed_widget(instance.widget_id)
+        import logging
+        logging.warning('\n\n\n$$\n\n' + str(wclass))
+        def_setting_dict = widget.get_widget_settings(wclass)
+        logging.warning('\n\n\n###\n\n\n' + str(def_setting_dict))
+        ins_settings = widget.get_instance_settings(instance)
+        # attach ins_settings to def_settings:
+        for key in def_setting_dict:
+            for ins_setting in ins_settings:
+                if key==ins_setting.setting_name:
+                    def_setting_dict[key].value = ins_setting.setting_value
+        instance.settings = def_setting_dict
+
     return {
-            'template' : 'widget_edit_list.html',
-            'installed_widgets' : installed_widgets
+            'template' : 'widget_edit.html',
+            'setting_to_html' : setting_to_html,
+            'instances' : instances,
+            'installed_widgets' : get_installed_widgets_details()
     }
 
-def __handle_post_add_widget():
-    ' add a new widget instance '
+def __handle_post_edit_instance():
     form = context.form
-    name = form.get_escape('name')
-    group = form.get_escape('group')
-    widget.create_widget_instance(name, group)
-    return __handle_get_list_widget()
+    if form.get('btn')=='add':
+        # add a new widget instance:
+        widget_id = form.get('widget_id')
+        max = len(widget.get_widget_instances())
+        instance = widget.WidgetInstance(widget_id=widget_id, widget_order=max)
+        instance.put()
+    return __handle_get_edit_instance()
 
-def __handle_post_edit_widget():
-    form = context.form
-    name = form.get_escape('name')
-    description = form.get_escape('description')
+def __handle_get_list_widget():
+    ' list all widgets '
     return {
-            'template' : 'message.html',
-            'message' : 'Category created.',
-            'detail' : 'Your category has been created successfully!',
-            'url' : '?app=blog&action=post_categories',
-            'url_title' : 'Continue'
+            'template' : 'widget_list.html',
+            'installed_widgets' : get_installed_widgets_details()
     }
 
-def __handle_get_tags():
-    return {
-            'template' : 'post_tags.html'
-    }
+def setting_to_html(name, widget_setting):
+    '''
+    Generate HTML input for WidgetSetting.
+    
+    Returns:
+      HTML code like '<input name=.../>'
+    '''
+    if isinstance(widget_setting, widget.WidgetSelectSetting):
+        list = [r'<select name="%s">' % name]
+        for opts in widget_setting.selections:
+            if opts[0]==widget_setting.default:
+                list.append(r'<option value="%s" selected="selected">%s</option>' % opts)
+            else:
+                list.append(r'<option value="%s">%s</option>' % opts)
+        list.append('</select>')
+        return ''.join(list)
+    if isinstance(widget_setting, widget.WidgetCheckedSetting):
+        if widget_setting.default==widget_setting.value:
+            return '<label><input name="%s" type="checkbox" value="%s" checked="checked"/>%s</label>' % (name, widget_setting.default, widget_setting.label)
+        return '<label><input name="%s" type="checkbox" value="%s"/>%s</label>' % (name, widget_setting.default, widget_setting.label)
+    if isinstance(widget_setting, widget.WidgetPasswordSetting):
+        return '<input name="%s" type="password" value="%s" maxlength="255"/>' % (name, widget_setting.default)
+    return '<input name="%s" type="text" value="%s" maxlength="255"/>' % (name, widget_setting.default)

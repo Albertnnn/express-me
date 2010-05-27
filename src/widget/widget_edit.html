@@ -1,36 +1,46 @@
 <!-- begin edit.html -->
 
 <div class="panel box-round">
-  <div class="panel-title" style="display:table; padding:0px">
-    <div class="tr">
-      <div class="td" style="width:3%"><input type="checkbox" id="select_all" name="select_all" /></div>
-      <div class="td" style="width:25%">Name</div>
-      <div class="td" style="width:40%">Description</div>
-      <div class="td" style="width:20%">Settings</div>
-      <div class="td" style="width:10%">Up</div>
-      <div class="td" style="width:10%">Dn</div>
-    </div>
-  </div>
-  <div class="panel-content" style="display:table; padding:0px">
-  #set $odd=''
-  #for $widget in $widgets
-    #if $odd==''
-    #set $odd='-odd'
-    #else
-    #set $odd=''
-    #end if
-    <div class="tr${odd}">
-      <div class="td" style="width:3%"><input type="checkbox" id="${widget.id}" name="${widget.id}" /></div>
-      <div class="td" style="width:25%">
-        <div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&action=${action}&id=${widget.id}">${widget.title}</a></div>
+  <div class="panel-title">Widget Bar</div>
+  <div class="panel-content">
+    #for $instance in $instances
+    <div class="panel box-round">
+      <div class="panel-title">${instance.widget_id}</div>
+      <div class="panel-content">
+        #set $w=$instance.widget_class()
+        $w.load($instance.key().__str__(), $instance.model)
+        $w.render()
+        <form name="widget_form" method="post">
+          <input type="hidden" name="app" value="${app}"/>
+          <input type="hidden" name="action" value="${action}"/>
+          <input type="hidden" name="btn" value="edit"/>
+          <input type="hidden" name="id" value="${instance.key}"/>
+        #for $key, $setting in $instance.settings.items()
+          <div>$setting.description</div>
+          <div>$setting_to_html($key, $setting)</div>
+        #end for
+          <div><button type="submit" name="submit">Save</button> <button type="button" name="cancel">Cancel</button></div>
+        </form>
       </div>
-      <div class="td" style="width:40%">${widget.description}</div>
-      <div class="td" style="width:20%">Settings</div>
-      <div class="td" style="width:10%">Up</div>
-      <div class="td" style="width:10%">Dn</div>
     </div>
-  #end for
+    #end for
+    #if not $instances
+      <div style="padding:12px; font-size:1.1em">No widget was added.</div>
+    #end if
   </div>
 </div>
 
+<div style="padding:3px 6px">
+  <form name="add" action="/manage" method="post">
+  <input type="hidden" name="app" value="${app}"/>
+  <input type="hidden" name="action" value="${action}"/>
+  <input type="hidden" name="btn" value="add"/>
+  <select name="widget_id">
+  #for $widget in $installed_widgets
+    <option value="${widget.id}">${widget.name}</option>
+  #end for
+  </select>
+  <button type="submit" name="add">Add</button>
+  </form>
+</div>
 <!-- end edit.html -->
