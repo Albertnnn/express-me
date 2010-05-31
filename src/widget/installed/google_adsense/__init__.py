@@ -7,10 +7,13 @@ Adsense Widget that display Google Adsense.
 
 import widget
 
-title = 'Google Adsense'
-description = 'Display Google Adsense of specified account'
-
 class Widget(widget.WidgetModel):
+
+    widget_name = 'Google Adsense'
+    widget_author = 'Michael Liao'
+    widget_description = 'Display Google Adsense'
+    widget_url = 'http://michael.liaoxuefeng.com/'
+
     '''
     Display Google Adsense
     '''

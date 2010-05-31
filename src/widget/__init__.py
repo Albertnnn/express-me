@@ -222,6 +222,25 @@ def create_widget_instance(id, settings=None, group=DEFAULT_GROUP):
             ws.put()
     return instance
 
+def delete_widget_instance(key):
+    '''
+    Delete a Widget instance and all its settings.
+    
+    Args:
+      key: Widget instance key.
+    Returns:
+      None
+    '''
+    instance = WidgetInstance.get(key)
+    db.delete(get_instance_settings(instance))
+    instance.delete()
+
+def get_widget_instance(key):
+    '''
+    Get widget instance by key.
+    '''
+    return WidgetInstance.get(key)
+
 def get_widget_instances(widget_group=DEFAULT_GROUP):
     '''
     get widget instances as list contains WidgetInstance objects by group name.
@@ -268,11 +287,13 @@ def bind_instance_model(instances, settings):
             d_settings[key].append(setting)
         else:
             d_settings[key] = [setting]
+    logging.warning('Processed settings map: ' + str(d_settings))
     for instance in instances:
         widget_class = get_installed_widget(instance.widget_id)
         instance.widget_class = widget_class
         key = str(instance.key())
         list = d_settings.pop(key, [])
+        logging.warning('Prepare instance settings: ' + str(list))
         instance.model = merge_settings(widget_class, list)
 
 def get_all_instances_settings(group=DEFAULT_GROUP):
@@ -298,6 +319,26 @@ def get_instance_settings(widget_instance):
     '''
     return WidgetInstanceSetting.all().filter('widget_instance', widget_instance).fetch(100)
 
+def update_instance_settings(widget_instance, setting_as_dict):
+    '''
+    Update instance settings.
+    
+    Args:
+      widget_instance: WidgetInstance object.
+      setting_as_dict: new settings as dict contains key as str and value as str or unicde.
+    Returns:
+      None
+    '''
+    group = widget_instance.widget_group
+    db.delete(get_instance_settings(widget_instance))
+    for name, value in setting_as_dict.items():
+        WidgetInstanceSetting(
+                widget_group=group,
+                widget_instance=widget_instance,
+                setting_name=name,
+                setting_value=value
+        ).put()
+
 def merge_settings(widget_class, instance_settings):
     '''
     Merge settings of dict of WidgetSetting and list of WidgetInstanceSetting. 
@@ -311,15 +352,20 @@ def merge_settings(widget_class, instance_settings):
       Dict contains key, value of settings.
     '''
     setting_dict = get_widget_settings(widget_class)
+    import logging
+    logging.warning('Load widget class setting for ' + str(widget_class))
+    logging.warning('Settings: ' + str(setting_dict))
     settings = {}
     # set default value of all settings:
     for key in setting_dict:
         settings[key] = setting_dict[key].default
+    logging.warning('Init settings: ' + str(settings))
     # override instance settings:
     for instance_setting in instance_settings:
         key = instance_setting.setting_name
         if key in settings:
             settings[key] = instance_setting.setting_value
+    logging.warning('Override settings: ' + str(settings))
     return settings
 
 

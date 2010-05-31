@@ -3,11 +3,6 @@
 
 import widget
 
-name = 'HTML Snippet'
-author = 'Michael Liao'
-description = 'Display any HTML snippet'
-url = 'http://michael.liaoxuefeng.com/'
-
 class Widget(widget.WidgetModel):
 
     widget_name = 'HTML Snippet'

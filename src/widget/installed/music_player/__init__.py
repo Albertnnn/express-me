@@ -7,12 +7,13 @@ Music Widget that play music online.
 
 import widget
 
-name = 'Music Player'
-author = 'Michael Liao'
-description = 'Play MP3 online'
-url = 'http://michael.liaoxuefeng.com/'
-
 class Widget(widget.WidgetModel):
+
+    widget_name = 'Music Player'
+    widget_author = 'Michael Liao'
+    widget_description = 'Play music online'
+    widget_url = 'http://michael.liaoxuefeng.com/'
+
     '''
     Play music
     '''
@@ -27,5 +28,5 @@ class Widget(widget.WidgetModel):
         auto_start = self.auto_play=='True'
         return r'''
 <div>%s</div>
-<div><embed src="/widget/music_box/static/player.swf?soundFile=%s&playerID=%s&bg=0xf8f8f8&leftbg=0xeeeeee&lefticon=0x666666&rightbg=0xcccccc&rightbghover=0x999999&righticon=0x666666&righticonhover=0xffffff&text=0x666666&slider=0x666666&track=0xFFFFFF&border=0x666666&loader=0x9FFFB8&loop=no&autostart=%s" type="application/x-shockwave-flash" wmode="transparent" height="40" width="100%%" /></div>
+<div><embed src="/widget/installed/music_player/static/player.swf?soundFile=%s&playerID=%s&bg=0xf8f8f8&leftbg=0xeeeeee&lefticon=0x666666&rightbg=0xcccccc&rightbghover=0x999999&righticon=0x666666&righticonhover=0xffffff&text=0x666666&slider=0x666666&track=0xFFFFFF&border=0x666666&loader=0x9FFFB8&loop=no&autostart=%s" type="application/x-shockwave-flash" wmode="transparent" height="24" width="100%%" /></div>
 ''' % (self.music_title, self.music_url, self.__id__, auto_start)

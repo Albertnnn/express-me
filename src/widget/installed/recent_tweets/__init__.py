@@ -14,10 +14,6 @@ from exweb import HttpNotFoundError
 
 import widget
 
-author = 'Michael Liao'
-title = 'Recent Tweets'
-description = 'Display recent tweets of specified twitter account'
-
 IGNORE_HEADERS = frozenset([
     'set-cookie',
     'expires',
@@ -37,6 +33,13 @@ class Widget(widget.WidgetModel):
     '''
     Show recent tweets
     '''
+    widget_name = 'Tweets'
+    widget_author = 'Michael Liao'
+    widget_description = 'Show recent tweets'
+    widget_url = 'http://michael.liaoxuefeng.com/'
+
+    username = widget.WidgetSetting(description='Twitter username', required=True, default='')
+    recent_tweets = widget.WidgetSetting(description='How many recent tweets to display', required=True, default='20')
 
 #    title = widget.WidgetSetting()
 #    username = widget.WidgetSetting()
@@ -44,11 +47,9 @@ class Widget(widget.WidgetModel):
 #    show_follow_me = widget.WidgetSetting()
 
     def get_content(self):
-        self.user = 'liaoxuefeng'
-        self.count = '5'
         self.cache = '600'
-        id = 'id_' + str(randint(0, 100000))
-        url = 'http://api_twitter_com/1/statuses/user_timeline/%s.json%%3Fcount=%s?__cache__=%s' % (self.user, self.count, self.cache)
+        id = 'tw_' + self.__id__
+        url = 'http://api_twitter_com/1/statuses/user_timeline/%s.json%%3Fcount=%s?__cache__=%s' % (self.username, self.recent_tweets, self.cache)
         return r'''<div id="%s"><em>Loading...</em></div>
 <script type="text/javascript">
 if (typeof(g_widget_recent_tweets) == "undefined") {
@@ -199,4 +200,4 @@ if (typeof(g_widget_recent_tweets) == "undefined") {
 // make an async call:
 g_widget_recent_tweets.get_tweets("%s", "%s", "%s");
 </script>
-        ''' % (id, url, self.user, id)
+        ''' % (id, url, self.username, id)

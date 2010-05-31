@@ -2,25 +2,46 @@
 
 <div class="panel box-round">
   <div class="panel-title">Widget Bar</div>
-  <div class="panel-content">
+  <div class="panel-content" style="width:360px;padding:6px">
     #for $instance in $instances
     <div class="panel box-round">
       <div class="panel-title">${instance.widget_id}</div>
       <div class="panel-content">
         #set $w=$instance.widget_class()
-        $w.load($instance.key().__str__(), $instance.model)
-        $w.render()
-        <form name="widget_form" method="post">
+        #set $id=$instance.key().__str__()
+        <div id="r_$id" style="padding:6px">
+          $w.load($id, $instance.model)
+          $w.render()
+          <hr style="margin:6px 0px"/>
+          <form id="form_remove_$id" name="remove" method="post" onsubmit="return confirm('Are you sure that you want to remove this widget?')">
+            <input type="hidden" name="btn" value="remove"/>
+            <input type="hidden" name="id" value="$id"/>
+          </form>
+          <div style="padding:6px;margin:6px 0px 0px 0px">
+            <button type="button" name="setting" onclick="jQuery('#r_${id}').hide();jQuery('#s_${id}').show();">Setting</button>
+            <button type="button" name="remove" onclick="jQuery('#form_remove_${id}').submit()">Remove</button>
+          </div>
+        </div>
+        <div id="s_$id" style="padding:6px;display:none">
+        <div class="notice">You are editing settings</div>
+        <form id="f_$id" name="widget_form" method="post">
           <input type="hidden" name="app" value="${app}"/>
           <input type="hidden" name="action" value="${action}"/>
           <input type="hidden" name="btn" value="edit"/>
           <input type="hidden" name="id" value="${instance.key}"/>
         #for $key, $setting in $instance.settings.items()
-          <div>$setting.description</div>
-          <div>$setting_to_html($key, $setting)</div>
+          <div style="margin:3px 0px">
+            <div>$setting.description</div>
+            <div style="padding-left:24px">$setting_to_html($key, $setting)</div>
+          </div>
         #end for
-          <div><button type="submit" name="submit">Save</button> <button type="button" name="cancel">Cancel</button></div>
+          <hr style="margin:6px 0px"/>
+          <div style="padding:6px;margin:6px 0px 0px 0px">
+            <button type="submit" name="submit">Save</button>
+            <button type="button" name="cancel" onclick="jQuery('#f_${id}').get(0).reset();jQuery('#s_${id}').hide();jQuery('#r_${id}').show();">Cancel</button>
+          </div>
         </form>
+        </div>
       </div>
     </div>
     #end for

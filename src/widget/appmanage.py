@@ -8,6 +8,7 @@ Blog app management.
 '''
 
 import widget
+import copy
 
 from exweb import context
 
@@ -40,7 +41,7 @@ def get_default_settings(w):
     for attr in attr_list:
         setting = getattr(w, attr)
         if isinstance(setting, widget.WidgetSetting):
-            setting_dict[attr] = setting
+            setting_dict[attr] = copy.deepcopy(setting)
     return setting_dict
 
 def get_installed_widgets_details():
@@ -50,10 +51,10 @@ def get_installed_widgets_details():
         mod = dict[mod_name]
         w = {
                 'id' : mod_name,
-                'name' : getattr(mod, 'name', mod_name),
-                'author' : getattr(mod, 'author', '(unknown)'),
-                'description' : getattr(mod, 'description', '(no description)'),
-                'url' : getattr(mod, 'url', ''),
+                'name' : getattr(mod.Widget, 'widget_name', mod_name),
+                'author' : getattr(mod.Widget, 'widget_author', '(unknown)'),
+                'description' : getattr(mod.Widget, 'widget_description', '(no description)'),
+                'url' : getattr(mod.Widget, 'widget_url', ''),
                 'class' : mod.Widget,
                 'settings' : get_default_settings(mod.Widget)
         }
@@ -64,10 +65,12 @@ def __handle_get_edit_instance():
     # get widget instances of default group:
     instances = widget.get_widget_instances()
     all_settings = widget.get_all_instances_settings()
+    import logging
+    for s in all_settings:
+        logging.warning('Load all settings: ' + s.setting_name + '=' + s.setting_value)
     widget.bind_instance_model(instances, all_settings)
     for instance in instances:
         wclass = widget.get_installed_widget(instance.widget_id)
-        import logging
         logging.warning('\n\n\n$$\n\n' + str(wclass))
         def_setting_dict = widget.get_widget_settings(wclass)
         logging.warning('\n\n\n###\n\n\n' + str(def_setting_dict))
@@ -81,7 +84,7 @@ def __handle_get_edit_instance():
 
     return {
             'template' : 'widget_edit.html',
-            'setting_to_html' : setting_to_html,
+            'setting_to_html' : widget_setting_to_html,
             'instances' : instances,
             'installed_widgets' : get_installed_widgets_details()
     }
@@ -94,6 +97,21 @@ def __handle_post_edit_instance():
         max = len(widget.get_widget_instances())
         instance = widget.WidgetInstance(widget_id=widget_id, widget_order=max)
         instance.put()
+    elif form.get('btn')=='edit':
+        # update:
+        instance = widget.get_widget_instance(form.get('id'))
+        defaults = widget.get_widget_settings(widget.get_installed_widget(instance.widget_id))
+        args = form.arguments()
+        d = {}
+        for arg in args:
+            if arg in defaults:
+                d[arg] = form.get(arg)
+        import logging
+        logging.warning('update... ' + str(d))
+        widget.update_instance_settings(instance, d)
+    elif form.get('btn')=='remove':
+        # remove:
+        widget.delete_widget_instance(form.get('id'))
     return __handle_get_edit_instance()
 
 def __handle_get_list_widget():
@@ -103,7 +121,7 @@ def __handle_get_list_widget():
             'installed_widgets' : get_installed_widgets_details()
     }
 
-def setting_to_html(name, widget_setting):
+def widget_setting_to_html(name, widget_setting):
     '''
     Generate HTML input for WidgetSetting.
     
@@ -111,18 +129,18 @@ def setting_to_html(name, widget_setting):
       HTML code like '<input name=.../>'
     '''
     if isinstance(widget_setting, widget.WidgetSelectSetting):
-        list = [r'<select name="%s">' % name]
+        list = [r'<select name="%s" class="widget-select">' % name]
         for opts in widget_setting.selections:
-            if opts[0]==widget_setting.default:
+            if opts[0]==widget_setting.value:
                 list.append(r'<option value="%s" selected="selected">%s</option>' % opts)
             else:
                 list.append(r'<option value="%s">%s</option>' % opts)
         list.append('</select>')
         return ''.join(list)
     if isinstance(widget_setting, widget.WidgetCheckedSetting):
-        if widget_setting.default==widget_setting.value:
-            return '<label><input name="%s" type="checkbox" value="%s" checked="checked"/>%s</label>' % (name, widget_setting.default, widget_setting.label)
-        return '<label><input name="%s" type="checkbox" value="%s"/>%s</label>' % (name, widget_setting.default, widget_setting.label)
+        if widget_setting.value=='True':
+            return '<label><input name="%s" type="checkbox" value="True" checked="checked"/>%s</label>' % (name, widget_setting.label)
+        return '<label><input name="%s" type="checkbox" value="True"/>%s</label>' % (name, widget_setting.label)
     if isinstance(widget_setting, widget.WidgetPasswordSetting):
-        return '<input name="%s" type="password" value="%s" maxlength="255"/>' % (name, widget_setting.default)
-    return '<input name="%s" type="text" value="%s" maxlength="255"/>' % (name, widget_setting.default)
+        return '<input name="%s" type="password" value="%s" maxlength="255" class="widget-input"/>' % (name, widget_setting.value)
+    return '<input name="%s" type="text" value="%s" maxlength="255" class="widget-input"/>' % (name, widget_setting.value)

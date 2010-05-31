@@ -5,10 +5,8 @@
     <div class="tr">
       <div class="td" style="width:3%"><input type="checkbox" id="select_all" name="select_all" /></div>
       <div class="td" style="width:26%">Name</div>
-      <div class="td" style="width:18%">Author</div>
-      <div class="td" style="width:30%">Description</div>
-      <div class="td" style="width:6%">&nbsp;</div>
-      <div class="td" style="width:11%">Date</div>
+      <div class="td" style="width:20%">Author</div>
+      <div class="td" style="width:45%">Description</div>
     </div>
   </div>
   <div class="panel-content" style="display:table; padding:0px">
@@ -20,14 +18,18 @@
     #set $odd=''
     #end if
     <div class="tr${odd}">
-      <div class="td" style="width:3%"><input type="checkbox" id="a" name="a" /></div>
+      <div class="td" style="width:3%"><input type="checkbox" name="a" /></div>
       <div class="td" style="width:26%">
         <div style="font-size:1.1em;font-weight:bold">${w.name}</div>
       </div>
-      <div class="td" style="width:18%">${w.author}</div>
-      <div class="td" style="width:30%">${w.description}</div>
-      <div class="td" style="width:6%">&nbsp;</div>
-      <div class="td" style="width:11%"></div>
+      <div class="td" style="width:20%">
+      #if $w.url
+        <a href="${w.url}" target="_blank">${w.author}</a>
+      #else
+        ${w.author}
+      #end if
+      </div>
+      <div class="td" style="width:45%">${w.description}</div>
     </div>
   #end for
   #if not $installed_widgets
