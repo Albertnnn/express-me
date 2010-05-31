@@ -57,3 +57,18 @@ div.td { display:table-cell; padding:3px; }
 .form-field-title { font-size:1.1em }
 .form-field-input { width: 95% }
 
+.widget-input { width:90% }
+.widget-select { width:90% }
+
+.error,
+.notice, 
+.success    { padding: .8em; margin-bottom: 1em; border: 1px solid #ddd; }
+
+.error      { background: #FBE3E4; color: #8a1f11; border-color: #FBC2C4; }
+.notice     { background: #FFF6BF; color: #514721; border-color: #FFD324; }
+.success    { background: #E6EFC2; color: #264409; border-color: #C6D880; }
+.error a    { color: #8a1f11; }
+.notice a   { color: #514721; }
+.success a  { color: #264409; }
+
+.info { font-size:1.1em;font-weight:bold;background-color:#f}
