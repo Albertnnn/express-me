@@ -45,13 +45,10 @@ ${site.title}</title>
     #include $app_main
     </div>
     <div class="span-6 last">
-      <h3>Subscribe</h3>
-      <p>Subscribe the latest feed using:</p>
-      <h3>Follow</h3>
-      <p>Follow me on Twitter</p>
-      <h3>More Widgets...</h3>
-      <p>More widgets comming soon...</p>
-      </div>
+      #for $widget in $widgets
+        $show_widget($widget)
+      #end for
+    </div>
     <hr/>
     <h2 class="alt">Copyright&copy;2010, powered by Express Me!</h2>
   </div>
