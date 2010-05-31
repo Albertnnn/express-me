@@ -42,6 +42,11 @@ indexes:
   - name: reference_key
   - name: comment_date
 
+- kind: WidgetInstance
+  properties:
+  - name: widget_group
+  - name: widget_order
+
 - kind: WikiPage
   properties:
   - name: wiki_title
