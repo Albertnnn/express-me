@@ -19,10 +19,10 @@ import wiki
 from wiki import parser
 
 def __to_unicode(raw):
-    return raw.decode('utf8').replace('_', ' ')
+    return raw.decode('utf8')
 
 def __url_encode(uni_string):
-    return urllib.quote(uni_string.encode('utf8').replace(' ', '_'), '')
+    return urllib.quote(uni_string.encode('utf8'), '')
 
 @get('/')
 def get_main_page():

@@ -95,7 +95,7 @@ class Comment(db.Model):
     comment_date = db.DateTimeProperty(auto_now_add=True)
     comment_content = db.TextProperty(required=True)
 
-def create_comment(ref_key, content, name='', link=''):
+def create_comment(ref_target_key, content, name='', link=''):
     user = 'Guest' # anomymouse user
     if name:
         user = name
@@ -104,7 +104,7 @@ def create_comment(ref_key, content, name='', link=''):
         link = '/manage/profile/' + str(context.user.key())
     ip = context.request.remote_addr
     content = context.form.get('content')
-    c = Comment(reference_key=ref_key, comment_user=user, comment_link=link, comment_ip=ip, comment_content=content)
+    c = Comment(reference_key=ref_target_key, comment_user=user, comment_link=link, comment_ip=ip, comment_content=content)
     c.put()
     return c
 
