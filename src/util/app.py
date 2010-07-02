@@ -100,7 +100,7 @@ def proxy(url):
     buffer.append(result.content)
     cached_data = '\n'.join(buffer)
     if cached_time>0:
-        memcache.add(url, cached_data, cached_time)
+        memcache.set(url, cached_data, cached_time)
         logging.info('Put cached content after url fetch: %s' % url)
 
     # write to context.response:
