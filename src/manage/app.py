@@ -16,7 +16,7 @@ from exweb import HttpForbiddenError
 import os
 import urllib
 
-import manage
+from manage import shared
 
 @mapping('/register')
 def register():
@@ -28,12 +28,12 @@ def register():
     # handle post:
     form = context.form
     email = form.get('email').strip().lower()
-    user = manage.User.all().filter('user_email =', email).get()
+    user = shared.User.all().filter('user_email =', email).get()
     if user is not None:
         return 'register.html', {'error':'Email is already registered.'}
     passwd = form.get('passwd')
     nicename = form.get_escape('nicename').strip()
-    user = manage.User(
+    user = shared.User(
             user_email = email,
             user_passwd = passwd,
             user_nicename = nicename,
@@ -59,13 +59,13 @@ def google():
     email = gu.email().lower()
     nicename = gu.nickname()
     # check if user exist:
-    user = manage.get_user_by_email(email)
+    user = shared.get_user_by_email(email)
     if user is None:
         # auto-create new user:
         role = get_default_role()
         if users.is_current_user_admin():
-            role = manage.USER_ROLE_ADMINISTRATOR
-        user = manage.create_user(role, email, manage.EMPTY_PASSWORD, nicename, '')
+            role = shared.USER_ROLE_ADMINISTRATOR
+        user = shared.create_user(role, email, '', nicename, '')
     redirect = context.query.get('redirect', '/')
     return 'redirect:' + redirect
 
@@ -101,33 +101,35 @@ def sign_in():
     # handle post:
     form = context.form
     email = form.get('email').lower()
-    passwd = form.get('passwd')
-    if passwd==manage.EMPTY_PASSWORD:
-        passwd = ''
+    passwd = form.get('passwd', '')
     redirect = form.get('redirect', '/manage/')
+    signin_failed = ('signin.html', {'error' : 'Invalid email or password.', 'redirect' : redirect})
+    if not email or not passwd:
+        return signin_failed
+
     expires = manage.COOKIE_EXPIRES_MAX
     try:
         expires = int(form.get('expires'))
     except ValueError:
         pass
-    user = manage.User.all().filter('user_email =', email).filter('user_passwd =', passwd).get()
+    user = shared.get_user_by_passwd(email, passwd)
     if user is not None:
         key = str(user.key())
         value = manage.make_sign_on_cookie(key, passwd, expires)
         context.set_cookie(manage.COOKIE_AUTO_SIGN_ON, value, expires)
         return 'redirect:' + redirect
     else:
-        return 'signin.html', {'error' : 'Invalid email or password.', 'redirect' : redirect}
+        return signin_failed
 
 @post('/upload/$')
 def upload(type):
     if context.user is None:
         raise HttpForbiddenError()
     # get photo service:
-    provider = manage.get_setting('storage', 'photo_provider', '')
+    provider = shared.get_setting('storage', 'photo_provider', '')
     if not provider:
         return __upload_result(403, '', '', 'You do not configure a photo provider. Go to "Setting", "Storage" to configure a photo provider.')
-    settings = manage.get_settings('storage')
+    settings = shared.get_settings('storage')
     prefix = provider[:-len('PhotoProvider')].replace('.', '_')
     kw = {}
     for key in settings:
@@ -249,8 +251,8 @@ def __get_visible_menu(role, appname, menuname, menuitems):
     return menu
 
 def get_default_role():
-    return int(manage.get_setting(
-            manage.SETTING_GLOBAL,
-            manage.SETTING_GLOBAL_DEFAULT_ROLE,
-            `manage.USER_ROLE_SUBSCRIBER`
+    return int(shared.get_setting(
+            shared.SETTING_GLOBAL,
+            shared.SETTING_GLOBAL_DEFAULT_ROLE,
+            `shared.USER_ROLE_SUBSCRIBER`
     ))

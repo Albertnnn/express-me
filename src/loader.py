@@ -8,7 +8,6 @@ Load template by theme
 '''
 
 import os
-import manage
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -16,6 +15,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from exweb import context
 from exweb.dispatcher import Dispatcher
 
+from manage import shared
 import widget
 
 def load_template(selected=''):
@@ -24,25 +24,25 @@ def load_template(selected=''):
     '''
     themes = manage.get_themes()
     if selected=='':
-        selected = manage.get_setting('theme', 'selected', '')
+        selected = shared.get_setting('theme', 'selected', '')
     if not selected in themes:
         selected = themes[0]
     return ('theme', selected, 'template.html')
 
 def update_model(rootpath, appname, model):
     model['site'] = {
-            'title' : manage.get_setting('global', 'site_title', 'ExpressMe'),
-            'subtitle' : manage.get_setting('global', 'site_subtitle', 'powered by ExpressMe')
+            'title' : shared.get_setting('global', 'site_title', 'ExpressMe'),
+            'subtitle' : shared.get_setting('global', 'site_subtitle', 'powered by ExpressMe')
     }
-    model['navigations'] = manage.get_navigations()
+    model['navigations'] = shared.get_navigations()
     model['user'] = context.user
     model['app'] = appname
     # set current theme = 'simple':
-    theme = manage.get_setting('theme', 'selected', '')
+    theme = shared.get_setting('theme', 'selected', '')
     if not theme:
-        themes = manage.get_themes()
+        themes = shared.get_themes()
         theme = themes[0]
-        manage.save_setting('theme', 'selected', theme)
+        shared.save_setting('theme', 'selected', theme)
     model['theme'] = theme
     # add widgets:
     instances = widget.get_widget_instances()

@@ -8,19 +8,20 @@ app management for User, global settings.
 '''
 
 from exweb import context
-import manage
+from manage import shared
+import appconfig
 
 appmenus = [
         ('User', [
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
-                manage.AppMenuItem(manage.USER_ROLE_SUBSCRIBER, 'Your Profile', 'profile')
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
+                manage.AppMenuItem(shared.USER_ROLE_SUBSCRIBER, 'Your Profile', 'profile')
         ]),
         ('Setting', [
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Theme', 'theme'),
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Settings', 'setting'),
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Storage', 'storage')
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Theme', 'theme'),
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Settings', 'setting'),
+                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Storage', 'storage')
         ])
 ]
 
@@ -37,22 +38,21 @@ def __handle_post_navigation():
         t = form.get_escape(key_t, '')
         u = form.get(key_u, '')
         if t and u:
-            manage.save_setting('navigation', key_t, t)
-            manage.save_setting('navigation', key_u, u)
+            shared.save_setting('navigation', key_t, t)
+            shared.save_setting('navigation', key_u, u)
     dict = __handle_get_navigation()
     dict['message'] = 'Your navigations are saved.'
     return dict
 
 def __handle_get_navigation():
     guides = [('- Select -', '#'), ('Home', '/')]
-    import appconfig
     for appname in appconfig.apps:
         module = __import__(appname + '.appmanage')
         manage_nav = getattr(module.appmanage, 'manage_nav', None)
         if callable(manage_nav):
             guides.extend(manage_nav())
     guides.append(('Custom', ''))
-    navs = manage.get_settings('navigation')
+    navs = shared.get_settings('navigation')
     if not navs:
         navs['title_0'] = 'Home'
         navs['url_0'] = '/'
@@ -77,8 +77,8 @@ def __handle_get_theme():
     '''
     Display all themes under dir '/theme'
     '''
-    themes = manage.get_themes()
-    selected = manage.get_setting('theme', 'selected', '')
+    themes = shared.get_themes()
+    selected = shared.get_setting('theme', 'selected', '')
     if not selected in themes:
         selected = themes[0]
     return {
@@ -91,13 +91,13 @@ def __handle_post_theme():
     selected = context.form.get('theme', '')
     dict = __handle_get_theme()
     if selected in dict['themes']:
-        manage.save_setting('theme', 'selected', selected)
+        shared.save_setting('theme', 'selected', selected)
         dict['selected'] = selected
         dict['message'] = 'New theme applied. <a href="/" target="_blank">View Site</a>'
     return dict
 
 def __handle_get_setting():
-    settings = manage.get_settings('global')
+    settings = shared.get_settings('global')
     return {
             'template' : 'setting.html',
             # site settings:
@@ -124,8 +124,8 @@ def __handle_post_setting():
     Save all settings
     '''
     form = context.form
-    manage.save_setting('global', 'site_title', form.get('site_title'))
-    manage.save_setting('global', 'site_subtitle', form.get('site_subtitle'))
+    shared.save_setting('global', 'site_title', form.get('site_title'))
+    shared.save_setting('global', 'site_subtitle', form.get('site_subtitle'))
     dict = __handle_get_setting()
     dict['message'] = 'Your settings are saved.'
     return dict
@@ -139,7 +139,7 @@ def __handle_get_storage():
     import storage
     photo_module_names = storage.find_photo_modules()
     photo_providers = [mod.PhotoProvider for mod in [__import__('storage.photo.' + p, globals(), locals(), ['PhotoProvider']) for p in photo_module_names]]
-    settings = manage.get_settings('storage')
+    settings = shared.get_settings('storage')
     def __get_provider_setting(provider, name):
         key = provider.__module__.replace('.', '_') + '_' + name
         if key in settings:
@@ -162,12 +162,12 @@ def __handle_post_storage():
     form = context.form
     args = form.arguments()
     if 'photo_provider' in args:
-        manage.save_setting('storage', 'photo_provider', form.get('photo_provider'))
+        shared.save_setting('storage', 'photo_provider', form.get('photo_provider'))
         photo_args = [arg for arg in args if arg.startswith('storage_photo_')]
         for arg in photo_args:
-            manage.save_setting('storage', arg, form.get(arg, ''))
-    manage.save_setting('storage', 'photo_proxied', form.get('photo_proxied'))
-    manage.save_setting('storage', 'file_proxied', form.get('file_proxied'))
+            shared.save_setting('storage', arg, form.get(arg, ''))
+    shared.save_setting('storage', 'photo_proxied', form.get('photo_proxied'))
+    shared.save_setting('storage', 'file_proxied', form.get('file_proxied'))
     dict = __handle_get_storage()
     dict['message'] = 'Your storage settings are saved.'
     return dict
@@ -175,8 +175,8 @@ def __handle_post_storage():
 def __handle_get_edit_user():
     return {
             'template' : 'user_edit.html',
-            'get_role_name' : manage.get_role_name,
-            'users' : manage.get_users()
+            'get_role_name' : shared.get_role_name,
+            'users' : shared.get_users()
     }
 
 def __handle_get_add_user():
@@ -191,7 +191,7 @@ def __handle_post_add_user():
     hashed_passwd = form.get('passwd')
     nicename = form.get('nicename')
     website = form.get('website')
-    user = manage.create_user(role, email, hashed_passwd, nicename, website)
+    user = shared.create_user(role, email, hashed_passwd, nicename, website)
     return {
             'template' : 'message.html',
             'message' : 'New user created',
@@ -211,7 +211,7 @@ def __handle_post_profile():
     nicename = form.get('nicename')
     website = form.get('website')
     hashed_passwd = form.get('passwd', '')
-    user = manage.get_user_by_email(context.user.user_email)
+    user = shared.get_user_by_email(context.user.user_email)
     user.user_nicename = nicename
     user.user_website = website
     if hashed_passwd:

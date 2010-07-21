@@ -132,8 +132,7 @@ class Dispatcher(webapp.RequestHandler):
         context.set_cookie = set_cookie
         context.remove_cookie = remove_cookie
         try:
-            apps = list(appconfig.apps)
-            apps.extend(['widget', 'manage', 'util'])
+            apps = appconfig.apps
             path = context.request.path
             if path=='/':
                 return self.__render_string('redirect:/' + apps[0])

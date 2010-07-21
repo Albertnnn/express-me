@@ -7,7 +7,7 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Blog app management.
 '''
 
-import blog
+from blog import store
 
 from exweb import context
 
@@ -39,7 +39,7 @@ def manage_nav():
         A list contains (title, url).
     '''
     navs = [('Posts', '/blog/')]
-    pages = blog.get_pages()
+    pages = store.get_pages()
     for page in pages:
         navs.append((page.post_title, '/blog/page/' + str(page.key())))
     return navs
@@ -64,7 +64,7 @@ def __handle_get_add_post():
     '''
     show form of creating a new post
     '''
-    cats = blog.get_categories()
+    cats = store.get_categories()
     return {
             'template' : 'editor.html',
             'post_action_title' : 'Add a New Post',
@@ -72,7 +72,7 @@ def __handle_get_add_post():
             'post_category' : cats[0],
             'post_content' : '',
             'post_tags' : '',
-            'tags' : blog.get_hot_tags(10),
+            'tags' : store.get_hot_tags(10),
             'categories' : cats
     }
 
@@ -83,7 +83,7 @@ def __handle_post_add_page():
     form = context.form
     title = form.get_escape('title')
     content = form.get('content')
-    post = blog.BlogPost(
+    post = store.BlogPost(
             post_static = True,
             post_owner = context.user,
             post_title = title,
@@ -91,7 +91,7 @@ def __handle_post_add_page():
             post_excerpt = '',
             post_category = None,
             post_tags = [],
-            post_state = blog.POST_STATE_PUBLISHED
+            post_state = store.POST_STATE_PUBLISHED
     )
     post.put()
     return {
@@ -112,29 +112,29 @@ def __handle_post_add_post():
     content = form.get('content')
     categoryKey = form.get('categoryKey')
     tags = __get_tags(form)
-    state = blog.POST_STATE_PUBLISHED
+    state = store.POST_STATE_PUBLISHED
     if context.user.user_role >= manage.USER_ROLE_CONTRIBUTOR:
-        state = blog.POST_STATE_PENDING
+        state = store.POST_STATE_PENDING
     # create a new post:
-    post = blog.BlogPost(
+    post = store.BlogPost(
             post_static = False,
             post_owner = context.user,
             post_title = title,
             post_content = content,
             post_excerpt = '',
-            post_category = blog.get_category(categoryKey),
+            post_category = store.get_category(categoryKey),
             post_tags = [t.lower() for t in tags],
             post_state = state
     )
     post.put()
     for t in tags:
-        blog.create_tag(t, 1)
+        store.create_tag(t, 1)
     dict = {
             'template' : 'message.html',
-            'message' : state==blog.POST_STATE_PUBLISHED and 'Post published.' or 'Post submitted.',
-            'detail' : state==blog.POST_STATE_PUBLISHED and 'Your post has been published successfully!' or 'Your post has been submitted and pending for approval.',
+            'message' : state==store.POST_STATE_PUBLISHED and 'Post published.' or 'Post submitted.',
+            'detail' : state==store.POST_STATE_PUBLISHED and 'Your post has been published successfully!' or 'Your post has been submitted and pending for approval.',
     }
-    if state==blog.POST_STATE_PUBLISHED:
+    if state==store.POST_STATE_PUBLISHED:
         dict['url'] = '/blog/post/' + str(post.key())
         dict['url_title'] = 'View Post'
         dict['url_blank'] = True
@@ -143,7 +143,7 @@ def __handle_post_add_post():
 def __handle_get_edit_page():
     id = context.form.get('id', '')
     if id:
-        post = blog.BlogPost.get(id)
+        post = store.BlogPost.get(id)
         return {
                 'template' : 'editor.html',
                 'post_action_title' : 'Edit a Page',
@@ -153,13 +153,13 @@ def __handle_get_edit_page():
         }
     return {
             'template' : 'page_edit_list.html',
-            'posts' : blog.get_pages()
+            'posts' : store.get_pages()
     }
 
 def __handle_get_edit_post():
     id = context.form.get('id', '')
     if id:
-        post = blog.BlogPost.get(id)
+        post = store.BlogPost.get(id)
         return {
                 'template' : 'editor.html',
                 'post_action_title' : 'Edit a Post',
@@ -168,14 +168,14 @@ def __handle_get_edit_post():
                 'post_category' : post.post_category,
                 'post_content' : post.post_content,
                 'post_tags' : post.post_tags_as_string(),
-                'tags' : blog.get_hot_tags(10),
-                'categories' : blog.get_categories()
+                'tags' : store.get_hot_tags(10),
+                'categories' : store.get_categories()
         }
     from time import time
-    posts = blog.get_posts(time(), 21)
+    posts = store.get_posts(time(), 21)
     return {
             'template' : 'post_edit_list.html',
-            'categories' : blog.get_categories(),
+            'categories' : store.get_categories(),
             'posts' : posts
     }
 
@@ -184,7 +184,7 @@ def __handle_post_edit_page():
     id = form.get('id')
     title = form.get_escape('title')
     content = form.get('content')
-    post = blog.BlogPost.get(id)
+    post = store.BlogPost.get(id)
     post.post_title = title
     post.post_content = content
     post.put()
@@ -204,10 +204,10 @@ def __handle_post_edit_post():
     content = form.get('content')
     categoryKey = form.get('categoryKey')
     tags = __get_tags(form)
-    post = blog.BlogPost.get(id)
+    post = store.BlogPost.get(id)
     post.post_title = title
     post.post_content = content
-    post.post_category = blog.get_category(categoryKey)
+    post.post_category = store.get_category(categoryKey)
     # handle tags:
     old_tags = post.post_tags[:]
     post.post_tags = [t.lower() for t in tags]
@@ -217,15 +217,15 @@ def __handle_post_edit_post():
         if t in old_tags:
             old_tags.remove(t)
         else:
-            blog.create_tag(t, 1)
+            store.create_tag(t, 1)
     for t in old_tags:
-        blog.create_tag(t, -1)
+        store.create_tag(t, -1)
     dict = {
             'template' : 'message.html',
-            'message' : post.post_state==blog.POST_STATE_PUBLISHED and 'Post published.' or 'Post submitted.',
-            'detail' : post.post_state==blog.POST_STATE_PUBLISHED and 'Your post has been published successfully!' or 'Your post has been submitted and pending for approval.'
+            'message' : post.post_state==store.POST_STATE_PUBLISHED and 'Post published.' or 'Post submitted.',
+            'detail' : post.post_state==store.POST_STATE_PUBLISHED and 'Your post has been published successfully!' or 'Your post has been submitted and pending for approval.'
     }
-    if post.post_state==blog.POST_STATE_PUBLISHED:
+    if post.post_state==store.POST_STATE_PUBLISHED:
         dict['url'] = '/blog/post/' + id
         dict['url_title'] = 'View Post'
         dict['url_blank'] = True
@@ -234,14 +234,14 @@ def __handle_post_edit_post():
 def __handle_get_categories():
     return {
             'template' : 'post_categories.html',
-            'categories' : blog.get_categories()
+            'categories' : store.get_categories()
     }
 
 def __handle_post_categories():
     form = context.form
     name = form.get_escape('name')
     description = form.get_escape('description')
-    blog.create_category(name, description)
+    store.create_category(name, description)
     return {
             'template' : 'message.html',
             'message' : 'Category created.',
@@ -277,8 +277,8 @@ def __handle_post_settings():
 def __handle_get_tags():
     return {
             'template' : 'post_tags.html',
-            'tags' : blog.get_tags(),
-            'hot_tags' : blog.get_hot_tags(20)
+            'tags' : store.get_tags(),
+            'hot_tags' : store.get_hot_tags(20)
     }
 
 def __get_tags(form):

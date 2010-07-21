@@ -15,6 +15,7 @@ import os
 
 from google.appengine.ext import db
 from exweb import context
+from manage import shared
 
 class AppMenu(object):
     def __init__(self, title):
@@ -48,135 +49,11 @@ def date_format(date):
 def time_format(time):
     return time.strftime('%H:%M:%S')
 
-# empty password:
-EMPTY_PASSWORD = '________________________________'
-
-# user role constants:
-
-USER_ROLE_ADMINISTRATOR = 0
-USER_ROLE_EDITOR = 10
-USER_ROLE_AUTHOR = 20
-USER_ROLE_CONTRIBUTOR = 30
-USER_ROLE_SUBSCRIBER = 40
-
-def get_role_name(role):
-    names = ('Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber')
-    return names[role//10]
-
-class UserExistError(StandardError):
-    pass
-
-class User(db.Model):
-    'a single user'
-    user_role = db.IntegerProperty(required=True, default=USER_ROLE_SUBSCRIBER)
-    user_email = db.EmailProperty(required=True)
-    user_passwd = db.StringProperty(required=True)
-    user_nicename = db.StringProperty(default='')
-    user_website = db.StringProperty(indexed=False, default='')
-    user_registered = db.DateTimeProperty(auto_now_add=True)
-    user_locked = db.BooleanProperty(required=True, default=False)
-
-class Setting(db.Model):
-    '''
-    a single key-value setting grouped by property 'setting_group'
-    '''
-    setting_group = db.StringProperty(required=True)
-    setting_key = db.StringProperty(required=True)
-    setting_value = db.StringProperty(indexed=False, default='')
-
-class Comment(db.Model):
-    '''
-    Comment on published post, wiki page, photo, etc.
-    '''
-    reference_key = db.StringProperty(required=True)
-    comment_user = db.StringProperty(default='')
-    comment_link = db.StringProperty(default='')
-    comment_ip = db.StringProperty(required=True)
-    comment_date = db.DateTimeProperty(auto_now_add=True)
-    comment_content = db.TextProperty(required=True)
-
-def create_comment(ref_target_key, content, name='', link=''):
-    user = 'Guest' # anomymouse user
-    if name:
-        user = name
-    if context.user is not None:
-        user = context.user.user_nicename
-        link = '/manage/profile/' + str(context.user.key())
-    ip = context.request.remote_addr
-    content = context.form.get('content')
-    c = Comment(reference_key=ref_target_key, comment_user=user, comment_link=link, comment_ip=ip, comment_content=content)
-    c.put()
-    return c
-
-def get_comments(key, sort_asc=True):
-    order = sort_asc and 'comment_date' or '-comment_date'
-    return Comment.all().filter('reference_key =', key).order(order).fetch(1000)
-
-def delete_comment(comment_key):
-    c = Comment.get(comment_key)
-    if c is not None:
-        db.delete(c)
-
-def delete_all_comments(ref_key):
-    db.delete(get_comments(ref_key))
-
 # cookie constants:
 
 COOKIE_AUTO_SIGN_ON = '_auto_signon_'
 COOKIE_EXPIRES_MIN = 86400
 COOKIE_EXPIRES_MAX = 31536000
-
-SETTING_GLOBAL = 'global'
-SETTING_GLOBAL_DEFAULT_ROLE = 'default-role'
-
-def save_setting(group, key, value):
-    '''
-    Save a stting's value by its group and key.
-    '''
-    settings = Setting.all().filter('setting_group =', group).filter('setting_key =', key).fetch(1)
-    if settings:
-        settings[0].setting_value = value
-        settings[0].put()
-    else:
-        s = Setting(setting_group = group, setting_key = key, setting_value = value)
-        s.put()
-
-def get_setting(group_or_dict, key, default_value=''):
-    '''
-    get a setting's value by its group (usually is app name) and key.
-    
-    Args:
-        group_or_dict: setting group as string, or dict.
-        key: key of setting.
-        default_value: if not found, default_value will returned, default to ''.
-    Returns:
-        setting value.
-    '''
-    if isinstance(group_or_dict, dict):
-        if key in group_or_dict:
-            return group_or_dict[key]
-        return default_value
-    settings = Setting.all().filter('setting_group =', group_or_dict).filter('setting_key =', key).fetch(1)
-    if settings:
-        return settings[0].setting_value
-    return default_value
-
-def get_settings(group):
-    '''
-    get all settings by its group (usually is app name).
-    
-    Args:
-        group: group of setting.
-    Returns:
-        a dict (maybe empty) contains key-value pairs.
-    '''
-    settings = Setting.all().filter('setting_group =', group).fetch(1000)
-    if not settings:
-        return {}
-    all = {}
-    for setting in settings:
-        all[setting.setting_key] = setting.setting_value
-    return all
 
 NAV_MAX = 10
 
@@ -187,7 +64,7 @@ def get_navigations():
     Returns:
         A list contains multiple tuple of (title, url).
     '''
-    navs = get_settings('navigation')
+    navs = shared.get_settings('navigation')
     if not navs:
         import appconfig
         return [(x, '/' + x) for x in appconfig.apps]
@@ -205,42 +82,6 @@ def get_navigations():
             navigations.append((title, url))
     return navigations
 
-def create_user(role, email, hashed_passwd, nicename, website):
-    '''
-    Create a new user.
-    
-    Returns:
-        User object.
-    '''
-    email = email.strip().lower()
-    if is_user_exist(email):
-        raise UserExistError
-    user = User(user_role = role, user_email = email, user_passwd = hashed_passwd, user_nicename = nicename, user_website = website)
-    user.put()
-    return user
-
-def get_users(role=None):
-    if role is None:
-        return User.all().order('user_registered').fetch(100)
-    return User.all().order('user_registered').filter('user_role =', role).fetch(100)
-
-def is_user_exist(email):
-    return User.all().filter('user_email =', email).fetch(1)
-
-def get_user_by_email(email):
-    '''
-    Get user by email.
-    
-    Args:
-        email: email address.
-    Return:
-        User object or None if no such user.
-    '''
-    users = User.all().filter('user_email =', email).fetch(1)
-    if users:
-        return users[0]
-    return None
-
 def get_user(key):
     '''
     Get User object by key.
@@ -251,7 +92,7 @@ def get_user(key):
     Returns:
         User object or None if not found.
     '''
-    return User.get(key)
+    return shared.User.get(key)
 
 def make_sign_on_cookie(key, passwd, expire_in_seconds):
     # make sign on cookie with following format:
