@@ -9,6 +9,7 @@ app management for User, global settings.
 
 from exweb import context
 from manage import shared
+import manage
 import appconfig
 
 appmenus = [
@@ -77,7 +78,7 @@ def __handle_get_theme():
     '''
     Display all themes under dir '/theme'
     '''
-    themes = shared.get_themes()
+    themes = manage.get_themes()
     selected = shared.get_setting('theme', 'selected', '')
     if not selected in themes:
         selected = themes[0]

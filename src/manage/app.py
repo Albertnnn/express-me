@@ -16,6 +16,7 @@ from exweb import HttpForbiddenError
 import os
 import urllib
 
+import manage
 from manage import shared
 
 @mapping('/register')
