@@ -13,6 +13,22 @@ from google.appengine.ext import db
 
 from exweb import context
 
+class AppMenu(object):
+    '''
+    A menu object displayed in management console.
+    '''
+    def __init__(self, title):
+        self.title = title
+
+class AppMenuItem(object):
+    '''
+    A menu item that belongs to an AppMenu.
+    '''
+    def __init__(self, role, title, action):
+        self.role = role
+        self.title = title
+        self.action = action
+
 ###############################################################################
 # User
 ###############################################################################

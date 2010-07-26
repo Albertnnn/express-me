@@ -11,23 +11,21 @@ from blog import store
 
 from exweb import context
 
-from manage import AppMenuItem
-from manage import USER_ROLE_ADMINISTRATOR
-from manage import USER_ROLE_CONTRIBUTOR
+from manage import shared
 
 import manage
 
 appmenus = [
         ('Post', [
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Edit', 'edit_post'),
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Add New', 'add_post'),
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Tags', 'tags'),
-                AppMenuItem(USER_ROLE_ADMINISTRATOR, 'Categories', 'categories'),
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Settings', 'settings')
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Edit', 'edit_post'),
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Add New', 'add_post'),
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Tags', 'tags'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Categories', 'categories'),
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Settings', 'settings')
         ]),
         ('Page', [
-                AppMenuItem(USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_page'),
-                AppMenuItem(USER_ROLE_ADMINISTRATOR, 'Add New', 'add_page')
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_page'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Add New', 'add_page')
         ])
 ]
 
@@ -113,7 +111,7 @@ def __handle_post_add_post():
     categoryKey = form.get('categoryKey')
     tags = __get_tags(form)
     state = store.POST_STATE_PUBLISHED
-    if context.user.user_role >= manage.USER_ROLE_CONTRIBUTOR:
+    if context.user.user_role >= shared.USER_ROLE_CONTRIBUTOR:
         state = store.POST_STATE_PENDING
     # create a new post:
     post = store.BlogPost(
@@ -251,16 +249,16 @@ def __handle_post_categories():
     }
 
 def __handle_get_settings():
-    settings = manage.get_settings('blog_setting')
+    settings = shared.get_settings('blog_setting')
     return {
             'template' : 'setting.html',
-            'posts_per_page' : manage.get_setting(settings, 'posts_per_page', '20'),
-            'posts_in_feed' : manage.get_setting(settings, 'posts_in_feed', '20'),
-            'feed_full' : manage.get_setting(settings, 'feed_full', 'True'),
-            'feed_title' : manage.get_setting(settings, 'feed_title', 'Rss Feed'),
-            'feed_desc' : manage.get_setting(settings, 'feed_desc', 'Subscribe Rss Feed'),
-            'feed_proxy' : manage.get_setting(settings, 'feed_proxy', ''),
-            'comment_allow' : manage.get_setting(settings, 'comment_allow', 'registered')
+            'posts_per_page' : shared.get_setting(settings, 'posts_per_page', '20'),
+            'posts_in_feed' : shared.get_setting(settings, 'posts_in_feed', '20'),
+            'feed_full' : shared.get_setting(settings, 'feed_full', 'True'),
+            'feed_title' : shared.get_setting(settings, 'feed_title', 'Rss Feed'),
+            'feed_desc' : shared.get_setting(settings, 'feed_desc', 'Subscribe Rss Feed'),
+            'feed_proxy' : shared.get_setting(settings, 'feed_proxy', ''),
+            'comment_allow' : shared.get_setting(settings, 'comment_allow', 'registered')
     }
 
 def __handle_post_settings():
@@ -269,7 +267,7 @@ def __handle_post_settings():
     '''
     form = context.form
     for key in ['posts_per_page', 'posts_in_feed', 'feed_full', 'feed_title', 'feed_desc', 'feed_proxy', 'comment_allow']:
-        manage.save_setting('blog_setting', key, form.get(key))
+        shared.save_setting('blog_setting', key, form.get(key))
     dict = __handle_get_settings()
     dict['message'] = 'Your settings are saved.'
     return dict

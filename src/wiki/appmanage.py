@@ -11,16 +11,14 @@ import wiki
 
 from exweb import context
 
-from manage import AppMenuItem
-from manage import USER_ROLE_ADMINISTRATOR
-from manage import USER_ROLE_CONTRIBUTOR
+from manage import shared
 
 import manage
 
 appmenus = [
         ('Wiki', [
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Pages', 'edit_pages'),
-                AppMenuItem(USER_ROLE_CONTRIBUTOR, 'Settings', 'settings')
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Pages', 'edit_pages'),
+                shared.AppMenuItem(shared.USER_ROLE_CONTRIBUTOR, 'Settings', 'settings')
         ])
 ]
 
@@ -74,7 +72,7 @@ def __handle_get_settings():
     '''
     return {
             'template' : 'setting.html',
-            'entry' : manage.get_setting('wiki', 'entry', 'Main Page'),
+            'entry' : shared.get_setting('wiki', 'entry', 'Main Page'),
             'edit_level' : '',
             'approve_level' : ''
     }
@@ -84,7 +82,7 @@ def __handle_post_settings():
     update settings of wiki
     '''
     entry = context.form.get('entry', 'Main Page')
-    manage.save_setting('wiki', 'entry', entry)
+    shared.save_setting('wiki', 'entry', entry)
     dict = __handle_get_settings();
     dict['message'] = 'Your wiki settings are saved.'
     return dict

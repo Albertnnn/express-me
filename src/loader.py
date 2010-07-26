@@ -15,6 +15,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from exweb import context
 from exweb.dispatcher import Dispatcher
 
+import manage
 from manage import shared
 import widget
 
@@ -34,13 +35,13 @@ def update_model(rootpath, appname, model):
             'title' : shared.get_setting('global', 'site_title', 'ExpressMe'),
             'subtitle' : shared.get_setting('global', 'site_subtitle', 'powered by ExpressMe')
     }
-    model['navigations'] = shared.get_navigations()
+    model['navigations'] = manage.get_navigations()
     model['user'] = context.user
     model['app'] = appname
     # set current theme = 'simple':
     theme = shared.get_setting('theme', 'selected', '')
     if not theme:
-        themes = shared.get_themes()
+        themes = manage.get_themes()
         theme = themes[0]
         shared.save_setting('theme', 'selected', theme)
     model['theme'] = theme

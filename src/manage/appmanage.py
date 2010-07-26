@@ -14,15 +14,15 @@ import appconfig
 
 appmenus = [
         ('User', [
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
-                manage.AppMenuItem(shared.USER_ROLE_SUBSCRIBER, 'Your Profile', 'profile')
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
+                shared.AppMenuItem(shared.USER_ROLE_SUBSCRIBER, 'Your Profile', 'profile')
         ]),
         ('Setting', [
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Theme', 'theme'),
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Settings', 'setting'),
-                manage.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Storage', 'storage')
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Theme', 'theme'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Settings', 'setting'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Storage', 'storage')
         ])
 ]
 

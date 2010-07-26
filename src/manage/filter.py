@@ -25,6 +25,6 @@ def auto_sign_on_filter():
         from google.appengine.api import users
         gu = users.get_current_user()
         if gu:
-            context.user = manage.get_user_by_email(gu.email())
+            context.user = manage.shared.get_user_by_email(gu.email())
     except ImportError:
         pass

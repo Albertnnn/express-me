@@ -12,12 +12,12 @@ import copy
 
 from exweb import context
 
-import manage
+from manage import shared
 
 appmenus = [
         ('Widget', [
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'List', 'list_widget'),
-                manage.AppMenuItem(manage.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_instance')
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'List', 'list_widget'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_instance')
         ])
 ]
 

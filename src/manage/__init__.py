@@ -17,22 +17,6 @@ from google.appengine.ext import db
 from exweb import context
 from manage import shared
 
-class AppMenu(object):
-    '''
-    A menu object displayed in management console.
-    '''
-    def __init__(self, title):
-        self.title = title
-
-class AppMenuItem(object):
-    '''
-    A menu item that belongs to an AppMenu.
-    '''
-    def __init__(self, role, title, action):
-        self.role = role
-        self.title = title
-        self.action = action
-
 class Page(object):
     def __init__(self, page_index, page_size, total=(-1)):
         assert page_index>0

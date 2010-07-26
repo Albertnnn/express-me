@@ -243,10 +243,10 @@ def __get_visible_menu(role, appname, menuname, menuitems):
         return None
     if type(menuitems)!=type([]):
         return None
-    items = [item for item in menuitems if isinstance(item, manage.AppMenuItem) and item.role>=role]
+    items = [item for item in menuitems if isinstance(item, shared.AppMenuItem) and item.role>=role]
     if not items:
         return None
-    menu = manage.AppMenu(menuname)
+    menu = shared.AppMenu(menuname)
     menu.app = appname
     menu.items = items
     return menu
