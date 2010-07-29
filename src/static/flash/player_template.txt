@@ -1,0 +1,16 @@
+<!--
+  start StrobeMediaPlayback
+  parameters:
+    $width: integer, player width
+    $height: integer, player height
+    $movie_url: string, URL-encoded movie URL
+    $poster_url: string, URL-encoded image URL
+-->
+<object width="${width}" height="${height}">
+  <param name="movie" value="/static/flash/StrobeMediaPlayback.swf"></param>
+  <param name="flashvars" value="src=${movie_url}&poster=${poster_url}&controlBarMode=floating&optimizeInitialIndex=false"></param>
+  <param name="allowFullScreen" value="true"></param>
+  <param name="allowscriptaccess" value="always"></param>
+  <embed src="/static/flash/StrobeMediaPlayback.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="${width}" height="${height}" flashvars="src=${movie_url}&poster=${poster_url}&controlBarMode=floating&optimizeInitialIndex=false"></embed>
+</object>
+<!-- end StrobeMediaPlayback -->
