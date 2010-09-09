@@ -7,7 +7,7 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Blog app management.
 '''
 
-from blog import store
+from blog import blog_store as store
 
 from exweb import context
 
@@ -66,10 +66,7 @@ def __handle_get_add_post():
     return {
             'template' : 'editor.html',
             'post_action_title' : 'Add a New Post',
-            'post_title' : '',
-            'post_category' : cats[0],
-            'post_content' : '',
-            'post_tags' : '',
+            'post' : {'post_title' : '', 'post_category': cats[0], 'post_tags': '', 'post_content__raw__': '' },
             'tags' : store.get_hot_tags(10),
             'categories' : cats
     }
@@ -162,10 +159,7 @@ def __handle_get_edit_post():
                 'template' : 'editor.html',
                 'post_action_title' : 'Edit a Post',
                 'id' : id,
-                'post_title' : post.post_title,
-                'post_category' : post.post_category,
-                'post_content' : post.post_content,
-                'post_tags' : post.post_tags_as_string(),
+                'post' : post,
                 'tags' : store.get_hot_tags(10),
                 'categories' : store.get_categories()
         }
@@ -198,7 +192,7 @@ def __handle_post_edit_page():
 def __handle_post_edit_post():
     form = context.form
     id = form.get('id')
-    title = form.get_escape('title')
+    title = form.get('title')
     content = form.get('content')
     categoryKey = form.get('categoryKey')
     tags = __get_tags(form)

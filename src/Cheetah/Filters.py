@@ -127,13 +127,19 @@ class MaxLen(Filter):
 
 class WebSafe(Filter):
     """Escape HTML entities in $placeholders.
+    (Modified version)
     """
     def filter(self, val, **kw):
         s = super(WebSafe, self).filter(val, **kw)
+        if 'rawExpr' in kw:
+            raw_expr = kw['rawExpr']
+            if raw_expr.find(u'__raw__')!=(-1):
+                return s
         # These substitutions are copied from cgi.escape().
         s = s.replace("&", "&amp;") # Must be done first!
         s = s.replace("<", "&lt;")
         s = s.replace(">", "&gt;")
+        s = s.replace("\"", "&quot;")
         # Process the additional transformations if any.
         if 'also' in kw:
             also = kw['also']

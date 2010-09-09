@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao (askxuefeng@gmail.com)'
-
 '''
 Widget definition
 '''
 
-from google.appengine.ext import db
+__author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import os
 
-DEFAULT_GROUP = 'default'
+from widget.store import DEFAULT_GROUP
+from widget.store import WidgetInstance
+from widget.store import WidgetInstanceSetting
 
 class WidgetSetting(object):
     '''
-    settings of a widget class.
+    settings of a widget class, display as input.
     '''
     __slot__ = ('default', 'required', 'description', 'value')
 
@@ -36,6 +36,11 @@ class WidgetSetting(object):
 
     def is_modified(self):
         return self.default!=self.value
+
+    def __str__(self):
+        return r'''WidgetSetting(default='%s', required=%s, description='%s', value='%s')''' % (self.default, self.required, self.description, self.value)
+
+    __repr__ = __str__
 
 class WidgetSelectSetting(WidgetSetting):
     '''
@@ -115,31 +120,6 @@ class WidgetModel(object):
                 self.__id__,
                 '</p>'
         ])
-
-# db models:
-
-class WidgetInstance(db.Model):
-    '''
-    Store widget instance that can display in widget bar.
-    
-    A widget instance has 3 properties:
-    
-    widget_group: indicate the widget bar name this widget belongs to. Default to DEFAULT_GROUP ('default').
-    widget_id: the widget id, same as parent package name.
-    widget_order: the widget order.
-    '''
-    widget_group = db.StringProperty(required=True, default=DEFAULT_GROUP)
-    widget_id = db.StringProperty(required=True)
-    widget_order = db.IntegerProperty(required=True)
-
-class WidgetInstanceSetting(db.Model):
-    '''
-    store settings of widget instance
-    '''
-    widget_group = db.StringProperty(required=True, default=DEFAULT_GROUP)
-    widget_instance = db.ReferenceProperty(reference_class=WidgetInstance, required=True)
-    setting_name = db.StringProperty(required=True)
-    setting_value = db.StringProperty()
 
 # helper class for db models:
 
@@ -222,19 +202,6 @@ def create_widget_instance(id, settings=None, group=DEFAULT_GROUP):
             ws.put()
     return instance
 
-def delete_widget_instance(key):
-    '''
-    Delete a Widget instance and all its settings.
-    
-    Args:
-      key: Widget instance key.
-    Returns:
-      None
-    '''
-    instance = WidgetInstance.get(key)
-    db.delete(get_instance_settings(instance))
-    instance.delete()
-
 def get_widget_instance(key):
     '''
     Get widget instance by key.
@@ -270,6 +237,7 @@ def get_widget_settings(widget_class):
         setting = getattr(widget_class, attr)
         if isinstance(setting, WidgetSetting):
             settings[attr] = setting
+    logging.info('get widget settings:\n' + str(settings))
     return settings
 
 def bind_instance_model(instances, settings):
@@ -307,38 +275,6 @@ def get_all_instances_settings(group=DEFAULT_GROUP):
     '''
     return WidgetInstanceSetting.all().filter('widget_group', group).fetch(1000)
 
-def get_instance_settings(widget_instance):
-    '''
-    Get widget instance settings.
-    
-    Args:
-      Widget instance object.
-    
-    Return:
-      List of WidgetInstanceSetting objects.
-    '''
-    return WidgetInstanceSetting.all().filter('widget_instance', widget_instance).fetch(100)
-
-def update_instance_settings(widget_instance, setting_as_dict):
-    '''
-    Update instance settings.
-    
-    Args:
-      widget_instance: WidgetInstance object.
-      setting_as_dict: new settings as dict contains key as str and value as str or unicde.
-    Returns:
-      None
-    '''
-    group = widget_instance.widget_group
-    db.delete(get_instance_settings(widget_instance))
-    for name, value in setting_as_dict.items():
-        WidgetInstanceSetting(
-                widget_group=group,
-                widget_instance=widget_instance,
-                setting_name=name,
-                setting_value=value
-        ).put()
-
 def merge_settings(widget_class, instance_settings):
     '''
     Merge settings of dict of WidgetSetting and list of WidgetInstanceSetting. 
@@ -368,23 +304,7 @@ def merge_settings(widget_class, instance_settings):
     logging.warning('Override settings: ' + str(settings))
     return settings
 
-
 ############ TODO #################
-
-def get_instance_settings_as_dict(widget_instance):
-    '''
-    get widget instance settings as dict which contains key-value pairs (both str/unicode).
-    
-    Args:
-        widget_instance: WidgetInstance object.
-    Returns:
-        Settings as dict which both key and value are str/unicode.
-    '''
-    list = WidgetInstanceSetting.all().filter('widget_instance ==', widget_instance).fetch(100)
-    d = {}
-    for setting in list:
-        d[setting.setting_key] = setting.setting_value
-    return d
 
 def instantiate_widget(widget_instance):
     '''

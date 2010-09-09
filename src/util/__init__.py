@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__author__ = 'Michael Liao (askxuefeng@gmail.com)'
-
 '''
 Util app that contains useful functions such as proxy.
 '''
+
+__author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 from urllib2 import urlparse
 from urllib2 import unwrap

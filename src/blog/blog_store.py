@@ -5,6 +5,7 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 from google.appengine.ext import db
 
+from manage.shared import Storage
 from manage.shared import User
 
 class BlogPostMeta(db.Model):
@@ -30,7 +31,7 @@ class BlogCategory(db.Model):
     category_description = db.StringProperty(required=False, default='', indexed=False)
     category_count = db.IntegerProperty(required=True, default=0, indexed=False)
 
-class BlogPost(db.Model):
+class BlogPost(Storage):
     'a single post'
     post_owner = db.ReferenceProperty(reference_class=User, required=True)
     post_state = db.IntegerProperty(required=True, default=POST_STATE_PUBLISHED)

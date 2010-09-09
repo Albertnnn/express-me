@@ -8,7 +8,7 @@ Forum app that allows users to discuss.
 '''
 
 from google.appengine.ext import db
-from manage import User
+from manage.shared import User
 
 class Forum(db.Model):
     pass

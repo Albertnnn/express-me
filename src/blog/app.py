@@ -14,7 +14,7 @@ from exweb import HttpForbiddenError
 from exweb import HttpNotFoundError
 
 from manage import shared
-from blog import store
+from blog import blog_store as store
 
 def assert_not_none(o):
     if o is None:
@@ -103,7 +103,7 @@ def __get_feed():
     return { 'url' : url, 'title' : title }
 
 @post('/comment')
-def make_comment():
+def comment():
     ''' make a comment on a post or page '''
     form = context.form
     id = form.get('id')

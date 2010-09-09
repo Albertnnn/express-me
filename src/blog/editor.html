@@ -11,7 +11,7 @@
   <div class="panel-content">
     <div class="form-field">
       <div class="form-field-title">Title:</div>
-      <div class="form-field-input"><input name="title" type="text" id="title" maxlength="100" style="width:100%" value="${post_title}" /></div>
+      <div class="form-field-input"><input name="title" type="text" id="title" maxlength="100" style="width:100%" value="${post.post_title}" /></div>
     </div>
     #if $varExists('categories')
     <div class="form-field">
@@ -20,7 +20,7 @@
         <select name="categoryKey" id="categoryKey" style="width:100%">
         #for $cat in $categories
           <option value="${cat.key}"
-            #if $cat.key == $post_category.key
+            #if $cat.key == $post.post_category.key
               selected="selected"
             #end if
           >${cat.category_name}</option>
@@ -32,7 +32,7 @@
     <script type="text/javascript" src="/static/js/fckeditor/fckeditor.js"></script>
     <div class="form-field">
       <div class="form-field-title">Content:</div>
-      <div class="form-field-input"><textarea name="content" id="fckeditor" style="width:100%">${post_content}</textarea></div>
+      <div class="form-field-input"><textarea name="content" id="fckeditor" style="width:100%">${post.post_content__raw__}</textarea></div>
     </div>
     <script type="text/javascript">
       var oFCKeditor = new FCKeditor('fckeditor','100%','480');
@@ -40,12 +40,10 @@
       oFCKeditor.Config["CustomConfigurationsPath"] = '/blog/static/fckconfig.js';
       oFCKeditor.ReplaceTextarea();
     </script>
-    #if $varExists('post_tags')
     <div class="form-field">
       <div class="form-field-title">Tags: (seperated by ',')</div>
-      <div class="form-field-input"><input name="tags" type="text" id="tags" maxlength="100" style="width:100%" value="${post_tags}" /></div>
+      <div class="form-field-input"><input name="tags" type="text" id="tags" maxlength="100" style="width:100%" value="${post.post_tags_as_string()}" /></div>
     </div>
-    #end if
     <div class="form-field">
       <div class="form-field-input">
         <button type="submit" name="submit">Save</button>

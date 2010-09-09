@@ -197,7 +197,7 @@ class Dispatcher(webapp.RequestHandler):
                 raise ValueError('Tuple must be (\'basestring\', {dict})')
 
     def __render_template(self, templatepath, model):
-        t = Template(file=templatepath, searchList=[model])
+        t = Template(file=templatepath, searchList=[model], filter='WebSafe')
         self.response.out.write(t)
 
     def __render_string(self, s):

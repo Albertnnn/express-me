@@ -13,6 +13,7 @@ import copy
 from exweb import context
 
 from manage import shared
+from widget import store
 
 appmenus = [
         ('Widget', [
@@ -74,7 +75,7 @@ def __handle_get_edit_instance():
         logging.warning('\n\n\n$$\n\n' + str(wclass))
         def_setting_dict = widget.get_widget_settings(wclass)
         logging.warning('\n\n\n###\n\n\n' + str(def_setting_dict))
-        ins_settings = widget.get_instance_settings(instance)
+        ins_settings = store.get_instance_settings(instance)
         # attach ins_settings to def_settings:
         for key in def_setting_dict:
             for ins_setting in ins_settings:
@@ -108,10 +109,10 @@ def __handle_post_edit_instance():
                 d[arg] = form.get(arg)
         import logging
         logging.warning('update... ' + str(d))
-        widget.update_instance_settings(instance, d)
+        store.update_instance_settings(instance, d)
     elif form.get('btn')=='remove':
         # remove:
-        widget.delete_widget_instance(form.get('id'))
+        store.delete_widget_instance(form.get('id'))
     return __handle_get_edit_instance()
 
 def __handle_get_list_widget():

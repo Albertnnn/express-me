@@ -51,7 +51,7 @@ def update_model(rootpath, appname, model):
     widget.bind_instance_model(instances, all_settings)
     import logging
     model['widgets'] = instances
-    model['show_widget'] = show_widget
+    model['show_widget__raw__'] = show_widget
     logging.warning('loaded ' + str(instances))
 
     # set app_main to path:

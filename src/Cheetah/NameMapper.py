@@ -320,13 +320,16 @@ def hasName(obj, name):
         return True
     except NotFound:
         return False
-try:
-    from _namemapper import NotFound, valueForKey, valueForName, \
-         valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
-    # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
-    C_VERSION = True
-except:
-    C_VERSION = False
+
+# MODIFIED: C_VERSION is set to False:
+C_VERSION = False
+#try:
+#    from _namemapper import NotFound, valueForKey, valueForName, \
+#         valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
+#    # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
+#    C_VERSION = True
+#except:
+#    C_VERSION = False
 
 ##################################################
 ## CLASSES

@@ -19,6 +19,11 @@ import urllib
 import manage
 from manage import shared
 
+def googlemail_to_gmail(email):
+    if email.endswith('@googlemail.com'):
+        return email[:-15] + '@gmail.com'
+    return email
+
 @mapping('/register')
 def register():
     '''
@@ -29,6 +34,7 @@ def register():
     # handle post:
     form = context.form
     email = form.get('email').strip().lower()
+    email = googlemail_to_gmail(email)
     user = shared.User.all().filter('user_email =', email).get()
     if user is not None:
         return 'register.html', {'error':'Email is already registered.'}
@@ -58,6 +64,7 @@ def google():
         raise StandardError()
     context.remove_cookie(manage.COOKIE_AUTO_SIGN_ON)
     email = gu.email().lower()
+    email = googlemail_to_gmail(email)
     nicename = gu.nickname()
     # check if user exist:
     user = shared.get_user_by_email(email)
