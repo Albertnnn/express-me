@@ -19,12 +19,12 @@ import manage
 from manage import shared
 import widget
 
-def load_template(selected=''):
+def load_template(selected=None):
     '''
     Load template and return its path.
     '''
     themes = manage.get_themes()
-    if selected=='':
+    if selected is None:
         selected = shared.get_setting('theme', 'selected', '')
     if not selected in themes:
         selected = themes[0]
