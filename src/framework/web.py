@@ -178,10 +178,17 @@ def _matches(pattern, raw_mapping, url):
     return None
 
 def _has_varkw(func):
+    '''
+    Return True if function has kw args. False otherwise.
+    Args:
+        func: Function reference.
+    Returns:
+        True or False.
+    '''
     # get args spec: (arg_names, varargs, varkw, defaults)
     argsspec = inspect.getargspec(func)
     return argsspec[2] is not None
- 
+
 def get(pattern=None):
     '''
     decorator of @get() that support get only
