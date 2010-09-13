@@ -10,6 +10,10 @@ from framework.web import get
 from framework.web import post
 from framework.web import raw_mapping
 
+@get() # using default url '/say'
+def say():
+    return 'hello'
+
 @get('/product')
 def get_product():
     return 'product'
@@ -60,6 +64,17 @@ class Test(unittest.TestCase):
         self.assertEquals(None, _matches('/', True, ''))
         self.assertEquals(None, _matches('/abc(.+)', True, '/abc'))
         self.assertEquals(None, _matches('/(.+)/(.+)/(.+)', True, '/a/b/'))
+
+    def test_say(self):
+        f = say
+        self.assertTrue(f.support_get)
+        self.assertFalse(f.support_post)
+        self.assertFalse(f.raw_mapping)
+        self.assertEquals('/say', f.pattern)
+        self.assertEquals('say', f.__name__)
+        self.assertEquals('hello', f())
+        self.assertEquals((), f.matches('/say'))
+        self.assertEquals(None, f.matches('/say/'))
 
     def test_get_product(self):
         f = get_product

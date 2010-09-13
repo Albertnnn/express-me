@@ -15,6 +15,18 @@ import inspect
 from google.appengine.ext import webapp
 from Cheetah.Template import Template
 
+class Context(dict):
+    '''
+    Web application context as a dict.
+    '''
+    def __getattr__(self, name):
+        if self.has_key(name):
+            return self[name]
+        raise AttributeError('\'%s\' object has no attribute \'%s\'' % (self.__class__.__name__, name))
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
 class Dispatcher(webapp.RequestHandler):
     '''
     Entry point of MVC tier. It handles URL with '/appname/apppath'. 
@@ -68,11 +80,16 @@ class Dispatcher(webapp.RequestHandler):
                 if func.has_varkw():
                     # need varkw args, prepare environment:
                     kw = {
-                          'environ' : self.request.environ,
-                          'headers' : self.request.headers,
-                          'cookies' : self.request.cookies,
-                          'request' : self.request,
-                          'response' : self.response,
+                            'environ' : self.request.environ,
+                            'headers' : self.request.headers,
+                            'cookies' : self.request.cookies,
+                            'request' : self.request,
+                            'response' : self.response,
+                            'context' : Context(
+                                    get_argument=lambda argument_name, default_value=None: self.request.get(argument_name, default_value),
+                                    get_arguments=lambda argument_name: self.request.get_all(argument_name),
+                                    arguments=lambda: self.request.arguments()
+                            )
                     }
                     result = func(*args, **kw)
                 else:
@@ -98,6 +115,7 @@ class Dispatcher(webapp.RequestHandler):
     def _render_template(self, model):
         '''
         Render a template using the given model.
+        
         Args:
             model: model as dict.
         '''
@@ -200,19 +218,19 @@ def get(pattern=None):
         decorated function.
     '''
     def execute(f):
-        def wrapper(*args, **kw):
+        def _wrapper(*args, **kw):
             return f(*args, **kw)
         if pattern==None:
-            wrapper.pattern = '/' + f.__name__
+            _wrapper.pattern = '/' + f.__name__
         else:
-            wrapper.pattern = pattern
-        wrapper.support_get = True
-        wrapper.support_post = False
-        wrapper.raw_mapping = False
-        wrapper.__name__ = f.__name__
-        wrapper.matches = lambda url: _matches(wrapper.pattern, wrapper.raw_mapping, url)
-        wrapper.has_varkw = lambda: _has_varkw(f)
-        return wrapper
+            _wrapper.pattern = pattern
+        _wrapper.support_get = True
+        _wrapper.support_post = False
+        _wrapper.raw_mapping = False
+        _wrapper.__name__ = f.__name__
+        _wrapper.matches = lambda url: _matches(_wrapper.pattern, _wrapper.raw_mapping, url)
+        _wrapper.has_varkw = lambda: _has_varkw(f)
+        return _wrapper
     return execute
 
 def post(pattern=None):

@@ -19,5 +19,16 @@ def http_hello(name):
     return '<p>Hello, %s!</p>' % name
 
 @get('/redirect/$')
-def http_redirect(target, **kw):
-    return 'redirect:/about/%s/%s' % (target, kw['request'].method.lower())
+def http_redirect(target):
+    return 'redirect:/about/%s' % target
+
+@get('/args')
+def http_args(**kw):
+    ctx = kw['context']
+    return u'%s, %s, %s, [%s, %s]' % (
+            ctx.get_argument('q'),
+            ctx.get_argument('ref'),
+            ctx.get_argument('src'),
+            ctx.get_arguments('nl')[0],
+            ctx.get_arguments('nl')[1],
+    )
