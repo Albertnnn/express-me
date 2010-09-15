@@ -1,2 +1,5 @@
 syntax: regexp
 ^.*\.pyc$
+
+syntax: regexp
+^src/autogen$
