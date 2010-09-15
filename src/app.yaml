@@ -26,7 +26,7 @@ handlers:
 - url: /robots.txt
   static_files: robots.txt
   upload: robots.txt
-  expiration: 3d
+  expiration: 30d
 
 - url: /.*
-  script: loader.py
+  script: entry.py
