@@ -28,21 +28,21 @@ class Test(unittest.TestCase):
             self.dispatcher.post()
 
     def test_home(self):
-        self.init_get('/httptest/')
+        self.init_get('/http_test/')
         self.assertEquals('<h1>Home</h1>', self.response.out.getvalue())
 
     def test_hello(self):
-        self.init_post('/httptest/hello/world')
+        self.init_post('/http_test/hello/world')
         self.assertEquals('<p>Hello, world!</p>', self.response.out.getvalue())
-        self.init_post('/httptest/hello/Michael')
+        self.init_post('/http_test/hello/Michael')
         self.assertEquals('<p>Hello, Michael!</p>', self.response.out.getvalue())
 
     def test_redirect(self):
-        self.init_get('/httptest/redirect/abc')
+        self.init_get('/http_test/redirect/abc')
         self.assertEquals('/about/abc', self.response.headers['Location'])
 
     def test_args(self):
-        self.init_get('/httptest/args?q=Express%20Me&ref=&nl=en_US&nl=zh_CN')
+        self.init_get('/http_test/args?q=Express%20Me&ref=&nl=en_US&nl=zh_CN')
         self.assertEquals(u'Express Me, , None, [en_US, zh_CN]', self.response.out.getvalue())
 
 if __name__ == "__main__":
