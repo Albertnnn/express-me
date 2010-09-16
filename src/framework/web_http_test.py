@@ -45,6 +45,6 @@ class Test(unittest.TestCase):
         self.init_get('/http_test/args?q=Express%20Me&ref=&nl=en_US&nl=zh_CN')
         self.assertEquals(u'Express Me, , None, [en_US, zh_CN]', self.response.out.getvalue())
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

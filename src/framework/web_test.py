@@ -121,6 +121,6 @@ class Test(unittest.TestCase):
         self.assertEquals(None, f.matches('/a/b'))
         self.assertEquals(None, f.matches('//123'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

@@ -26,6 +26,6 @@ class Test(unittest.TestCase):
         self.assertEquals('Engineer', ctx['title'])
         self.assertEquals('Engineer', ctx.title)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

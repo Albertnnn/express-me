@@ -20,6 +20,15 @@ def set(key, value, time=0):
     '''
     memcache.set(key, value, time)
 
+def delete(key):
+    '''
+    Delete a key from cache.
+    
+    Args:
+        key: key as str.
+    '''
+    memcache.delete(key)
+
 def get(key, func_or_value=None, time=0):
     '''
     Retrieve the value from cache for a given key. 
@@ -46,5 +55,5 @@ def get(key, func_or_value=None, time=0):
         memcache.set(key, value, time)
     return value
 
-def incr(key):
-    memcache.incr(key)
+def incr(key, delta=1):
+    memcache.incr(key, delta=delta)

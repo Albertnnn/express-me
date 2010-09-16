@@ -4,6 +4,7 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import unittest
+from time import sleep
 
 from google.appengine.ext import db as db
 
@@ -16,10 +17,10 @@ class TestModel(BaseModel):
 class Test(GaeTestCase):
 
     def test_raw_field(self):
-        m = TestModel(name='Howto & Style')
-        self.assertEquals('Howto & Style', m.name)
-        self.assertEquals('Howto & Style', m.name__raw__)
-        self.assertEquals(0, m.version)
+        input = 'Howto & Style'
+        m = TestModel(name=input)
+        self.assertEquals(input, m.name)
+        self.assertEquals(input, m.name__raw__)
         self.assertRaises(AttributeError, lambda: m.location)
         self.assertRaises(AttributeError, lambda: m.location__raw__)
         delta = m.creation_date - m.modified_date
@@ -29,8 +30,7 @@ class Test(GaeTestCase):
         m.put()
         self.assertFalse(m.id is None)
         self.assertEquals(m.id, str(m.key()))
-        print dir(m)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

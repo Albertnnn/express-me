@@ -4,7 +4,7 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 '''
-Sharding counters.
+Simple API for counters that support sharding.
 '''
 
 import random
@@ -29,9 +29,10 @@ def get(name):
         for counter in ShardedCounter.all().filter('name =', name).fetch(1000):
             total += counter.count
         cache.set(CACHE_KEY_PREFIX + name, str(total))
-    return total
+        return total
+    return int(total)
 
-def incr(name):
+def incr(name, delta=1):
     '''
     Increment the value for a given sharded counter.
     
@@ -45,12 +46,12 @@ def incr(name):
         counter = ShardedCounter.get_by_key_name(shard_name)
         if counter is None:
             counter = ShardedCounter(key_name=shard_name, name=name)
-        counter.count += 1
+        counter.count += delta
         counter.put()
     db.run_in_transaction(tx)
-    cache.incr(CACHE_KEY_PREFIX + name)
+    cache.incr(CACHE_KEY_PREFIX + name, delta=delta)
 
-def inc_shards(name, num):
+def incr_shards(name, num):
     '''
     Increase the number of shards for a given sharded counter.
     Will never decrease the number of shards.
