@@ -4,7 +4,6 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import unittest
-from time import sleep
 
 from google.appengine.ext import db as db
 

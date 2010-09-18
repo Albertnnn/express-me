@@ -9,9 +9,6 @@ All storage-related class and functions.
 
 from google.appengine.ext import db as db
 
-class StoreError(StandardError):
-    pass
-
 class BaseModel(db.Model):
     '''
     Base model for storage which has basic properties.
