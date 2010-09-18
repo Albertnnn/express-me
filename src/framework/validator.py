@@ -15,7 +15,7 @@ REGEX_MD5 = re.compile(r'^[a-f0-9]{32}$')
 
 def check_email(email):
     '''
-    Check email if it is validated.
+    Check email if it is validated. Upper-case characters are NOT allowed.
     
     Args:
         email: email address for test.
