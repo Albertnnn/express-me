@@ -3,6 +3,7 @@
 
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
+import time
 import unittest
 
 from framework import cache
@@ -33,6 +34,14 @@ class Test(gaeunit.GaeTestCase):
         self.assertEquals(124, cache.get(key))
         cache.incr(key, 10)
         self.assertEquals(134, cache.get(key))
+
+    def test_expr(self):
+        key = 'expr'
+        self.assertEquals(None, cache.get(key))
+        cache.set(key, u'ABC', 1)
+        self.assertEquals(u'ABC', cache.get(key))
+        time.sleep(1.2)
+        self.assertEquals(None, cache.get(key))
 
 if __name__ == '__main__':
     #import sys;sys.argv = ['', 'Test.testName']
