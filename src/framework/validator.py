@@ -51,7 +51,7 @@ def check_text(text, allow_empty=True):
     Raises:
         ValueError if not a string, or too long.
     '''
-    if not isinstance(str, types.StringTypes):
+    if not isinstance(text, types.StringTypes):
         raise ValueError('not a text')
     if not allow_empty and text=='':
         raise ValueError('text is empty')
