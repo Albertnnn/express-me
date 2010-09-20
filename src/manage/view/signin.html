@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/SingleFormTemplate.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Sign In - ${site.name}</title>
+<!-- InstanceEndEditable -->
+<link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
+<!--[if lt IE 8]>
+	<link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection">
+<![endif]-->
+<link rel="stylesheet" href="/manage/static/css/single.css" type="text/css" media="screen, projection">
+<!-- InstanceBeginEditable name="head" -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/utils/md5.js"></script>
+<script type="text/javascript">
+<!-- #raw
+function show_error(msg){
+	if (msg===null || msg==='') {
+		$('#error_msg').hide();
+	}
+	else {
+		$('#error_msg').html(msg);
+		$('#error_msg').show();
+	}
+}
+
+function validate_form() {
+	if ($('#email').val()==''){
+		show_error('Please enter your email');
+		return false;
+	}
+	var pw = $('#passwd').val();
+	if (pw==''){
+		show_error('Please enter your password');
+		return false;
+	}
+	if (pw.length<6){
+		show_error('Password must be at least 6 characters');
+		return false;
+	}
+	show_error(null);
+	$('#signin').hide();
+	$('#loading').show();
+	$('#password').val(MD5(pw));
+	return true;
+}
+
+#end raw -->
+</script>
+<script type="text/javascript">
+jQuery(function(){
+	show_error('${error}');
+});
+</script>
+<!-- InstanceEndEditable -->
+</head>
+<body>
+  <div class="container" style="margin:3px auto">
+    <div class="span-18 prepend-3 last" style="margin-bottom:24px">
+      <div class="span-9" style="padding:12px 0px">
+        <a href="http://www.expressme.org/" target="_blank"><img src="/static/image/expressme.gif" width="326" height="60" /></a>
+	  </div>
+	  <div class="span-9 last large" style="text-align:right"><a href="/">廖雪峰的官方网站</a> | <a href="/manage/register">Register</a> | <a href="/manage/signin">登录</a></div>
+	</div>
+    <div class="span-12 prepend-6 last">
+      <!-- InstanceBeginEditable name="MainRegion" -->
+      <form name="signinForm" id="signinForm" method="post" action="/manage/signin" onsubmit="return validate_form()">
+        <fieldset>
+          <legend>Please sign in</legend>
+          <div id="error_msg" class="error" style="display:none"></div>
+          <p><label for="email">Email</label><br/><input id="email" name="email" type="text" maxlength="50" class="text" /></p>
+          <p><label for="passwd">Password</label><br/><input id="passwd" name="passwd" type="password" maxlength="20" class="text" /></p>
+          <p><label for="expires">Store for</label><br/>
+            <select id="expires" name="expires">
+              <option value="86400">One day</option>
+              <option value="604800">One week</option>
+              <option value="2592000">One month</option>
+              <option value="31536000" selected="selected">One year</option>
+            </select>
+          </p>
+          <p><input type="hidden" name="redirect" value="${redirect}" /><input type="hidden" id="password" name="password" /><input id="signin" type="submit" value="Sign In" /> 
+          	<span id="loading" class="loading">Processing, please wait...</span></p>
+        </fieldset>
+      </form>
+      <p><a href="register">Register</a> | <a href="#">Lost your password?</a></p>
+      #if $varExists('google_url')
+        <p>Don't want to register? try <a href="${google_url}">sign in with a Google account</a>!</p>
+      #end if
+	  <!-- InstanceEndEditable -->
+	</div>
+    <div class="span-16 prepend-4 last" style="margin:5px 0px"><hr/></div>
+    <div class="span-14 prepend-5 last">
+	  <div class="span-8" style="line-height:30px; text-align:center">Copyright&copy;2010, <a href="http://www.expressme.org/" target="_blank">ExpressMe</a></div>
+	  <div class="span-4 last"><a href="http://code.google.com/appengine/" target="_blank"><img src="http://code.google.com/appengine/images/appengine-silver-120x30.gif" 
+alt="Powered by Google App Engine" width="120" height="30" align="absmiddle"/></a></div>
+	</div>
+  </div>
+</body>
+<!-- InstanceEnd --></html>

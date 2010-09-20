@@ -1,0 +1,20 @@
+@charset "utf-8";
+/* Custom CSS Document */
+
+/*body { font: 12px/1.5 Arial; background-color: #f9f9f9; }*/
+
+a:link    {color: #2175ac; text-decoration:none}
+a:visited {color: #2175ac; text-decoration:none}
+a:hover   {color: #d54e4d; text-decoration:none}
+a:active  {color: #d54e4d; text-decoration:none}
+a:focus   {color: #d54e4d; text-decoration:none}
+
+legend { padding-left: 6px; padding-right: 6px; }
+
+span.loading {
+	background-image:url(/manage/static/image/loading.gif);
+	background-repeat:no-repeat;
+	padding-left: 20px;
+	line-height: 20px;
+	display: none;
+}
