@@ -8,7 +8,6 @@ All storage-related class and functions.
 '''
 
 import datetime
-import re
 import random
 
 from google.appengine.ext import db as db
@@ -215,6 +214,105 @@ class ShardedCounter(db.Model):
     '''
     name = db.StringProperty(required=True)
     count = db.IntegerProperty(required=True, default=0)
+
+###############################################################################
+# Setting operation
+###############################################################################
+
+DEFAULT_GROUP = '__default__'
+
+def _get_setting(name, group):
+    '''
+    Get setting object.
+    '''
+    return Setting.all().filter('name =', name).filter('group =', group).get()
+
+def get_setting(name, group=DEFAULT_GROUP, default_value=None):
+    '''
+    Get a setting value for specified name and group.
+    
+    Args:
+        name: setting name as string.
+        group: setting group as string, default to DEFAULT_GROUP.
+        default_value: default value to return if no such setting.
+    Returns:
+        Setting value as string or unicode.
+    '''
+    if not isinstance(name, basestring):
+        raise ValueError('Name must be basestring.')
+    if not isinstance(group, basestring):
+        raise ValueError('Group must be basestring.')
+    setting = _get_setting(name, group)
+    if setting is None:
+        return default_value
+    return setting.value
+
+def delete_setting(name, group=DEFAULT_GROUP):
+    '''
+    Delete a setting value for specified name and group.
+    
+    Args:
+        name: setting name as string.
+        group: setting group as string, default to DEFAULT_GROUP.
+    Returns:
+        None
+    '''
+    if not isinstance(name, basestring):
+        raise ValueError('Name must be basestring.')
+    if not isinstance(group, basestring):
+        raise ValueError('Group must be basestring.')
+    setting = _get_setting(name, group)
+    if setting is not None:
+        setting.delete()
+
+def set_setting(name, value, group=DEFAULT_GROUP):
+    '''
+    Set new setting for a given name, value and group.
+    
+    Args:
+        name: setting name as string.
+        value: setting value as string.
+        group: setting group as string, default to DEFAULT_GROUP.
+    Returns:
+        None
+    '''
+    if not isinstance(name, basestring):
+        raise ValueError('Name must be basestring.')
+    if not isinstance(group, basestring):
+        raise ValueError('Group must be basestring.')
+    if not isinstance(value, basestring):
+        raise ValueError('Value must be basestring.')
+    setting = _get_setting(name, group)
+    if setting is None:
+        setting = Setting(name=name, group=group, value=value)
+    else:
+        setting.value = value
+    setting.put()
+
+def get_settings(group=DEFAULT_GROUP):
+    '''
+    Get settings (100 first) as dict which belongs to specific group.
+    
+    Args:
+        group: setting group as string, default to DEFAULT_GROUP.
+    Returns:
+        Dict contains key as setting name, value as setting value.
+    '''
+    if not isinstance(group, basestring):
+        raise ValueError('Group must be basestring.')
+    settings = Setting.all().filter('group =', group).fetch(100)
+    d = {}
+    for setting in settings:
+        d[str(setting.name)] = setting.value
+    return d
+
+class Setting(db.Model):
+    '''
+    Settings that contains group, name and value.
+    '''
+    name = db.StringProperty(required=True)
+    group = db.StringProperty(required=True, default='__default__')
+    value = db.StringProperty()
 
 ###############################################################################
 # Comment operation

@@ -5,7 +5,6 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import unittest
 
-from framework import ValidationError
 from framework.gaeunit import GaeTestCase
 from framework import store
 

@@ -9,11 +9,15 @@ Web MVC framework for AppEngine/WebOb.
 
 import os
 import re
+import time
 import urllib
 import inspect
 
 from google.appengine.ext import webapp
 from Cheetah.Template import Template
+
+COOKIE_EXPIRES_MIN = 86400
+COOKIE_EXPIRES_MAX = 31536000
 
 class Context(dict):
     '''
@@ -88,7 +92,8 @@ class Dispatcher(webapp.RequestHandler):
                             'context' : Context(
                                     get_argument=lambda argument_name, default_value=None: self.request.get(argument_name, default_value),
                                     get_arguments=lambda argument_name: self.request.get_all(argument_name),
-                                    arguments=lambda: self.request.arguments()
+                                    arguments=lambda: self.request.arguments(),
+                                    set_cookie=lambda name, value, max_age=-1, path='/', secure=False: self._set_cookie(name, value, max_age, path, secure)
                             )
                     }
                     result = func(*args, **kw)
@@ -139,6 +144,10 @@ class Dispatcher(webapp.RequestHandler):
         '''
         if result.startswith('redirect:'):
             return self._error(301, result[9:])
+        if result.startswith('json:'):
+            self.request.headers['Content-Type'] = 'application/json'
+            self.response.out.write(result[5:])
+            return
         self.response.out.write(result)
 
     def _filter(self, func, args):
@@ -175,6 +184,35 @@ class Dispatcher(webapp.RequestHandler):
         if code==404:
             self.response.out.write('404 Not Found')
             return
+
+    def _set_cookie(self, name, value, max_age=-1, path='/', secure=False):
+        '''
+        Set cookie by name, value, max_age, path and secure.
+        
+        Args:
+            name: cookie name.
+            value: cookie value.
+            max_age: cookie age in seconds, if 0, cookie will be deleted immediately, if <0, ignored. Default to -1.
+            path: cookie path, default to '/'.
+            secure: if cookie is secure, default to False.
+        '''
+        cookie = name + '=' + value + '; path=' + path
+        if max_age>=0:
+            cookie += time.strftime('; expires=%a, %d-%b-%Y %H:%M:%S GMT', time.gmtime(time.time() + max_age))
+        if secure:
+            cookie += '; secure'
+        self.response.headers.add_header('Set-Cookie', cookie)
+
+    def _get_cookie(self, name):
+        '''
+        Get cookie value of specified cookie name.
+        
+        Args:
+            name: cookie name.
+        Returns:
+            Cookie value.
+        '''
+        return self.request.cookies[name].value
 
 def _matches(pattern, raw_mapping, url):
     '''
