@@ -91,6 +91,9 @@ ROLE_SUBSCRIBER = 40
 ROLES = (ROLE_ADMINISTRATOR, ROLE_EDITOR, ROLE_AUTHOR, ROLE_CONTRIBUTOR, ROLE_SUBSCRIBER)
 ROLE_NAMES = ('Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber')
 
+class UserAlreadyExistError(ValidationError):
+    pass
+
 def get_user_by_key(key):
     '''
     Get user by key, or None if not found.
@@ -117,7 +120,7 @@ def create_user(role, email, password, nicename):
         return None
     user = db.run_in_transaction(tx)
     if user is None:
-        raise ValidationError('User create failed.')
+        raise UserAlreadyExistError('User create failed.')
     return user
 
 class User(BaseModel):
