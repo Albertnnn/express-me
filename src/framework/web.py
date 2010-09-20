@@ -12,6 +12,7 @@ import re
 import time
 import urllib
 import inspect
+import logging
 
 from google.appengine.ext import webapp
 from Cheetah.Template import Template
@@ -115,9 +116,9 @@ class Dispatcher(webapp.RequestHandler):
         if isinstance(result, basestring):
             return self._render_string(result)
         if isinstance(result, dict):
-            return self._render_template(result)
+            return self._render_template(appname, result)
 
-    def _render_template(self, model):
+    def _render_template(self, appname, model):
         '''
         Render a template using the given model.
         
@@ -125,11 +126,14 @@ class Dispatcher(webapp.RequestHandler):
             model: model as dict.
         '''
         view_name = model.get('__view__')
+        if view_name is None:
+            return self._error(500, 'View is not set.')
         web_root = os.path.split(os.path.dirname(__file__))[0]
-        view_path = os.path.join(web_root, view_name.split('/'))
+        view_path = os.path.join(os.path.join(web_root, appname, 'view'), *view_name.split('/'))
+        logging.info('Render view: %s' % view_path)
         if not os.path.isfile(view_path):
             # 404 error:
-            return self._error(404)
+            return self._error(500, 'View is not found: %s' % view_path)
         t = Template(file=view_path, searchList=[model], filter='WebSafe')
         content_type = model.get('__content_type__')
         if content_type:
@@ -170,20 +174,22 @@ class Dispatcher(webapp.RequestHandler):
         all = [getattr(mod, f) for f in dir(mod)]
         return [func for func in all if callable(func) and getattr(func, attr, False)]
 
-    def _error(self, code, *args):
+    def _error(self, code, extra=None):
         '''
         Send HTTP error response.
         Args:
             code: HTTP code as int.
-            args: additional args based on code.
+            extra: additional message based on code.
         '''
         self.response.set_status(code)
         if code==301 or code==302:
-            self.response.headers['Location'] = args[0]
+            self.response.headers['Location'] = extra
             return
         if code==404:
-            self.response.out.write('404 Not Found')
+            self.response.out.write(extra or '404 Not Found')
             return
+        if extra:
+            self.response.out.write(extra)
 
     def _set_cookie(self, name, value, max_age=-1, path='/', secure=False):
         '''
