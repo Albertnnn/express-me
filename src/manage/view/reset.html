@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- InstanceBeginEditable name="doctitle" -->
-<title>Register - ${site.name}</title>
+<title>Reset password - ${site.name}</title>
 <!-- InstanceEndEditable -->
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
 <!--[if lt IE 8]>
@@ -12,7 +12,6 @@
 <link rel="stylesheet" href="/manage/static/css/single.css" type="text/css" media="screen, projection">
 <!-- InstanceBeginEditable name="head" -->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/utils/md5.js"></script>
 <script type="text/javascript">
 //#raw
 function show_error(msg) {
@@ -30,28 +29,9 @@ function validate_form() {
 		show_error('Please enter your email');
 		return false;
 	}
-	var pw1 = $('#password1').val();
-	var pw2 = $('#password2').val();
-	if (pw1=='') {
-		show_error('Please enter your password');
-		return false;
-	}
-	if (pw1.length<6) {
-		show_error('Password must be at least 6 characters');
-		return false;
-	}
-	if (pw1!=pw2) {
-		show_error('The two passwords are not match');
-		return false;
-	}
-	if ($('#nicename').val()=='') {
-		show_error('Please enter your nice name');
-		return false;
-	}
-	$('#password').val(MD5(pw1));
-	$('#register').hide();
-	$('#loading').show();
 	show_error(null);
+	$('#reset').hide();
+	$('#loading').show();
 	return true;
 }
 //#end raw
@@ -71,15 +51,25 @@ jQuery(function() {
 	</div>
     <div class="span-12 prepend-6 last">
       <!-- InstanceBeginEditable name="MainRegion" -->
-      <form name="registerForm" id="registerForm" method="post" action="/manage/register" onsubmit="return validate_form()">
+      <form name="resetForm" id="resetForm" method="post" action="/manage/reset" onsubmit="return validate_form()">
         <fieldset>
-          <legend>Welcome to ${site.name}</legend>
+          <legend>Reset your password</legend>
           <div id="error_msg" class="error" style="display:none"></div>
-          <p><label for="email">Email:</label><br/><input id="email" name="email" type="text" maxlength="50" class="text" /></p>
-          <p><label for="password1">Password:</label><br/><input id="password1" name="password1" type="password" maxlength="20" class="text" /></p>
-          <p><label for="password2">Re-type password:</label><br/><input id="password2" name="password2" type="password" maxlength="20" class="text" /></p>
-          <p><label for="nicename">Nice name:</label><br/><input id="nicename" name="nicename" type="text" maxlength="50" class="text" /></p>
-          <p><input type="hidden" id="password" name="password" /><input id="register" type="submit" value="Register" /><span id="loading" class="loading">Register new account, please wait...</span></p>
+		  <div class="info">If you lost your password of your Google account, please <a href="https://www.google.com/accounts/recovery" target="_blank">recover your password from Google</a>.</div>
+          <p><label for="email">Enter your email:</label><br/><input id="email" name="email" type="text" maxlength="50" class="text" /></p>
+          <p><label for="captcha">Enter the words:</label><br/>
+            <div id="recaptcha_widget" style="display:none"><div id="recaptcha_image"></div>
+          </p>
+<script type="text/javascript">
+var RecaptchaOptions = {
+  theme : 'custom',
+  custom_theme_widget: 'recaptcha_widget'
+};
+</script>
+<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LfDM70SAAAAAPOSr_MN76Ckb3cuK4qybrkZkPuX"></script>
+          <p>We will send you email contains instructions of how to reset your password.</p>
+          <p><input type="hidden" id="password" name="password" /><input id="signin" type="submit" value="Sign In" /> 
+          	<span id="loading" class="loading">Signing in, please wait...</span></p>
         </fieldset>
       </form>
       <p><a href="register">Register</a> | <a href="#">Lost your password?</a></p>
