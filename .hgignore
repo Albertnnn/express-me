@@ -3,3 +3,6 @@ syntax: regexp
 
 syntax: regexp
 ^src/autogen$
+
+syntax: regexp
+^\.settings$

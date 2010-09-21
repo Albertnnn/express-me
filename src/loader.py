@@ -9,11 +9,7 @@ Load template by theme
 
 import os
 
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-
 from exweb import context
-from exweb.dispatcher import Dispatcher
 
 import manage
 from manage import shared
@@ -71,11 +67,3 @@ def show_widget(w_instance):
     logging.warning('Model = ' + str(w_instance.model))
     w.load(id, w_instance.model)
     return w.render()
-
-application = webapp.WSGIApplication([('^/.*$', Dispatcher)], debug=True)
-
-def main():
-    run_wsgi_app(application)
-
-if __name__ == "__main__":
-    main()
