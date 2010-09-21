@@ -13,12 +13,6 @@ from google.appengine.ext import db
 
 from exweb import context
 
-class Storage(db.Model):
-    def __getattr__(self, name):
-        if name.endswith('__raw__'):
-            return getattr(self, name[:-7])
-        raise AttributeError('\'%s\' object has no attribute \'%s\'' % (self.__class__.__name__, name))
-
 class AppMenu(object):
     '''
     A menu object displayed in management console.

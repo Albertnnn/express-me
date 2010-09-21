@@ -9,6 +9,11 @@ a:hover   {color: #d54e4d; text-decoration:none}
 a:active  {color: #d54e4d; text-decoration:none}
 a:focus   {color: #d54e4d; text-decoration:none}
 
-.shadow { text-shadow: 1px 1px 1px #666; filter: Shadow(Color=#666666, Direction=135, Strength=2); }
+span.loading {
+	background-image:url(/manage/static/image/loading.gif);
+	background-repeat:no-repeat;
+	text-indent: 30px;
+	line-height: 24px;
+}
 
-.margin_top { margin-top:60px }
+.shadow { text-shadow: 1px 1px 1px #666; filter: Shadow(Color=#666666, Direction=135, Strength=2); }
