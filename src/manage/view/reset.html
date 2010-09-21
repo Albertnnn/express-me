@@ -29,6 +29,10 @@ function validate_form() {
 		show_error('Please enter your email');
 		return false;
 	}
+	if ($('#recaptcha_response_field').val()=='') {
+		show_error('Please enter the captcha words');
+		return false;
+	}
 	show_error(null);
 	$('#reset').hide();
 	$('#loading').show();
@@ -56,9 +60,13 @@ jQuery(function() {
           <legend>Reset your password</legend>
           <div id="error_msg" class="error" style="display:none"></div>
 		  <div class="info">If you lost your password of your Google account, please <a href="https://www.google.com/accounts/recovery" target="_blank">recover your password from Google</a>.</div>
-          <p><label for="email">Enter your email:</label><br/><input id="email" name="email" type="text" maxlength="50" class="text" /></p>
-          <p><label for="captcha">Enter the words:</label><br/>
-            <div id="recaptcha_widget" style="display:none"><div id="recaptcha_image"></div>
+          <p><label for="email">Enter your email:</label><br/><input id="email" name="email" type="text" value="${email}" maxlength="50" class="text" /></p>
+          <p>
+            <div id="recaptcha_widget">
+              <div id="recaptcha_image" style="border: 1px solid #ccc"></div>
+              <div><a href="javascript:Recaptcha.reload()">Get another CAPTCHA</a></div>
+              <label for="captcha">Enter the words above:</label><br/><input id="recaptcha_response_field" name="recaptcha_response_field" type="text" maxlength="50" class="text" />
+            </div>
           </p>
 <script type="text/javascript">
 var RecaptchaOptions = {
@@ -66,16 +74,11 @@ var RecaptchaOptions = {
   custom_theme_widget: 'recaptcha_widget'
 };
 </script>
-<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LfDM70SAAAAAPOSr_MN76Ckb3cuK4qybrkZkPuX"></script>
+<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=${recaptcha_public_key}"></script>
           <p>We will send you email contains instructions of how to reset your password.</p>
-          <p><input type="hidden" id="password" name="password" /><input id="signin" type="submit" value="Sign In" /> 
-          	<span id="loading" class="loading">Signing in, please wait...</span></p>
+          <p><input id="reset" type="submit" value="Reset Password" /><span id="loading" class="loading">Processing, please wait...</span></p>
         </fieldset>
       </form>
-      <p><a href="register">Register</a> | <a href="#">Lost your password?</a></p>
-      #if $varExists('google_signin_url')
-      <p>Don't want to register? <a href="${google_signin_url}">Sign in with a Google account!</a></p>
-      #end if
 	  <!-- InstanceEndEditable -->
 	</div>
     <div class="span-16 prepend-4 last" style="margin:5px 0px"><hr/></div>

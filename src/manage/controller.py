@@ -17,6 +17,7 @@ import logging
 
 from framework import store
 from framework import web
+from framework import recaptcha
 from framework.web import get
 from framework.web import post
 
@@ -29,6 +30,35 @@ def show_manage(**kw):
 @post('/')
 def do_manage(**kw):
     pass
+
+@get('/reset')
+def show_reset():
+    return {
+            '__view__' : 'reset.html',
+            'email' : '',
+            'error' : '',
+            'recaptcha_public_key' : recaptcha.get_public_key(),
+            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+    }
+
+@post('/reset')
+def do_reset(**kw):
+    ip = kw['request'].remote_addr
+    ctx = kw['context']
+    # verify captcha:
+    challenge = ctx.get_argument('recaptcha_challenge_field', '')
+    response = ctx.get_argument('recaptcha_response_field', '')
+    result, error = recaptcha.verify_captcha(challenge, response, recaptcha.get_private_key(), ip)
+    if result:
+        return '<h1>OK</h1>'
+    email = ctx.get_argument('email', '')
+    return {
+            '__view__' : 'reset.html',
+            'email' : email,
+            'error' : error,
+            'recaptcha_public_key' : recaptcha.get_public_key(),
+            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+    }
 
 @get('/signin')
 def show_signin(**kw):
