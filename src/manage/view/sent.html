@@ -11,49 +11,6 @@
 <![endif]-->
 <link rel="stylesheet" href="/manage/static/css/single.css" type="text/css" media="screen, projection">
 <!-- InstanceBeginEditable name="head" -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript">
-//#raw
-function show_error(msg) {
-	if (msg===null || msg==='') {
-		$('#error_msg').hide();
-	}
-	else {
-		$('#error_msg').html(msg);
-		$('#error_msg').show();
-	}
-}
-
-function validate_form() {
-	var pw1 = $('#password1').val();
-	var pw2 = $('#password2').val();
-	if (pw1=='') {
-		show_error('Please enter your password');
-		return false;
-	}
-	if (pw1.length<6) {
-		show_error('Password must be at least 6 characters');
-		return false;
-	}
-	if (pw1!=pw2) {
-		show_error('The two passwords are not match');
-		return false;
-	}
-	if ($('#nicename').val()=='') {
-		show_error('Please enter your nice name');
-		return false;
-	}
-	$('#password').val(MD5(pw1));
-	show_error(null);
-	$('#reset').hide();
-	$('#loading').show();
-	return true;
-}
-//#end raw
-jQuery(function() {
-	show_error('${error}');
-});
-</script>
 <!-- InstanceEndEditable -->
 </head>
 <body>
@@ -66,13 +23,11 @@ jQuery(function() {
 	</div>
     <div class="span-12 prepend-6 last">
       <!-- InstanceBeginEditable name="MainRegion" -->
-      <form name="resetForm" id="resetForm" method="post" action="/manage/reset" onsubmit="return validate_form()">
+      <form name="sentForm" id="sentForm" method="post" action="/" onsubmit="return false">
         <fieldset>
           <legend>Reset your password</legend>
-          <div id="error_msg" class="error" style="display:none"></div>
-          <p><label for="password1">Password:</label><br/><input id="password1" name="password1" type="password" maxlength="20" class="text" /></p>
-          <p><label for="password2">Re-type password:</label><br/><input id="password2" name="password2" type="password" maxlength="20" class="text" /></p>
-          <p><input id="password" name="password" type="hidden" /><input id="token" name="token" type="hidden" /><input id="reset" type="submit" value="Reset Password" /><span id="loading" class="loading">Processing, please wait...</span></p>
+		  <p>You should receive the email of instructions in your mail box <em>${email}</em> in serval minutes. Please click the link containing in email to reset your password.</p>
+          <p>Once you have reset your password, you can <a href="/manage/signin">sign in</a>.</p>
         </fieldset>
       </form>
 	  <!-- InstanceEndEditable -->

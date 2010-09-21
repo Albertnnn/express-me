@@ -14,12 +14,17 @@ import time
 import base64
 import hashlib
 import logging
+import urllib
 
+from framework import ApplicationError
 from framework import store
 from framework import web
+from framework import mail
 from framework import recaptcha
 from framework.web import get
 from framework.web import post
+
+from manage import model
 
 AUTO_SIGNIN_COOKIE = 'auto_signin'
 
@@ -31,29 +36,64 @@ def show_manage(**kw):
 def do_manage(**kw):
     pass
 
-@get('/reset')
-def show_reset():
+@get('/forgot')
+def show_forgot():
     return {
-            '__view__' : 'reset.html',
+            '__view__' : 'forgot.html',
             'email' : '',
             'error' : '',
             'recaptcha_public_key' : recaptcha.get_public_key(),
             'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
     }
 
-@post('/reset')
-def do_reset(**kw):
+@post('/forgot')
+def do_forgot(**kw):
     ip = kw['request'].remote_addr
     ctx = kw['context']
     # verify captcha:
     challenge = ctx.get_argument('recaptcha_challenge_field', '')
     response = ctx.get_argument('recaptcha_response_field', '')
+    email = ctx.get_argument('email', '')
+    user = store.get_user_by_email(email)
+    if user is None:
+        return {
+            '__view__' : 'forgot.html',
+            'email' : email,
+            'error' : 'Email is not exist',
+            'recaptcha_public_key' : recaptcha.get_public_key(),
+            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+        }
     result, error = recaptcha.verify_captcha(challenge, response, recaptcha.get_private_key(), ip)
     if result:
-        return '<h1>OK</h1>'
-    email = ctx.get_argument('email', '')
+        token = model.create_reset_password_token(user.id)
+        sender = store.get_setting('sender', 'mail', '')
+        if not sender:
+            raise ApplicationError('Cannot send mail: mail sender address is not configured.')
+        appid = kw['environ']['APPLICATION_ID']
+        body = r'''Dear %s
+  You received this mail because you have requested reset your password.
+  Please paste the following link to the address bar of the browser, then press ENTER:
+  https://%s.appspot.com/manage/reset?token=%s
+''' % (user.nicename, appid, token)
+        html = r'''<html>
+<body>
+<p>Dear %s</p>
+<p>You received this mail because you have requested reset your password.<p>
+<p>Please paste the following link to reset your password:</p>
+<p><a href="https://%s.appspot.com/manage/reset?token=%s">https://%s.appspot.com/manage/reset?token=%s</a></p>
+<p>If you have trouble in clicking the URL above, please paste the following link to the address bar of the browser, then press ENTER:</p>
+<p>https://%s.appspot.com/manage/reset?token=%s</p>
+</body>
+</html>
+''' % (urllib.quote(user.nicename), appid, token, appid, token, appid, token)
+        mail.send(sender, email, 'Reset your password', body, html)
+        return {
+            '__view__' : 'sent.html',
+            'email' : email,
+            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+    }
     return {
-            '__view__' : 'reset.html',
+            '__view__' : 'forgot.html',
             'email' : email,
             'error' : error,
             'recaptcha_public_key' : recaptcha.get_public_key(),
