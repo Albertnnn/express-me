@@ -80,9 +80,9 @@ jQuery(function() {
           	<span id="loading" class="loading">Signing in, please wait...</span></p>
         </fieldset>
       </form>
-      <p><a href="register">Register</a> | <a href="#">Lost your password?</a></p>
+      <p><a href="/manage/register">Register</a> | <a href="/manage/forgot">Lost your password?</a></p>
       #if $varExists('google_signin_url')
-      <p>Don't want to register? <a href="${google_signin_url}">Sign in with a Google account!</a></p>
+      <p>Don't want to register? <a href="${google_signin_url}">Sign in with a Google account</a></p>
       #end if
 	  <!-- InstanceEndEditable -->
 	</div>

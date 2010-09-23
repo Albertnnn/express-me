@@ -28,6 +28,9 @@ from manage import model
 
 AUTO_SIGNIN_COOKIE = 'auto_signin'
 
+def _get_site_info():
+    return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
+
 @get('/')
 def show_manage(**kw):
     pass
@@ -43,7 +46,7 @@ def show_forgot():
             'email' : '',
             'error' : '',
             'recaptcha_public_key' : recaptcha.get_public_key(),
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
     }
 
 @post('/forgot')
@@ -61,7 +64,7 @@ def do_forgot(**kw):
             'email' : email,
             'error' : 'Email is not exist',
             'recaptcha_public_key' : recaptcha.get_public_key(),
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
         }
     result, error = recaptcha.verify_captcha(challenge, response, recaptcha.get_private_key(), ip)
     if result:
@@ -90,24 +93,56 @@ def do_forgot(**kw):
         return {
             '__view__' : 'sent.html',
             'email' : email,
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
     }
     return {
             '__view__' : 'forgot.html',
             'email' : email,
             'error' : error,
             'recaptcha_public_key' : recaptcha.get_public_key(),
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
     }
+
+@get('/g_signin')
+def do_google_signin(**kw):
+    ctx = kw['context']
+    # get google user:
+    from google.appengine.api import users
+    gu = users.get_current_user()
+    if not gu:
+        logging.error('Google account info is not found. Exit g_signin...')
+        raise ApplicationError('Cannot find user information')
+    ctx.delete_cookie(AUTO_SIGNIN_COOKIE)
+    email = gu.email().lower()
+    nicename = gu.nickname()
+    # check if user exist:
+    user = store.get_user_by_email(email)
+    if user is None:
+        # auto-create new user:
+        role = store.ROLE_SUBSCRIBER
+        if users.is_current_user_admin():
+            role = store.ROLE_ADMINISTRATOR
+        user = store.create_user(role, email, '', nicename)
+    redirect = ctx.get_argument('redirect', '/')
+    logging.info('Sign in successfully with Google account and redirect to %s...' % redirect)
+    return 'redirect:%s' % redirect
 
 @get('/signin')
 def show_signin(**kw):
     ctx = kw['context']
     redirect = ctx.get_argument('redirect', '/')
+    google_signin_url = None
+    try:
+        from google.appengine.api import users
+        google_signin_url = users.create_login_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
+    except ImportError:
+        pass
     return {
             '__view__' : 'signin.html',
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'error' : '',
             'redirect' : redirect,
+            'google_signin_url' : google_signin_url,
+            'site' : _get_site_info(),
     }
 
 @get('/register')
@@ -115,7 +150,7 @@ def show_register(**kw):
     return {
             '__view__' : 'register.html',
             'error' : '',
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
     }
 
 @post('/register')
@@ -139,7 +174,7 @@ def do_register(**kw):
     return {
             '__view__' : 'register.html',
             'error' : error,
-            'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+            'site' : _get_site_info(),
     }
 
 @post('/signin')
@@ -162,7 +197,7 @@ def do_signin(**kw):
                 '__view__' : 'signin.html',
                 'error' : error,
                 'redirect' : redirect,
-                'site' : { 'name' : store.get_setting('name', 'site', 'ExpressMe') },
+                'site' : _get_site_info(),
         }
     # make cookie:
     expires = web.COOKIE_EXPIRES_MAX
