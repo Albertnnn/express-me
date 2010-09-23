@@ -58,7 +58,7 @@ class Dispatcher(webapp.RequestHandler):
         '''
         path = self.request.path;
         if path=='/':
-            self._handle_app(method, 'index', '/')
+            return self._handle_app(method, 'index', '/')
         n = path.find('/', 1)
         if n==(-1):
             n = len(path)
@@ -66,7 +66,7 @@ class Dispatcher(webapp.RequestHandler):
         apppath = path[len(appname)+1:]
         if not apppath.startswith('/'):
             apppath = '/' + apppath
-        self._handle_app(method, appname, apppath)
+        return self._handle_app(method, appname, apppath)
 
     def _handle_app(self, method, appname, apppath):
         '''
@@ -76,6 +76,7 @@ class Dispatcher(webapp.RequestHandler):
             appname: app name, the same as package name.
             apppath: URL that excludes the appname in prefix. For example, apppath of '/blog/view/123' is '/view/123'.
         '''
+        logging.info(r'Handle app "%s", path=%s' % (appname, apppath))
         for func in self._get_mapping(method, appname):
             r = func.matches(apppath)
             if r is not None:
@@ -94,7 +95,8 @@ class Dispatcher(webapp.RequestHandler):
                                     get_argument=lambda argument_name, default_value=None: self.request.get(argument_name, default_value),
                                     get_arguments=lambda argument_name: self.request.get_all(argument_name),
                                     arguments=lambda: self.request.arguments(),
-                                    set_cookie=lambda name, value, max_age=-1, path='/', secure=False: self._set_cookie(name, value, max_age, path, secure)
+                                    set_cookie=lambda name, value, max_age=-1, path='/', secure=False: self._set_cookie(name, value, max_age, path, secure),
+                                    delete_cookie=lambda name, path='/', secure=False: self._set_cookie(name, 'deleted', 0, path, secure)
                             )
                     }
                     result = func(*args, **kw)
@@ -170,7 +172,7 @@ class Dispatcher(webapp.RequestHandler):
             dict, url as key, function as value.
         '''
         attr = 'support_' + method
-        mod = __import__(appname + '.controller').controller
+        mod = __import__(appname, fromlist=['controller']).controller
         all = [getattr(mod, f) for f in dir(mod)]
         return [func for func in all if callable(func) and getattr(func, attr, False)]
 
@@ -219,6 +221,31 @@ class Dispatcher(webapp.RequestHandler):
             Cookie value.
         '''
         return self.request.cookies[name].value
+
+    def handle_exception(self, exception, debug_mode):
+        logging.exception('Unhandled exception caught by framework.web.Dispatcher.handle_exception()')
+        html = r'''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>An error occurred</title>
+</head>
+<body style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;">
+  <div style="margin:3px auto; width:640px;">
+    <div style="padding:12px 6px; border-bottom:solid 1px #ccc">
+      <a href="http://www.expressme.org/" target="_blank"><img src="/static/image/expressme.gif" width="326" height="60" border="0" /></a>
+    </div>
+    <div style="padding:0px 12px">
+      <h3 style="line-height:40px">We are sorry but an unexpected error occurred...</h3>
+    </div>
+    <div style="padding:12px">%s: %s</div>
+    <div style="padding:12px">See logs for more details.</div>
+    <div style="line-height:40px; text-align:center; border-top:solid 1px #ccc"><a href="http://www.expressme.org/" target="_blank">ExpressMe</a> copyright&copy;2010, all rights reserved.</div>
+  </div>
+</body>
+</html>
+''' % (exception.__class__.__name__, exception.message or '(no message)')
+        self.response.out.write(html)
 
 def _matches(pattern, raw_mapping, url):
     '''
