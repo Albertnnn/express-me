@@ -33,6 +33,17 @@ class BaseModel(db.Model):
             return getattr(self, name[:-7])
         raise AttributeError('\'%s\' object has no attribute \'%s\'' % (self.__class__.__name__, name))
 
+#    def __str__(self):
+#        buffer = []
+#        attr_names = dir(self)
+#        for attr_name in attr_names:
+#            if not attr_name.startswith('__') and not attr_name.endswith('__'):
+#                attr_value = getattr(self, attr_name)
+#                buffer.append('%s=%s' % (attr_name, str(attr_value),))
+#        return '%s (%s)' % (self.__class__.__name__, ', '.join(buffer))
+#
+#    __repr__ = __str__
+
 MAX_METADATA = 100
 
 def query_metadata(ref, name=None):
