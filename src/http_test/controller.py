@@ -9,6 +9,7 @@ httptest package for testing web framework of ExpressMe.
 
 from framework.web import get
 from framework.web import post
+from framework.web import mapping
 
 @get('/')
 def http_home():
@@ -17,6 +18,10 @@ def http_home():
 @post('/hello/$')
 def http_hello(name):
     return '<p>Hello, %s!</p>' % name
+
+@mapping('/hi/$')
+def hi(name):
+    return '<p>Hi, %s!</p>' % name
 
 @get('/redirect/$')
 def http_redirect(target):

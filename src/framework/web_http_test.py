@@ -37,6 +37,12 @@ class Test(unittest.TestCase):
         self.init_post('/http_test/hello/Michael')
         self.assertEquals('<p>Hello, Michael!</p>', self.response.out.getvalue())
 
+    def test_mapping(self):
+        self.init_get('/http_test/hi/Michael')
+        self.assertEquals('<p>Hi, Michael!</p>', self.response.out.getvalue())
+        self.init_post('/http_test/hi/Michael')
+        self.assertEquals('<p>Hi, Michael!</p>', self.response.out.getvalue())
+
     def test_redirect(self):
         self.init_get('/http_test/redirect/abc')
         self.assertEquals('/about/abc', self.response.headers['Location'])

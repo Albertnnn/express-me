@@ -330,31 +330,31 @@ def post(pattern=None):
         return wrapper
     return execute
 
-#def mapping(pattern=None):
-#    '''
-#    decorator of @mapping() that support get and post
-#    
-#    Args:
-#        pattern: string like '/$/$.html', default value: None
-#    
-#    Returns:
-#        decorated function.
-#    '''
-#    def execute(f):
-#        def wrapper(*args, **kw):
-#            return f(*args, **kw)
-#        if pattern==None:
-#            wrapper.pattern = '/' + f.__name__
-#        else:
-#            wrapper.pattern = pattern
-#        wrapper.support_get = True
-#        wrapper.support_post = True
-#        wrapper.raw_mapping = False
-#        wrapper.__name__ = f.__name__
-#        wrapper.matches = lambda url: _matches(wrapper.pattern, wrapper.raw_mapping, url)
-#        wrapper.has_varkw = lambda: _has_varkw(f)
-#        return wrapper
-#    return execute
+def mapping(pattern=None):
+    '''
+    decorator of @mapping() that support get and post
+    
+    Args:
+        pattern: string like '/$/$.html', default value: None
+    
+    Returns:
+        decorated function.
+    '''
+    def execute(f):
+        def wrapper(*args, **kw):
+            return f(*args, **kw)
+        if pattern==None:
+            wrapper.pattern = '/' + f.__name__
+        else:
+            wrapper.pattern = pattern
+        wrapper.support_get = True
+        wrapper.support_post = True
+        wrapper.raw_mapping = False
+        wrapper.__name__ = f.__name__
+        wrapper.matches = lambda url: _matches(wrapper.pattern, wrapper.raw_mapping, url)
+        wrapper.has_varkw = lambda: _has_varkw(f)
+        return wrapper
+    return execute
 
 def raw_mapping(pattern):
     '''
