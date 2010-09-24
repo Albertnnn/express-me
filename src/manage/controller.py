@@ -10,9 +10,6 @@ Manage app that supports:
   manage: manage all things of site.
 '''
 
-import time
-import base64
-import hashlib
 import logging
 import urllib
 
@@ -23,10 +20,10 @@ from framework import mail
 from framework import recaptcha
 from framework.web import get
 from framework.web import post
+from framework.web import mapping
 
 from manage import model
-
-AUTO_SIGNIN_COOKIE = 'auto_signin'
+from manage import cookie
 
 def _get_site_info():
     return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
@@ -112,7 +109,7 @@ def do_google_signin(**kw):
     if not gu:
         logging.error('Google account info is not found. Exit g_signin...')
         raise ApplicationError('Cannot find user information')
-    ctx.delete_cookie(AUTO_SIGNIN_COOKIE)
+    ctx.delete_cookie(cookie.AUTO_SIGNIN_COOKIE)
     email = gu.email().lower()
     nicename = gu.nickname()
     # check if user exist:
@@ -145,6 +142,16 @@ def show_signin(**kw):
             'site' : _get_site_info(),
     }
 
+@mapping('/signout')
+def signout(**kw):
+    ctx = kw['context']
+    ctx.delete_cookie(cookie.AUTO_SIGNIN_COOKIE)
+    redirect = '/'
+    referer = ctx.request.headers.get('Referer')
+    if referer and referer.find('/manage/signout')==(-1):
+        redirect = referer
+    return 'redirect:%s' % redirect
+
 @get('/register')
 def show_register(**kw):
     return {
@@ -163,8 +170,8 @@ def do_register(**kw):
     error = ''
     try:
         user = store.create_user(role, email, password, nicename)
-        value = _make_sign_on_cookie(user.id, password, 86400)
-        ctx.set_cookie(AUTO_SIGNIN_COOKIE, value)
+        value = cookie.make_sign_in_cookie(user.id, password, 86400)
+        ctx.set_cookie(cookie.AUTO_SIGNIN_COOKIE, value)
         return 'redirect:/manage/'
     except store.UserAlreadyExistError:
         error = 'Email is already registered by other'
@@ -205,13 +212,6 @@ def do_signin(**kw):
         expires = int(ctx.get_argument('expires'))
     except ValueError:
         pass
-    value = _make_sign_on_cookie(user.id, password, expires)
-    ctx.set_cookie(AUTO_SIGNIN_COOKIE, value, expires)
+    value = cookie.make_sign_in_cookie(user.id, password, expires)
+    ctx.set_cookie(cookie.AUTO_SIGNIN_COOKIE, value, expires)
     return 'redirect:' + redirect
-
-def _make_sign_on_cookie(key, passwd, expire_in_seconds):
-    # make sign on cookie with following format:
-    # base64(id_expires_md5(id_expires_passwd))
-    expires = int(time.time()) + expire_in_seconds
-    md5 = hashlib.md5(key + '_' + str(expires) + '_' + passwd).hexdigest()
-    return base64.b64encode(key + '_' + str(expires) + '_' + md5)

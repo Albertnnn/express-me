@@ -17,6 +17,8 @@ import logging
 from google.appengine.ext import webapp
 from Cheetah.Template import Template
 
+import interceptor
+
 COOKIE_EXPIRES_MIN = 86400
 COOKIE_EXPIRES_MAX = 31536000
 
@@ -82,23 +84,24 @@ class Dispatcher(webapp.RequestHandler):
             if r is not None:
                 # decode url parameter:
                 args = [urllib.unquote(arg) for arg in r]
-                self._filter(func, args)
+                # prepare environment as varkw:
+                kw = {
+                        'environ' : self.request.environ,
+                        'headers' : self.request.headers,
+                        'cookies' : self.request.cookies,
+                        'request' : self.request,
+                        'response' : self.response,
+                        'context' : Context(
+                                get_argument=lambda argument_name, default_value=None: self.request.get(argument_name, default_value),
+                                get_arguments=lambda argument_name: self.request.get_all(argument_name),
+                                arguments=lambda: self.request.arguments(),
+                                get_cookie=lambda name: self._get_cookie(name),
+                                set_cookie=lambda name, value, max_age=-1, path='/', secure=False: self._set_cookie(name, value, max_age, path, secure),
+                                delete_cookie=lambda name, path='/', secure=False: self._set_cookie(name, 'deleted', 0, path, secure)
+                        )
+                }
+                interceptor.intercept(kw)
                 if func.has_varkw():
-                    # need varkw args, prepare environment:
-                    kw = {
-                            'environ' : self.request.environ,
-                            'headers' : self.request.headers,
-                            'cookies' : self.request.cookies,
-                            'request' : self.request,
-                            'response' : self.response,
-                            'context' : Context(
-                                    get_argument=lambda argument_name, default_value=None: self.request.get(argument_name, default_value),
-                                    get_arguments=lambda argument_name: self.request.get_all(argument_name),
-                                    arguments=lambda: self.request.arguments(),
-                                    set_cookie=lambda name, value, max_age=-1, path='/', secure=False: self._set_cookie(name, value, max_age, path, secure),
-                                    delete_cookie=lambda name, path='/', secure=False: self._set_cookie(name, 'deleted', 0, path, secure)
-                            )
-                    }
                     result = func(*args, **kw)
                 else:
                     result = func(*args)
@@ -155,12 +158,6 @@ class Dispatcher(webapp.RequestHandler):
             self.response.out.write(result[5:])
             return
         self.response.out.write(result)
-
-    def _filter(self, func, args):
-        '''
-        Call filters before executing.
-        '''
-        return
 
     def _get_mapping(self, method, appname):
         '''
@@ -220,7 +217,9 @@ class Dispatcher(webapp.RequestHandler):
         Returns:
             Cookie value.
         '''
-        return self.request.cookies[name].value
+        if name in self.request.cookies:
+            return self.request.cookies[name].value
+        return None
 
     def handle_exception(self, exception, debug_mode):
         logging.exception('Unhandled exception caught by framework.web.Dispatcher.handle_exception()')
