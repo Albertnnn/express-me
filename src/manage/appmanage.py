@@ -13,6 +13,9 @@ from manage.common import AppMenu
 from manage.common import AppMenuItem
 
 def get_menus():
+    '''
+    Get menus for management.
+    '''
     user = AppMenu('User',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
@@ -26,10 +29,12 @@ def get_menus():
     )
     return (user, setting,)
 
-def _edit_user(user, command, **kw):
-    pass
+def _profile(user, app, command, model):
+    model['__view__'] = 'manage_profile.html'
+    return model
 
-def manage(user, command, **kw):
+def manage(user, app, command, model):
     map = {
-           'edit_user' : _edit_user
+           'profile' : _profile
     }
+    return map[command](user, app, command, model)

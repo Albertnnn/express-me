@@ -17,6 +17,7 @@ from framework import ApplicationError
 from framework import store
 from framework import web
 from framework import mail
+from framework import view
 from framework import recaptcha
 from framework.web import get
 from framework.web import post
@@ -24,6 +25,12 @@ from framework.web import mapping
 
 from manage import model
 from manage import cookie
+
+from manage.common import AppMenu
+from manage.common import AppMenuItem
+
+import appconfig
+from version import get_version
 
 def _get_site_info():
     return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
@@ -33,7 +40,68 @@ def do_manage(**kw):
     current_user = kw['current_user']
     if current_user is None:
         return 'redirect:/manage/signin?redirect=%s/manage/' % kw['request'].host_url
-    pass
+    ctx = kw['context']
+    role = current_user.role
+    app = ctx.get_argument('app', 'manage')
+    command = ctx.get_argument('command', 'profile')
+    menus = []
+    selected_menu = None
+    selected_menu_item = None
+    for appname in appconfig.apps:
+        logging.info('Import %s.appmanage...' % appname)
+        app_mod = __import__(appname, fromlist=['appmanage']).appmanage
+        for m in app_mod.get_menus():
+            fm = _filter_menu(m, role, appname)
+            if fm is not None:
+                menus.append(fm)
+                if appname==app:
+                    for item in fm.items:
+                        if item.command==command:
+                            selected_menu_item = item
+                            selected_menu = fm
+                            break
+    model = {
+            'user' : current_user,
+            'app' : app,
+            'command' : command,
+            'menus' : menus,
+            'selected_menu' : selected_menu,
+            'selected_menu_item' : selected_menu_item,
+            'version' : get_version(),
+    }
+    req = kw['request']
+    embed_model = {
+            'method' : req.method.lower(),
+            'get_argument' : lambda argument_name, default_value=None: req.get(argument_name, default_value),
+            'get_arguments' : lambda argument_name: req.get_all(argument_name),
+            'arguments' : lambda: req.arguments(),
+    }
+    embed_model.update(model)
+    app_mod = __import__(appname, fromlist=['appmanage']).appmanage
+    embeded = view.render(app, app_mod.manage(current_user, app, command, embed_model))
+    model['__embeded__raw__'] = embeded
+    model['__view__'] = 'manage.html'
+    return model
+
+def _filter_menu(menu, role, appname):
+    '''
+    Check AppMenu and return a authorized menu.
+    
+    Args:
+        menu: AppMenu object.
+        role: role of current user.
+    Returns:
+        new AppMenu object that has authority to the menu, or None if all items are forbidden.
+    '''
+    m = AppMenu(menu.title)
+    m.app = appname
+    for item in menu.items:
+        if item.role >= role:
+            item.app = appname
+            m.items.append(item)
+    if m.items:
+        return m
+    return None
 
 @get('/forgot')
 def show_forgot():
@@ -43,6 +111,7 @@ def show_forgot():
             'error' : '',
             'recaptcha_public_key' : recaptcha.get_public_key(),
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
 
 @post('/forgot')
@@ -61,6 +130,7 @@ def do_forgot(**kw):
             'error' : 'Email is not exist',
             'recaptcha_public_key' : recaptcha.get_public_key(),
             'site' : _get_site_info(),
+            'version' : get_version(),
         }
     result, error = recaptcha.verify_captcha(challenge, response, recaptcha.get_private_key(), ip)
     if result:
@@ -90,6 +160,7 @@ def do_forgot(**kw):
             '__view__' : 'sent.html',
             'email' : email,
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
     return {
             '__view__' : 'forgot.html',
@@ -97,6 +168,7 @@ def do_forgot(**kw):
             'error' : error,
             'recaptcha_public_key' : recaptcha.get_public_key(),
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
 
 @get('/g_signin')
@@ -139,6 +211,7 @@ def show_register(**kw):
             '__view__' : 'register.html',
             'error' : '',
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
 
 @post('/register')
@@ -163,6 +236,7 @@ def do_register(**kw):
             '__view__' : 'register.html',
             'error' : error,
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
 
 @get('/signin')
@@ -181,6 +255,7 @@ def show_signin(**kw):
             'redirect' : redirect,
             'google_signin_url' : google_signin_url,
             'site' : _get_site_info(),
+            'version' : get_version(),
     }
 
 @post('/signin')
@@ -204,6 +279,7 @@ def do_signin(**kw):
                 'error' : error,
                 'redirect' : redirect,
                 'site' : _get_site_info(),
+                'version' : get_version(),
         }
     # make cookie:
     expires = web.COOKIE_EXPIRES_MAX

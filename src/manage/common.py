@@ -13,7 +13,8 @@ class AppMenu(object):
     '''
     def __init__(self, title, *menu_items):
         self.title = title
-        self.items = menu_items
+        self.items = []
+        self.items.extend(menu_items)
 
 class AppMenuItem(object):
     '''

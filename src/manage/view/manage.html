@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+<!--[if lt IE 8]><link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection"/><![endif]-->
+<link rel="stylesheet" href="/manage/static/manage.css" type="text/css" media="screen, projection"/>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/manage/static/js/manage.js"></script>
+<script type="text/javascript">
+jQuery(function(){
+  v = jQuery("#${app}-${command}");
+  v.addClass("app-menu-item-selected");
+  toggle_menu(v.parent().parent().prev(), true);
+});
+</script>
+<title>Manage - Express Me</title>
+</head>
+<body>
+  <div class="container">
+    <div id="header" class="span-24 last">
+      <div class="span-9"><a href="http://www.expressme.org/" target="_blank"><img src="/manage/static/image/expressme-dark.gif" width="326" height="60" alt="Express Me" /></a></div>
+      <div class="span-3" style="height:60px; line-height:60px;"><a href="/" target="_blank">Visit Site &gt;&gt;</a></div>
+      <div class="span-12 last" style="height:60px; line-height:60px; text-align:right;">Hello, <a href="?app=manage&command=profile">${user.nicename}</a> | <a href="/manage/signout">Sign Out登出</a></div>
+    </div>
+    <div class="span-24 last" style="height:16px"></div>
+    <div id="menu-bar" class="span-4">
+      #for $menu in $menus
+      <!-- begin app menu -->
+      <div class="app-menu box-round">
+        <div class="app-menu-title app-menu-hide" onclick="toggle_menu(jQuery(this))" style="font-weight:bold;cursor:pointer">${menu.title}</div>
+        <div class="app-menu-content" style="display:none">
+          #for $item in $menu.items
+          <div><a id="${item.app}-${item.command}" href="/manage/?app=${menu.app}&command=${item.command}" class="app-menu-item">${item.title}</a></div>
+          #end for
+        </div>
+      </div>
+      <!-- end app menu -->
+      #end for
+    </div>
+    <div class="span-20 last">
+      ${__embeded__raw__}
+    </div>
+    <div id="footer" class="span-24 last">&nbsp;Thank you for creating with <a href="http://www.expressme.org/" target="_blank">Express Me</a>. | <a href="http://www.expressme.org/wiki/" target="_blank">Documentation</a> | <a href="http://code.google.com/p/express-me/issues/list" target="_blank">Report Issues</a><span style="float:right">Version ${version}&nbsp;</span></div>
+  </div>
+</body>
+</html>

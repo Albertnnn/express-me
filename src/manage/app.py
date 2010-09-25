@@ -14,120 +14,113 @@ from exweb import HttpBadRequestError
 from exweb import HttpForbiddenError
 
 import os
-import urllib
 
-import manage
 from manage import shared
 
-def googlemail_to_gmail(email):
-    if email.endswith('@googlemail.com'):
-        return email[:-15] + '@gmail.com'
-    return email
-
-@mapping('/register')
-def register():
-    '''
-    show register page if by get, or do register if by post.
-    '''
-    if context.method=='get':
-        return 'register.html', {}
-    # handle post:
-    form = context.form
-    email = form.get('email').strip().lower()
-    email = googlemail_to_gmail(email)
-    user = shared.User.all().filter('user_email =', email).get()
-    if user is not None:
-        return 'register.html', {'error':'Email is already registered.'}
-    passwd = form.get('passwd')
-    nicename = form.get_escape('nicename').strip()
-    user = shared.User(
-            user_email = email,
-            user_passwd = passwd,
-            user_nicename = nicename,
-            user_role = get_default_role()
-    )
-    user.put()
-    return '<html><body><h1>Hi, ' + nicename + ', you have registered successfully!</h1></body></html>'
-
-@mapping('/google')
-def google():
-    '''
-    Sign on from google account. If user sign on for the first time, an User 
-    object will be created automatically and its password is set to empty.
-    
-    Returns:
-        The redirected url as string.
-    '''
-    from google.appengine.api import users
-    gu = users.get_current_user()
-    if not gu:
-        raise StandardError()
-    context.remove_cookie(manage.COOKIE_AUTO_SIGN_ON)
-    email = gu.email().lower()
-    email = googlemail_to_gmail(email)
-    nicename = gu.nickname()
-    # check if user exist:
-    user = shared.get_user_by_email(email)
-    if user is None:
-        # auto-create new user:
-        role = get_default_role()
-        if users.is_current_user_admin():
-            role = shared.USER_ROLE_ADMINISTRATOR
-        user = shared.create_user(role, email, '', nicename, '')
-    redirect = context.query.get('redirect', '/')
-    return 'redirect:' + redirect
-
-@mapping('/signout')
-def signout():
-    context.remove_cookie(manage.COOKIE_AUTO_SIGN_ON)
-    # TODO: when sign in with google, there should be a cookie named 'from_google=True'
-    # and sign out from google.
-    redirect = '/'
-    referer = context.headers.get('Referer')
-    if referer is not None:
-        if referer.find('/manage/signout')==(-1):
-            redirect = referer
-    return 'redirect:' + redirect
-
-@mapping('/signin')
-def sign_in():
-    '''
-    handle sign in request and make cookie for track.
-    '''
-    if context.method=='get':
-        redirect = context.query.get('redirect', '/manage/')
-        # make sure NOT redirect to signon:
-        if redirect.startswith('/manage/signin'):
-            redirect = '/manage/'
-        model = { 'redirect' : redirect }
-        try:
-            from google.appengine.api import users
-            model['google_url'] = users.create_login_url('/manage/google?redirect=' + urllib.quote(redirect))
-        except ImportError:
-            pass
-        return 'signin.html', model
-    # handle post:
-    form = context.form
-    email = form.get('email').lower()
-    passwd = form.get('passwd', '')
-    redirect = form.get('redirect', '/manage/')
-    signin_failed = ('signin.html', {'error' : 'Invalid email or password.', 'redirect' : redirect})
-    if not email or not passwd:
-        return signin_failed
-
-    expires = manage.COOKIE_EXPIRES_MAX
-    try:
-        expires = int(form.get('expires'))
-    except ValueError:
-        pass
-    user = shared.get_user_by_passwd(email, passwd)
-    if user is not None:
-        key = str(user.key())
-        value = manage.make_sign_on_cookie(key, passwd, expires)
-        context.set_cookie(manage.COOKIE_AUTO_SIGN_ON, value, expires)
-        return 'redirect:' + redirect
-    else:
-        return signin_failed
+#@mapping('/register')
+#def register():
+#    '''
+#    show register page if by get, or do register if by post.
+#    '''
+#    if context.method=='get':
+#        return 'register.html', {}
+#    # handle post:
+#    form = context.form
+#    email = form.get('email').strip().lower()
+#    email = googlemail_to_gmail(email)
+#    user = shared.User.all().filter('user_email =', email).get()
+#    if user is not None:
+#        return 'register.html', {'error':'Email is already registered.'}
+#    passwd = form.get('passwd')
+#    nicename = form.get_escape('nicename').strip()
+#    user = shared.User(
+#            user_email = email,
+#            user_passwd = passwd,
+#            user_nicename = nicename,
+#            user_role = get_default_role()
+#    )
+#    user.put()
+#    return '<html><body><h1>Hi, ' + nicename + ', you have registered successfully!</h1></body></html>'
+#
+#@mapping('/google')
+#def google():
+#    '''
+#    Sign on from google account. If user sign on for the first time, an User 
+#    object will be created automatically and its password is set to empty.
+#    
+#    Returns:
+#        The redirected url as string.
+#    '''
+#    from google.appengine.api import users
+#    gu = users.get_current_user()
+#    if not gu:
+#        raise StandardError()
+#    context.remove_cookie(manage.COOKIE_AUTO_SIGN_ON)
+#    email = gu.email().lower()
+#    email = googlemail_to_gmail(email)
+#    nicename = gu.nickname()
+#    # check if user exist:
+#    user = shared.get_user_by_email(email)
+#    if user is None:
+#        # auto-create new user:
+#        role = get_default_role()
+#        if users.is_current_user_admin():
+#            role = shared.USER_ROLE_ADMINISTRATOR
+#        user = shared.create_user(role, email, '', nicename, '')
+#    redirect = context.query.get('redirect', '/')
+#    return 'redirect:' + redirect
+#
+#@mapping('/signout')
+#def signout():
+#    context.remove_cookie(manage.COOKIE_AUTO_SIGN_ON)
+#    # TODO: when sign in with google, there should be a cookie named 'from_google=True'
+#    # and sign out from google.
+#    redirect = '/'
+#    referer = context.headers.get('Referer')
+#    if referer is not None:
+#        if referer.find('/manage/signout')==(-1):
+#            redirect = referer
+#    return 'redirect:' + redirect
+#
+#@mapping('/signin')
+#def sign_in():
+#    '''
+#    handle sign in request and make cookie for track.
+#    '''
+#    if context.method=='get':
+#        redirect = context.query.get('redirect', '/manage/')
+#        # make sure NOT redirect to signon:
+#        if redirect.startswith('/manage/signin'):
+#            redirect = '/manage/'
+#        model = { 'redirect' : redirect }
+#        try:
+#            from google.appengine.api import users
+#            model['google_url'] = users.create_login_url('/manage/google?redirect=' + urllib.quote(redirect))
+#        except ImportError:
+#            pass
+#        return 'signin.html', model
+#    # handle post:
+#    form = context.form
+#    email = form.get('email').lower()
+#    passwd = form.get('passwd', '')
+#    redirect = form.get('redirect', '/manage/')
+#    signin_failed = ('signin.html', {'error' : 'Invalid email or password.', 'redirect' : redirect})
+#    if not email or not passwd:
+#        return signin_failed
+#
+#    expires = manage.COOKIE_EXPIRES_MAX
+#    try:
+#        expires = int(form.get('expires'))
+#    except ValueError:
+#        pass
+#    user = shared.get_user_by_passwd(email, passwd)
+#    if user is not None:
+#        key = str(user.key())
+#        value = manage.make_sign_on_cookie(key, passwd, expires)
+#        context.set_cookie(manage.COOKIE_AUTO_SIGN_ON, value, expires)
+#        return 'redirect:' + redirect
+#    else:
+#        return signin_failed
 
 @post('/upload/$')
 def upload(type):
