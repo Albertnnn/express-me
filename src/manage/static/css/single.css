@@ -1,7 +1,7 @@
 @charset "utf-8";
 /* Custom CSS Document */
 
-/*body { font: 12px/1.5 Arial; background-color: #f9f9f9; }*/
+body { background-image:url(/manage/static/image/single-bg.png); background-repeat:repeat-x; }
 
 a:link    {color: #2175ac; text-decoration:none}
 a:visited {color: #2175ac; text-decoration:none}
