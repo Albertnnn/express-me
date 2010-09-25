@@ -28,12 +28,11 @@ from manage import cookie
 def _get_site_info():
     return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
 
-@get('/')
-def show_manage(**kw):
-    pass
-
-@post('/')
+@mapping('/')
 def do_manage(**kw):
+    current_user = kw['current_user']
+    if current_user is None:
+        return 'redirect:/manage/signin?redirect=%s/manage/' % kw['request'].host_url
     pass
 
 @get('/forgot')
@@ -106,7 +105,7 @@ def do_google_signin(**kw):
     # get google user:
     from google.appengine.api import users
     gu = users.get_current_user()
-    if not gu:
+    if gu is None:
         logging.error('Google account info is not found. Exit g_signin...')
         raise ApplicationError('Cannot find user information')
     ctx.delete_cookie(cookie.AUTO_SIGNIN_COOKIE)
@@ -123,24 +122,6 @@ def do_google_signin(**kw):
     redirect = ctx.get_argument('redirect', '/')
     logging.info('Sign in successfully with Google account and redirect to %s...' % redirect)
     return 'redirect:%s' % redirect
-
-@get('/signin')
-def show_signin(**kw):
-    ctx = kw['context']
-    redirect = ctx.get_argument('redirect', '/')
-    google_signin_url = None
-    try:
-        from google.appengine.api import users
-        google_signin_url = users.create_login_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
-    except ImportError:
-        pass
-    return {
-            '__view__' : 'signin.html',
-            'error' : '',
-            'redirect' : redirect,
-            'google_signin_url' : google_signin_url,
-            'site' : _get_site_info(),
-    }
 
 @mapping('/signout')
 def signout(**kw):
@@ -181,6 +162,24 @@ def do_register(**kw):
     return {
             '__view__' : 'register.html',
             'error' : error,
+            'site' : _get_site_info(),
+    }
+
+@get('/signin')
+def show_signin(**kw):
+    ctx = kw['context']
+    redirect = ctx.get_argument('redirect', '/')
+    google_signin_url = None
+    try:
+        from google.appengine.api import users
+        google_signin_url = users.create_login_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
+    except ImportError:
+        pass
+    return {
+            '__view__' : 'signin.html',
+            'error' : '',
+            'redirect' : redirect,
+            'google_signin_url' : google_signin_url,
             'site' : _get_site_info(),
     }
 

@@ -100,7 +100,11 @@ class Dispatcher(webapp.RequestHandler):
                                 delete_cookie=lambda name, path='/', secure=False: self._set_cookie(name, 'deleted', 0, path, secure)
                         )
                 }
+                # global interceptor:
                 interceptor.intercept(kw)
+                # app interceptor:
+                app_inter = __import__(appname, fromlist=['interceptor']).interceptor
+                app_inter.intercept(kw)
                 if func.has_varkw():
                     result = func(*args, **kw)
                 else:
