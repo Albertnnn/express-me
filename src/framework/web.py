@@ -17,6 +17,7 @@ import logging
 from google.appengine.ext import webapp
 from Cheetah.Template import Template
 
+from framework import view
 import interceptor
 
 COOKIE_EXPIRES_MIN = 86400
@@ -134,16 +135,7 @@ class Dispatcher(webapp.RequestHandler):
         Args:
             model: model as dict.
         '''
-        view_name = model.get('__view__')
-        if view_name is None:
-            return self._error(500, 'View is not set.')
-        web_root = os.path.split(os.path.dirname(__file__))[0]
-        view_path = os.path.join(os.path.join(web_root, appname, 'view'), *view_name.split('/'))
-        logging.info('Render view: %s' % view_path)
-        if not os.path.isfile(view_path):
-            # 404 error:
-            return self._error(500, 'View is not found: %s' % view_path)
-        t = Template(file=view_path, searchList=[model], filter='WebSafe')
+        t = view.render(appname, model)
         content_type = model.get('__content_type__')
         if content_type:
             self.response.content_type = content_type

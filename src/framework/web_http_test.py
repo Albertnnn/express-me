@@ -7,6 +7,7 @@ import unittest
 
 from google.appengine.ext import webapp
 from framework.web import Dispatcher
+import interceptor
 
 class Test(unittest.TestCase):
 
@@ -22,6 +23,7 @@ class Test(unittest.TestCase):
         self.response = webapp.Response() #webob.Response(request=self.request))
         self.dispatcher = Dispatcher()
         self.dispatcher.initialize(self.request, self.response)
+        interceptor.intercept = lambda kw: None
         if method=='GET':
             self.dispatcher.get()
         else:

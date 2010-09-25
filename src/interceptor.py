@@ -10,9 +10,6 @@ Global interceptor for ExpressMe application.
 from manage import cookie
 from framework import store
 
-def intercept(kw):
-    _detect_current_user(kw)
-
 def _detect_current_user(kw):
     kw['current_user'] = None
     ctx = kw['context']
@@ -29,3 +26,5 @@ def _detect_current_user(kw):
         user = store.get_user_by_email(email)
         if user:
             kw['current_user'] = user
+
+intercept = _detect_current_user
