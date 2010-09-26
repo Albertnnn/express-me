@@ -29,12 +29,11 @@ def get_menus():
     )
     return (user, setting,)
 
-def _profile(user, app, command, model):
+def _profile(user, app, model):
     model['__view__'] = 'manage_profile.html'
-    return model
 
 def manage(user, app, command, model):
     map = {
            'profile' : _profile
     }
-    return map[command](user, app, command, model)
+    map[command](user, app, model)

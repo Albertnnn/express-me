@@ -7,7 +7,6 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Web MVC framework for AppEngine/WebOb.
 '''
 
-import os
 import re
 import time
 import urllib
@@ -15,7 +14,6 @@ import inspect
 import logging
 
 from google.appengine.ext import webapp
-from Cheetah.Template import Template
 
 from framework import view
 import interceptor

@@ -27,7 +27,6 @@ from manage import model
 from manage import cookie
 
 from manage.common import AppMenu
-from manage.common import AppMenuItem
 
 import appconfig
 from version import get_version
@@ -78,9 +77,10 @@ def do_manage(**kw):
     }
     embed_model.update(model)
     app_mod = __import__(appname, fromlist=['appmanage']).appmanage
-    embeded = view.render(app, app_mod.manage(current_user, app, command, embed_model))
+    app_mod.manage(current_user, app, command, embed_model)
+    embeded = view.render(app, embed_model)
     model['__embeded__raw__'] = embeded
-    model['__view__'] = 'manage.html'
+    model['__view__'] = 'manage'
     return model
 
 def _filter_menu(menu, role, appname):
@@ -106,7 +106,7 @@ def _filter_menu(menu, role, appname):
 @get('/forgot')
 def show_forgot():
     return {
-            '__view__' : 'forgot.html',
+            '__view__' : 'forgot',
             'email' : '',
             'error' : '',
             'recaptcha_public_key' : recaptcha.get_public_key(),
@@ -125,7 +125,7 @@ def do_forgot(**kw):
     user = store.get_user_by_email(email)
     if user is None:
         return {
-            '__view__' : 'forgot.html',
+            '__view__' : 'forgot',
             'email' : email,
             'error' : 'Email is not exist',
             'recaptcha_public_key' : recaptcha.get_public_key(),
@@ -157,13 +157,13 @@ def do_forgot(**kw):
 ''' % (urllib.quote(user.nicename), appid, token, appid, token, appid, token)
         mail.send(sender, email, 'Reset your password', body, html)
         return {
-            '__view__' : 'sent.html',
+            '__view__' : 'sent',
             'email' : email,
             'site' : _get_site_info(),
             'version' : get_version(),
     }
     return {
-            '__view__' : 'forgot.html',
+            '__view__' : 'forgot',
             'email' : email,
             'error' : error,
             'recaptcha_public_key' : recaptcha.get_public_key(),
@@ -208,7 +208,7 @@ def signout(**kw):
 @get('/register')
 def show_register(**kw):
     return {
-            '__view__' : 'register.html',
+            '__view__' : 'register',
             'error' : '',
             'site' : _get_site_info(),
             'version' : get_version(),
@@ -250,7 +250,7 @@ def show_signin(**kw):
     except ImportError:
         pass
     return {
-            '__view__' : 'signin.html',
+            '__view__' : 'signin',
             'error' : '',
             'redirect' : redirect,
             'google_signin_url' : google_signin_url,
@@ -275,7 +275,7 @@ def do_signin(**kw):
         error = 'Unexpected error occurred: %s' % e.message
     if error:
         return {
-                '__view__' : 'signin.html',
+                '__view__' : 'signin',
                 'error' : error,
                 'redirect' : redirect,
                 'site' : _get_site_info(),
