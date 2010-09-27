@@ -262,6 +262,10 @@ def valueForName(obj, name, executeCallables=False):
         _wrapNotFoundException(e, fullName=name, namespace=obj)
 
 def valueFromSearchList(searchList, name, executeCallables=False):
+    # hack: remove __raw__ from name
+    if name.endswith('__raw__'):
+        name = name[:-7]
+    # end hask
     key = name.split('.')[0]
     for namespace in searchList:
         if hasKey(namespace, key):
