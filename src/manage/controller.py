@@ -71,15 +71,16 @@ def do_manage(**kw):
             'version' : get_version(),
     }
     req = kw['request']
-    embed_model = {
-            'method' : req.method.lower(),
-            'get_argument' : lambda argument_name, default_value=None: req.get(argument_name, default_value),
-            'get_arguments' : lambda argument_name: req.get_all(argument_name),
-            'arguments' : lambda: req.arguments(),
-    }
-    embed_model.update(model)
+    embed_context = web.Context()
+    embed_context.method = req.method.lower()
+    embed_context.get_argument = lambda argument_name, default_value=None: req.get(argument_name, default_value)
+    embed_context.get_arguments = lambda argument_name: req.get_all(argument_name)
+    embed_context.arguments = lambda: req.arguments()
     app_mod = __import__(appname, fromlist=['appmanage']).appmanage
-    app_mod.manage(current_user, app, command, embed_model)
+    embed_model = app_mod.manage(current_user, app, command, embed_context)
+    embed_model['app'] = app
+    embed_model['command'] = command
+    embed_model['user'] = current_user
     embeded = view.render(app, embed_model)
     model['__embeded__'] = embeded
     model['__view__'] = 'manage'

@@ -29,11 +29,16 @@ def get_menus():
     )
     return (user, setting,)
 
-def _profile(user, app, model):
-    model['__view__'] = 'manage_profile'
+def _profile(user, app, context):
+    if context.method=='post':
+        nicename = context.get_argument('nicename')
+        #password = context.get_argument('password')
+    return {
+            '__view__' : 'manage_profile',
+    }
 
-def manage(user, app, command, model):
+def manage(user, app, command, context):
     map = {
            'profile' : _profile
     }
-    map[command](user, app, model)
+    return map[command](user, app, context)
