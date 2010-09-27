@@ -68,12 +68,12 @@ def render(appname, model):
     '''
     view_name = model.get('__view__')
     if view_name is None:
-        return RenderError('View is not set.')
+        raise RenderError('View is not set.')
     cc = import_compiled_template(appname, view_name)
     if cc is not None:
         return cc(searchList=[model], filter='WebSafe')
     view_path = get_template_path(appname, view_name)
     logging.info('Render view at runtime: %s' % view_path)
     if not os.path.isfile(view_path):
-        return RenderError('Template is not found: %s' % view_path)
+        raise RenderError('Template is not found: %s' % view_path)
     return Template(file=view_path, searchList=[model], filter='WebSafe')
