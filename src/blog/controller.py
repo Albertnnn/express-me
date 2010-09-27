@@ -40,7 +40,7 @@ def get_posts_by_page(page):
             'feed' : blog_utils.get_feed()
     }
 
-@get('/tag/$')
+@get('/t/$')
 def get_posts_by_tag(tag_key):
     tag = store.get_tag(tag_key)
     return {
@@ -50,7 +50,7 @@ def get_posts_by_tag(tag_key):
             'feed' : blog_utils.get_feed()
     }
 
-@get('/cat/$')
+@get('/c/$')
 def get_posts_by_category(cat_key):
     category = store.get_category(cat_key)
     return {
