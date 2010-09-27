@@ -46,16 +46,22 @@ function validate_form(){
     #end if
     <div id="err_msg" class="error" style="display:none"></div>
     <div class="form-field">
+      <div class="form-field-title">Role <em>(cannot change)</em>:</div>
+      <div class="form-field-input"><select name="role" id="role" value="${user.role}" style="width:360px" disabled="disabled">
+        <option value="0">Administrator</option>
+        <option value="10">Editor</option>
+        <option value="20">Author</option>
+        <option value="30">Contributor</option>
+        <option value="40">Subscriber</option>
+      </select></div>
+    </div>
+    <div class="form-field">
       <div class="form-field-title">Email <em>(cannot change)</em>:</div>
       <div class="form-field-input"><input name="email" value="${user.email}" type="text" id="email" style="width:360px" disabled="disabled" /></div>
     </div>
     <div class="form-field">
       <div class="form-field-title">Nice name <em>(required)</em>:</div>
       <div class="form-field-input"><input name="nicename" value="${user.nicename}" type="text" id="nicename" maxlength="100" style="width:360px" /></div>
-    </div>
-    <div class="form-field">
-      <div class="form-field-title">Website <em>(optional)</em>:</div>
-      <div class="form-field-input"><input name="website" value="{user.user_website}" type="text" id="website" maxlength="200" style="width:360px" /></div>
     </div>
     <div class="form-field">
       <div class="form-field-title">Change password <em>(leave blank if you do not want to change your password)</em>:</div>

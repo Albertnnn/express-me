@@ -13,6 +13,8 @@ Manage app that supports:
 import logging
 import urllib
 
+from google.appengine.api import users
+
 from framework import ApplicationError
 from framework import store
 from framework import web
@@ -79,7 +81,7 @@ def do_manage(**kw):
     app_mod = __import__(appname, fromlist=['appmanage']).appmanage
     app_mod.manage(current_user, app, command, embed_model)
     embeded = view.render(app, embed_model)
-    model['__embeded__raw__'] = embeded
+    model['__embeded__'] = embeded
     model['__view__'] = 'manage'
     return model
 
@@ -175,7 +177,6 @@ def do_forgot(**kw):
 def do_google_signin(**kw):
     ctx = kw['context']
     # get google user:
-    from google.appengine.api import users
     gu = users.get_current_user()
     if gu is None:
         logging.error('Google account info is not found. Exit g_signin...')
@@ -191,6 +192,9 @@ def do_google_signin(**kw):
         if users.is_current_user_admin():
             role = store.ROLE_ADMINISTRATOR
         user = store.create_user(role, email, '', nicename)
+    elif users.is_current_user_admin() and user.role!=store.ROLE_ADMINISTRATOR:
+        user.role = store.ROLE_ADMINISTRATOR
+        user.put()
     redirect = ctx.get_argument('redirect', '/')
     logging.info('Sign in successfully with Google account and redirect to %s...' % redirect)
     return 'redirect:%s' % redirect
@@ -200,7 +204,7 @@ def signout(**kw):
     ctx = kw['context']
     ctx.delete_cookie(cookie.AUTO_SIGNIN_COOKIE)
     redirect = '/'
-    referer = ctx.request.headers.get('Referer')
+    referer = kw['request'].headers.get('Referer')
     if referer and referer.find('/manage/signout')==(-1):
         redirect = referer
     return 'redirect:%s' % redirect

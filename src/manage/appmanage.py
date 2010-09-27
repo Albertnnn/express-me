@@ -19,7 +19,7 @@ def get_menus():
     user = AppMenu('User',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit_user'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Add New', 'add_user'),
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Your Profile', 'profile')
+            AppMenuItem(store.ROLE_SUBSCRIBER, 'Your Profile', 'profile')
     )
     setting = AppMenu('Setting',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Site Info', 'site'),
@@ -30,7 +30,7 @@ def get_menus():
     return (user, setting,)
 
 def _profile(user, app, model):
-    model['__view__'] = 'manage_profile.html'
+    model['__view__'] = 'manage_profile'
 
 def manage(user, app, command, model):
     map = {
