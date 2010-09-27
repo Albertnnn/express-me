@@ -12,6 +12,7 @@ import base64
 import hashlib
 
 AUTO_SIGNIN_COOKIE = 'auto_signin'
+IS_FROM_GOOGLE_COOKIE = 'is_from_google'
 
 def make_sign_in_cookie(key, passwd, expire_in_seconds):
     # make sign in cookie with following format:

@@ -195,6 +195,7 @@ def do_google_signin(**kw):
     elif users.is_current_user_admin() and user.role!=store.ROLE_ADMINISTRATOR:
         user.role = store.ROLE_ADMINISTRATOR
         user.put()
+    ctx.set_cookie(cookie.IS_FROM_GOOGLE_COOKIE, 'yes', 31536000)
     redirect = ctx.get_argument('redirect', '/')
     logging.info('Sign in successfully with Google account and redirect to %s...' % redirect)
     return 'redirect:%s' % redirect
@@ -207,6 +208,9 @@ def signout(**kw):
     referer = kw['request'].headers.get('Referer')
     if referer and referer.find('/manage/signout')==(-1):
         redirect = referer
+    if ctx.get_cookie(cookie.IS_FROM_GOOGLE_COOKIE)=='yes':
+        ctx.delete_cookie(cookie.IS_FROM_GOOGLE_COOKIE)
+        redirect = users.create_logout_url(redirect)
     return 'redirect:%s' % redirect
 
 @get('/register')
