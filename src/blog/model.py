@@ -165,7 +165,7 @@ def create_category(name, description=''):
     '''
     if BlogCategory.all().count(100)==100:
         raise ApplicationError('Maximum number (100) of categories exceeded.')
-    cat = BlogCategory(category_name=name, category_description=description, category_count=0)
+    cat = BlogCategory(name=name, description=description, count=0)
     cat.put()
     return cat
 
