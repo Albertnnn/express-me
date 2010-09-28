@@ -16,8 +16,8 @@ class GaeTestCase(unittest.TestCase):
     Base GAE TestCase that prepare all GAE local environment for test.
     '''
 
-    def __init__(self, *args, **kwargs):
-        super(GaeTestCase, self).__init__(*args, **kwargs)
+    def setUp(self):
+        super(GaeTestCase, self).setUp()
         gae_home = self._lookup_gae_home()
         sys.path = _get_extra_path(gae_home) + sys.path
 
