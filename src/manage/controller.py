@@ -13,6 +13,8 @@ Manage app that supports:
 import logging
 import urllib
 
+from google.appengine.api import users
+
 from framework import ApplicationError
 from framework import store
 from framework import web
@@ -69,17 +71,18 @@ def do_manage(**kw):
             'version' : get_version(),
     }
     req = kw['request']
-    embed_model = {
-            'method' : req.method.lower(),
-            'get_argument' : lambda argument_name, default_value=None: req.get(argument_name, default_value),
-            'get_arguments' : lambda argument_name: req.get_all(argument_name),
-            'arguments' : lambda: req.arguments(),
-    }
-    embed_model.update(model)
+    embed_context = web.Context()
+    embed_context.method = req.method.lower()
+    embed_context.get_argument = lambda argument_name, default_value=None: req.get(argument_name, default_value)
+    embed_context.get_arguments = lambda argument_name: req.get_all(argument_name)
+    embed_context.arguments = lambda: req.arguments()
     app_mod = __import__(appname, fromlist=['appmanage']).appmanage
-    app_mod.manage(current_user, app, command, embed_model)
+    embed_model = app_mod.manage(current_user, app, command, embed_context)
+    embed_model['app'] = app
+    embed_model['command'] = command
+    embed_model['user'] = current_user
     embeded = view.render(app, embed_model)
-    model['__embeded__raw__'] = embeded
+    model['__embeded__'] = embeded
     model['__view__'] = 'manage'
     return model
 
@@ -175,7 +178,6 @@ def do_forgot(**kw):
 def do_google_signin(**kw):
     ctx = kw['context']
     # get google user:
-    from google.appengine.api import users
     gu = users.get_current_user()
     if gu is None:
         logging.error('Google account info is not found. Exit g_signin...')
@@ -191,6 +193,10 @@ def do_google_signin(**kw):
         if users.is_current_user_admin():
             role = store.ROLE_ADMINISTRATOR
         user = store.create_user(role, email, '', nicename)
+    elif users.is_current_user_admin() and user.role!=store.ROLE_ADMINISTRATOR:
+        user.role = store.ROLE_ADMINISTRATOR
+        user.put()
+    ctx.set_cookie(cookie.IS_FROM_GOOGLE_COOKIE, 'yes', 31536000)
     redirect = ctx.get_argument('redirect', '/')
     logging.info('Sign in successfully with Google account and redirect to %s...' % redirect)
     return 'redirect:%s' % redirect
@@ -200,9 +206,12 @@ def signout(**kw):
     ctx = kw['context']
     ctx.delete_cookie(cookie.AUTO_SIGNIN_COOKIE)
     redirect = '/'
-    referer = ctx.request.headers.get('Referer')
+    referer = kw['request'].headers.get('Referer')
     if referer and referer.find('/manage/signout')==(-1):
         redirect = referer
+    if ctx.get_cookie(cookie.IS_FROM_GOOGLE_COOKIE)=='yes':
+        ctx.delete_cookie(cookie.IS_FROM_GOOGLE_COOKIE)
+        redirect = users.create_logout_url(redirect)
     return 'redirect:%s' % redirect
 
 @get('/register')

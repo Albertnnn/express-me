@@ -144,6 +144,9 @@ class User(BaseModel):
     nicename = db.StringProperty(default='')
     locked = db.BooleanProperty(required=True, default=False)
 
+    def is_admin(self):
+        return self.role==ROLE_ADMINISTRATOR
+
     @staticmethod
     def get_role_name(role):
         '''

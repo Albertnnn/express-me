@@ -12,6 +12,7 @@ import base64
 import hashlib
 
 AUTO_SIGNIN_COOKIE = 'auto_signin'
+IS_FROM_GOOGLE_COOKIE = 'is_from_google'
 
 def make_sign_in_cookie(key, passwd, expire_in_seconds):
     # make sign in cookie with following format:
@@ -41,14 +42,14 @@ def validate_sign_in_cookie(value, get_user):
     expires = ss[1]
     md5 = ss[2]
     try:
-        if float(expires)<time():
+        if float(expires) < time.time():
             return None
     except ValueError:
         return None
     user = get_user(key)
     if user is None:
         return None
-    calc_md5 = hashlib.md5(','.join([key, expires, str(user.user_passwd)])).hexdigest()
+    calc_md5 = hashlib.md5(','.join([key, expires, str(user.password)])).hexdigest()
     if calc_md5!=md5:
         return None
     return user

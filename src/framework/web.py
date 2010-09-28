@@ -212,7 +212,7 @@ class Dispatcher(webapp.RequestHandler):
             Cookie value.
         '''
         if name in self.request.cookies:
-            return self.request.cookies[name].value
+            return self.request.cookies[name]
         return None
 
     def handle_exception(self, exception, debug_mode):

@@ -2,7 +2,7 @@ syntax: regexp
 ^.*\.pyc$
 
 syntax: regexp
-^src/autogen$
+^src/compiled$
 
 syntax: regexp
 ^\.settings$
