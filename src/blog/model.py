@@ -6,14 +6,23 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 from google.appengine.ext import db
 
 from framework import store
+from framework import ApplicationError
 
 # post state constants:
 
-POST_STATE_PUBLISHED = 0
-POST_STATE_PENDING = 1
-POST_STATE_DRAFT = 2
+POST_PUBLISHED = 0
+POST_PENDING = 1
+POST_DRAFT = 2
 
 CATEGORY_UNCATEGORIED = 'Uncategorized'
+
+class BlogTag(db.Model):
+    '''
+    a tag object
+    '''
+    name = db.StringProperty(required=True)
+    nicename = db.StringProperty(required=True)
+    count = db.IntegerProperty(required=True, default=0)
 
 class BlogCategory(store.BaseModel):
     '''
@@ -27,11 +36,11 @@ class BlogPost(store.BaseModel):
     A single post
     '''
     ref = db.StringProperty(required=True) # user's key
-    state = db.IntegerProperty(required=True, default=POST_STATE_PUBLISHED)
+    state = db.IntegerProperty(required=True, default=POST_PUBLISHED)
     title = db.StringProperty(required=True)
-    excerpt = db.TextProperty()
-    content = db.TextProperty()
-    category = db.StringProperty(required=True, default=CATEGORY_UNCATEGORIED)
+    excerpt = db.TextProperty(required=True)
+    content = db.TextProperty(required=True)
+    category = db.ReferenceProperty(required=True, reference_class=BlogCategory)
     tags = db.StringListProperty()
     static = db.BooleanProperty(default=False)
     allow_comment = db.BooleanProperty(required=True, default=True)
@@ -39,21 +48,55 @@ class BlogPost(store.BaseModel):
     def tags_as_string(self):
         return ','.join(self.post_tags)
 
-def get_public_posts(limit=100):
+def _query_posts(limit, cursor, ref_user=None, state=None, static=None, category=None, tag=None, order='-creation_date'):
     '''
-    get all public posts order by post date (newest first).
+    Low-level query with specific limit, cursor, filter and order.
+    
+    Returns:
+        Query result as list and a cursor for next start of query.
+    '''
+    q = BlogPost.all()
+    if ref_user is not None:
+        q = q.filter('ref =', ref_user)
+    if state is not None:
+        q = q.filter('state =', state)
+    if static is not None:
+        q = q.filter('static =', static)
+    if category is not None:
+        q = q.filter('category =', category)
+    if tag is not None:
+        q = q.filter('tags =', tag)
+    q = q.order(order)
+    if cursor is not None:
+        q.with_cursor(cursor)
+    result = q.fetch(limit)
+    return result, q.cursor()
+
+def get_all_posts(limit=50, cursor=None):
+    '''
+    Get all posts with specific condition satisfied.
     
     Args:
-        limit: Maximum return number.
-    Return: List of BlogPost.
+        limit: maximum number of posts returned, default to 50.
+        cursor: the last position of query.
+    Returns:
+        Posts list and a cursor to indicate the next position.
     '''
-    return BlogPost.all() \
-                   .filter('state =', POST_STATE_PUBLISHED) \
-                   .filter('static =', False) \
-                   .order('-creation_date') \
-                   .fetch(limit)
+    return _query_posts(limit, cursor, static=False)
 
-def get_posts_by_tag(tag, limit=100):
+def get_published_posts(limit=50, cursor=None):
+    '''
+    Get all published posts with specific condition satisfied.
+    
+    Args:
+        limit: maximum number of posts returned, default to 50.
+        cursor: the last position of query.
+    Returns:
+        Posts list and a cursor to indicate the next position.
+    '''
+    return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False)
+
+def get_posts_by_tag(tag, limit=50, cursor=None):
     '''
     get all posts by tag.
     
@@ -61,30 +104,22 @@ def get_posts_by_tag(tag, limit=100):
         tag: Tag object, or tag string.
         limit: Maximum return number.
     Return:
-        List of BlogPost.
+        Posts list and a cursor to indicate the next position.
     '''
-    if isinstance(tag, Tag):
+    if isinstance(tag, BlogTag):
         tag = tag.tag_name
     else:
         tag = tag.lower()
-    return BlogPost.all() \
-                   .filter('state =', POST_STATE_PUBLISHED) \
-                   .filter('tags =', tag) \
-                   .filter('static =', False) \
-                   .order('-creation_date') \
-                   .fetch(limit)
+    return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, tag=tag)
 
-def get_posts_by_category(category, published_only=True, limit=100):
+def get_posts_by_category(category, limit=50, cursor=None, published_only=True):
     '''
     get all posts by category.
     '''
-    query = BlogPost.all()
     if published_only:
-        query = query.filter('post_state =', POST_STATE_PUBLISHED)
-    return query.filter('post_category =', category) \
-                .filter('post_static =', False) \
-                .order('-post_date') \
-                .fetch(limit)
+        return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, category=category)
+    else:
+        return _query_posts(limit, cursor, static=False, category=category)
 
 def get_tag(key):
     '''
@@ -129,7 +164,7 @@ def create_category(name, description=''):
         MaximumNumberExceededError: if categories reach the maximum allowed number (100).
     '''
     if BlogCategory.all().count(100)==100:
-        raise StandardError('Maximum number (100) of categories exceeded.')
+        raise ApplicationError('Maximum number (100) of categories exceeded.')
     cat = BlogCategory(category_name=name, category_description=description, category_count=0)
     cat.put()
     return cat
@@ -167,9 +202,9 @@ def get_post(key, publish_only=True):
     Return: BlogPost object, or None if no such post.
     '''
     p = BlogPost.get(key)
-    if p is None or p.post_static:
+    if p is None or p.static:
         return None
-    if publish_only and p.post_state!=POST_STATE_PUBLISHED:
+    if publish_only and p.state!=POST_PUBLISHED:
         return None
     return p
 
@@ -183,21 +218,11 @@ def get_page(key, publish_only=True):
     Return: BlogPost object, or None if no such post.
     '''
     p = BlogPost.get(key)
-    if p is None or not p.post_static:
+    if p is None or not p.static:
         return None
-    if publish_only and p.post_state!=POST_STATE_PUBLISHED:
+    if publish_only and p.state!=POST_PUBLISHED:
         return None
     return p
-
-
-
-
-
-
-
-
-
-
 
 def list_tags():
     return BlogTag.all().filter('tag_count >', 0).order('tag_name').fetch(1000)
@@ -207,12 +232,6 @@ def create_post():
 
 def get_pages():
     return BlogPost.all().filter('post_static =', True).order('-post_date').fetch(1000)
-
-def get_posts(date=None, limit=21):
-    query = BlogPost.all()
-    if date is not None:
-        query = query.filter('post_date <=', date)
-    return query.filter('post_static =', False).order('-post_date').fetch(limit)
 
 def create_tag(nicename, increase=1):
     '''
