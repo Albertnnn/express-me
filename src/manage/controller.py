@@ -77,11 +77,16 @@ def do_manage(**kw):
     embed_context.get_arguments = lambda argument_name: req.get_all(argument_name)
     embed_context.arguments = lambda: req.arguments()
     app_mod = __import__(appname, fromlist=['appmanage']).appmanage
+    # call app's manage method and get the embed model:
     embed_model = app_mod.manage(current_user, app, command, embed_context)
     embed_model['app'] = app
     embed_model['command'] = command
     embed_model['user'] = current_user
     embeded = view.render(app, embed_model)
+    # copy some value from embed_model:
+    for key in ['info', 'warning', 'error']:
+        if key in embed_model:
+            model[key] = embed_model[key]
     model['__embeded__'] = embeded
     model['__view__'] = 'manage'
     return model

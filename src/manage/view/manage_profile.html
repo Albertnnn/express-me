@@ -10,11 +10,11 @@ function validate_form(){
     var p2 = $('#password2').val();
     if (p1!='' && p2!='') {
         if (p1.length<6) {
-            show_error('The password should be at least 6 characters long.');
+            set_error('The password should be at least 6 characters long.');
             return false;
         }
         if (p1!=p2) {
-            show_error('Please enter the same password in the two password fields.');
+            set_error('Please enter the same password in the two password fields.');
             return false;
         }
         $('#password').val(MD5(p1));
@@ -23,7 +23,7 @@ function validate_form(){
         $('#password').val('');
     }
 	else {
-		show_error('Please enter the same password in the two password fields.');
+		set_error('Please enter the same password in the two password fields.');
     	return false;
 	}
 	set_info();

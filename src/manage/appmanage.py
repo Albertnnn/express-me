@@ -32,7 +32,24 @@ def get_menus():
 def _profile(user, app, context):
     if context.method=='post':
         nicename = context.get_argument('nicename')
-        #password = context.get_argument('password')
+        password = context.get_argument('password', '')
+        profile_changed = False
+        password_changed = False
+        if user.nicename!=nicename:
+            user.nicename = nicename
+            profile_changed = True
+        if password and user.password!=password:
+            user.password = password
+            password_changed = True
+        if profile_changed or password_changed:
+            user.put()
+        msg = 'Your profile has been saved.'
+        if password_changed:
+            msg = 'Your profile and password have been saved.'
+        return {
+            '__view__' : 'manage_profile',
+            'info' : msg,
+        }
     return {
             '__view__' : 'manage_profile',
     }
