@@ -22,3 +22,33 @@ function toggle_menu(v, no_ani){
       v.next().slideDown();
   }
 }
+
+function set_info(msg){
+	m = '#info_msg'
+	if (msg) {
+		$(m).html(msg).show();
+	}
+	else {
+		$(m).hide();
+	}
+}
+
+function set_warning(msg){
+	m = '#warning_msg'
+	if (msg) {
+		$(m).html(msg).show();
+	}
+	else {
+		$(m).hide();
+	}
+}
+
+function set_error(msg){
+	m = '#error_msg'
+	if (msg) {
+		$(m).html(msg).show();
+	}
+	else {
+		$(m).hide();
+	}
+}

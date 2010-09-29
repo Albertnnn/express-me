@@ -1,6 +1,7 @@
 /**
  * string utils
  */
+var str = 'a';
 
 function is_blank(s) {
     var isNonblank_re = /\S/;

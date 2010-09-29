@@ -5,13 +5,24 @@
 <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection"/>
 <!--[if lt IE 8]><link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection"/><![endif]-->
 <link rel="stylesheet" href="/manage/static/css/manage.css" type="text/css" media="screen, projection"/>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery/jquery.js"></script>
 <script type="text/javascript" src="/manage/static/js/manage.js"></script>
+<script type="text/javascript" src="/manage/static/js/md5.js"></script>
+<script type="text/javascript" src="/manage/static/js/str.js"></script>
 <script type="text/javascript">
 jQuery(function(){
   v = jQuery("#${app}-${command}");
   v.addClass("app-menu-item-selected");
   toggle_menu(v.parent().parent().prev(), true);
+#if $varExists('info')
+  set_info("${info}")
+#end if
+#if $varExists('warning')
+  set_info("${warning}")
+#end if
+#if $varExists('error')
+  set_info("${error}")
+#end if
 });
 </script>
 <title>Manage - Express Me</title>
@@ -39,7 +50,14 @@ jQuery(function(){
       #end for
     </div>
     <div class="span-20 last">
-      ${__embeded____raw__}
+      <div class="span-20 last">
+        <div id="info_msg" class="msg success" style="display:none"></div>
+        <div id="warning_msg" class="msg notice" style="display:none"></div>
+        <div id="error_msg" class="msg error" style="display:none"></div>
+      </div>
+      <div class="span-20 last">
+        ${__embeded____raw__}
+      </div>
     </div>
     <div id="footer" class="span-24 last">&nbsp;Thank you for creating with <a href="http://www.expressme.org/" target="_blank">Express Me</a>. | <a href="http://www.expressme.org/wiki/" target="_blank">Documentation</a> | <a href="http://code.google.com/p/express-me/issues/list" target="_blank">Report Issues</a><span style="float:right">Version ${version}&nbsp;</span></div>
   </div>

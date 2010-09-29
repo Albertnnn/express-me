@@ -63,7 +63,9 @@ div.td { display:table-cell; padding:3px; }
 .widget-input { width:90% }
 .widget-select { width:90% }
 
-.error,
+.msg { margin-bottom:16px; }
+
+.error, 
 .notice, 
 .success    { padding: .8em; margin-bottom: 1em; border: 1px solid #ddd; }
 
@@ -75,3 +77,11 @@ div.td { display:table-cell; padding:3px; }
 .success a  { color: #264409; }
 
 .info { font-size:1.1em;font-weight:bold;background-color:#f}
+
+span.loading {
+	background-image:url(/manage/static/image/loading.gif);
+	background-repeat:no-repeat;
+	padding-left: 20px;
+	line-height: 20px;
+	display: none;
+}
