@@ -5,23 +5,35 @@ jQuery(function() {
         location.assign('/manage/?app=${app}&command=${command}&role=' + jQuery('\#role').val())
     });
     jQuery('\#role').val('${role}');
-    jQuery('\#select_all').change(function() {
-        if (jQuery('\#select_all').is(':checked')) {
-            jQuery('.select-user').attr('checked', 'checked');
+});
+//#raw
+$(function() {
+    $('#select_all').change(function() {
+        if ($('#select_all').is(':checked')) {
+            $('.select-user').attr('checked', 'checked');
+            $('.tr-hover').addClass('tr-selected');
         }
         else {
-            jQuery('.select-user').removeAttr('checked');
+            $('.select-user').removeAttr('checked');
+            $('.tr-hover').removeClass('tr-selected');
         }
     });
-    jQuery('.select-user').click(function() {
-        if (jQuery('input.select-user:checked').length==jQuery('input.select-user').length) {
-            jQuery('\#select_all').attr('checked', 'checked');
+    $('.select-user').click(function() {
+        if ($(this).is(':checked')) {
+            $(this).parent().parent().addClass('tr-selected');
         }
         else {
-            jQuery('\#select_all').removeAttr('checked');
+            $(this).parent().parent().removeClass('tr-selected');
+        }
+        if ($('input.select-user:checked').length==$('input.select-user').length) {
+            $('#select_all').attr('checked', 'checked');
+        }
+        else {
+            $('#select_all').removeAttr('checked');
         }
 	});
 });
+//#end raw
 </script>
 <div class="span-20 panel box-round">
   <div class="span-20 panel-title"><div>Registered Users</div></div>
@@ -37,14 +49,8 @@ jQuery(function() {
   #if not $users
     <div class="span-20 tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No user found that match the filter.</div></div></div>
   #end if
-  #set $odd=''
   #for $user in $users
-    #if $odd==''
-    #set $odd='odd'
-    #else
-    #set $odd=''
-    #end if
-    <div class="span-20 tr $odd">
+    <div class="span-20 tr tr-hover">
       <div class="span-1"><input type="checkbox" name="select_user" class="select-user" value="${user.id}" /></div>
       <div class="span-6">
       	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=${command}&id=${user.id}">${user.email}</a></div>

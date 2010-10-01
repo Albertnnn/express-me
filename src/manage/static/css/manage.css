@@ -18,8 +18,8 @@ a:focus   {color: #d54e4d; text-decoration:none}
 #header a:active  {color: #fff; text-decoration:none}
 #header a:focus   {color: #fff; text-decoration:none}
 
-#footer { color:#999; height:40px; line-height:40px; font-size:16px; font-style:italic; background-color:#464646; }
-
+#footer { color:#999; background-color:#464646; }
+#footer div { line-height:40px; font-size:16px; font-style:italic; padding:6px 12px; }
 #footer a:link    {color: #ccc; text-decoration:none}
 #footer a:visited {color: #ccc; text-decoration:none}
 #footer a:hover   {color: #fff; text-decoration:none}
@@ -54,9 +54,12 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 
 .panel-title div { padding:3px 6px; }
 
-.th { background-color:#F9F9F9 }
+.th { background-color:#f9f9f9 }
 .th div div {padding:3px 6px; }
 .tr div div {padding:3px 6px; }
+
+.tr-selected { background-color:#f9f9f9 !important; }
+.tr-hover:hover { background-color:#f9f9f9; }
 
 .top-line { border-top:1px solid #e3e3e3 }
 .bottom-line { border-bottom:1px solid #e3e3e3 }

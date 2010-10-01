@@ -36,13 +36,13 @@ function validate_form(){
 </script>
 #end raw
 
-<div class="panel box-round">
-<form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
-<input type="hidden" name="app" value="${app}" />
-<input type="hidden" name="action" value="${command}" />
-<input type="hidden" name="passwd" id="passwd" />
-  <div class="panel-title">Your Profile</div>
-  <div class="panel-content">
+<div class="span-20 panel box-round">
+  <form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
+  <input type="hidden" name="app" value="${app}" />
+  <input type="hidden" name="action" value="${command}" />
+  <input type="hidden" name="passwd" id="passwd" />
+  <div class="span-20 panel-title"><div>Your Profile</div></div>
+  <div class="span-20 panel-content">
     <div class="form-field">
       <div class="form-field-title">Role <em>(cannot change)</em>:</div>
       <div class="form-field-input"><select name="role" id="role" value="${user.role}" style="width:360px" disabled="disabled">
