@@ -49,12 +49,17 @@ a.app-menu-item-selected:link { color:#d54e4d; }
 a.app-menu-item-selected:visited { color:#d54e4d; }
 
 .panel { border:1px solid #E3E3E3; background-color:#FFF; margin-bottom:16px; }
-.panel-title { padding:3px 6px; margin:0px; background-color:#F1F1F1; font-weight:bold; border-bottom:1px solid #E3E3E3 }
-.panel-content { padding:3px 6px; margin:0px; background-color:#FFF }
+.panel-title { background-color:#f1f1f1; font-weight:bold; border-bottom:1px solid #e3e3e3 }
+.panel-content { padding:0px; margin:0px; background-color:#fff }
 
-div.tr { display:table-row; margin:0px; padding:0px; }
-div.tr-odd { display:table-row; margin:0px; padding:0px; background-color:#F9F9F9 }
-div.td { display:table-cell; padding:3px; }
+.panel-title div { padding:3px 6px; }
+
+.th { background-color:#F9F9F9 }
+.th div div {padding:3px 6px; }
+.tr div div {padding:3px 6px; }
+
+.top-line { border-top:1px solid #e3e3e3 }
+.bottom-line { border-bottom:1px solid #e3e3e3 }
 
 .form-field { padding:3px 6px; margin:12px 0px; width:95% }
 .form-field-title { font-size:1.1em }

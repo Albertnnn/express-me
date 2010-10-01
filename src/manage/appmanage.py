@@ -31,13 +31,23 @@ def get_menus():
 
 def _edit_user(user, app, context):
     if context.method=='get':
+        role = context.get_argument('role', '')
+        if role=='':
+            role = None
+        else:
+            role = int(role)
         offset = context.get_argument('offset', '')
-        users, next_cursor = store.get_users(4, offset)
+        index = 1
+        if offset:
+            index = int(context.get_argument('index'))
+        users, next_cursor = store.get_users(4, offset, role=role)
         return {
                 '__view__' : 'manage_edit_user',
                 'users' : users,
+                'role' : role,
                 'offset' : offset,
                 'next' : next_cursor,
+                'index' : index,
         }
 
 def _profile(user, app, context):
