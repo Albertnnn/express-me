@@ -33,6 +33,12 @@ from manage.common import AppMenu
 import appconfig
 from version import get_version
 
+_MODEL_UTILS = {
+        'format_datetime' : lambda d : d.strftime('%Y-%m-%d %H:%M:%S'),
+        'format_date' : lambda d : d.strftime('%Y-%m-%d'),
+        'format_time' : lambda d : d.strftime('%H:%M:%S'),
+}
+
 def _get_site_info():
     return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
 
@@ -82,6 +88,7 @@ def do_manage(**kw):
     embed_model['app'] = app
     embed_model['command'] = command
     embed_model['user'] = current_user
+    embed_model['utils'] = _MODEL_UTILS
     embeded = view.render(app, embed_model)
     # copy some value from embed_model:
     for key in ['info', 'warning', 'error']:
@@ -253,16 +260,14 @@ def do_register(**kw):
             'version' : get_version(),
     }
 
+def _get_google_signin_url(redirect):
+    return users.create_login_url(redirect)
+
 @get('/signin')
 def show_signin(**kw):
     ctx = kw['context']
     redirect = ctx.get_argument('redirect', '/')
-    google_signin_url = None
-    try:
-        from google.appengine.api import users
-        google_signin_url = users.create_login_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
-    except ImportError:
-        pass
+    google_signin_url = _get_google_signin_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
     return {
             '__view__' : 'signin',
             'error' : '',
@@ -294,6 +299,7 @@ def do_signin(**kw):
                 'redirect' : redirect,
                 'site' : _get_site_info(),
                 'version' : get_version(),
+                'google_signin_url' : _get_google_signin_url('/manage/g_signin?redirect=' + urllib.quote(redirect)),
         }
     # make cookie:
     expires = web.COOKIE_EXPIRES_MAX

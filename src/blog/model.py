@@ -67,7 +67,7 @@ def _query_posts(limit, cursor, ref_user=None, state=None, static=None, category
     if tag is not None:
         q = q.filter('tags =', tag)
     q = q.order(order)
-    if cursor is not None:
+    if cursor:
         q.with_cursor(cursor)
     result = q.fetch(limit)
     return result, q.cursor()

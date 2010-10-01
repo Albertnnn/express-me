@@ -29,6 +29,17 @@ def get_menus():
     )
     return (user, setting,)
 
+def _edit_user(user, app, context):
+    if context.method=='get':
+        offset = context.get_argument('offset', '')
+        users, next_cursor = store.get_users(4, offset)
+        return {
+                '__view__' : 'manage_edit_user',
+                'users' : users,
+                'offset' : offset,
+                'next' : next_cursor,
+        }
+
 def _profile(user, app, context):
     if context.method=='post':
         nicename = context.get_argument('nicename')
@@ -56,6 +67,7 @@ def _profile(user, app, context):
 
 def manage(user, app, command, context):
     map = {
-           'profile' : _profile
+           'edit_user' : _edit_user,
+           'profile' : _profile,
     }
     return map[command](user, app, context)
