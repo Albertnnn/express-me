@@ -4,7 +4,7 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 '''
-app that manage User and core data in datastore and handle sign on.
+app that do management.
 '''
 
 from time import time
@@ -16,6 +16,11 @@ import os
 from google.appengine.ext import db
 from exweb import context
 from manage import shared
+
+from framework import ApplicationError
+
+class PermissionError(ApplicationError):
+    pass
 
 class Page(object):
     def __init__(self, page_index, page_size, total=(-1)):
@@ -29,15 +34,6 @@ class UserMeta(db.Model):
     'settings for website'
     meta_key = db.StringProperty(required=True)
     meta_values = db.StringListProperty()
-
-def datetime_format(datetime):
-    return datetime.strftime('%Y-%m-%d %H:%M:%S')
-
-def date_format(date):
-    return date.strftime('%Y-%m-%d')
-
-def time_format(time):
-    return time.strftime('%H:%M:%S')
 
 # cookie constants:
 
@@ -71,55 +67,6 @@ def get_navigations():
         if title and url:
             navigations.append((title, url))
     return navigations
-
-def get_user(key):
-    '''
-    Get User object by key.
-    
-    Args:
-        key: key as string.
-    
-    Returns:
-        User object or None if not found.
-    '''
-    return shared.User.get(key)
-
-def make_sign_on_cookie(key, passwd, expire_in_seconds):
-    # make sign on cookie with following format:
-    # base64(id_expires_md5(id_expires_passwd))
-    expires = int(time()) + expire_in_seconds
-    md5 = hashlib.md5(key + '_' + str(expires) + '_' + passwd).hexdigest()
-    return base64.b64encode(key + '_' + str(expires) + '_' + md5)
-
-def validate_sign_on_cookie(value, get_user):
-    '''
-    Validate signon cookie.
-    
-    Args:
-        value: cookie value, a base64-encoded string.
-        get_user: function for get User object by key.
-    
-    Returns:
-        User object if sign on ok, None if cookie is invalid.
-    '''
-    dec = base64.b64decode(value)
-    ss = dec.split('_')
-    if len(ss)!=3:
-        return None
-    key = ss[0]
-    expires = ss[1]
-    try:
-        if int(expires)<time():
-            return None
-    except ValueError:
-        return None
-    user = get_user(key)
-    if user is None:
-        return None
-    md5 = hashlib.md5(key + '_' + expires + '_' + user.user_passwd).hexdigest()
-    if md5!=ss[2]:
-        return None
-    return user
 
 def get_themes():
     root = os.path.split(os.path.dirname(__file__))[0]

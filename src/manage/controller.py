@@ -25,6 +25,7 @@ from framework.web import get
 from framework.web import post
 from framework.web import mapping
 
+from manage import PermissionError
 from manage import model
 from manage import cookie
 
@@ -67,6 +68,9 @@ def do_manage(**kw):
                             selected_menu_item = item
                             selected_menu = fm
                             break
+    # check permission:
+    if selected_menu_item is None or selected_menu_item.role < current_user.role:
+        raise PermissionError('You do not have permission to access this resource.')
     model = {
             'user' : current_user,
             'app' : app,
