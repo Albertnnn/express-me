@@ -117,6 +117,27 @@ def get_user_by_email(email):
     '''
     return User.get_by_key_name(email)
 
+def get_users(limit, cursor=None, role=None, order='-creation_date'):
+    '''
+    Get next users with current cursor.
+    
+    Args:
+        limit: limit of returned users.
+        cursor: current cursor position, or None if no cursor.
+        role: filter by role, default to None (do not filter by role).
+        order: default to '-creation_date'.
+    Returns:
+        results as list and cursor for next fetch position, or None if reach the end of results.
+    '''
+    q = User.all()
+    if role is not None:
+        q = q.filter('role =', role)
+    q = q.order(order)
+    result, next_cursor = get_by_cursor(q, cursor, limit)
+    if not has_more(q, next_cursor):
+        next_cursor = None
+    return result, next_cursor
+
 def create_user(role, email, password, nicename):
     if role not in ROLES:
         raise ValueError('invalid role.')
@@ -134,6 +155,17 @@ def create_user(role, email, password, nicename):
         raise UserAlreadyExistError('User create failed.')
     return user
 
+def get_user_role_name(role):
+    '''
+    Get role display name by role number.
+    
+    Args:
+        role: role number, constants defined as USER_ROLE_XXX.
+    Returns:
+        Role name as string.
+    '''
+    return ROLE_NAMES[role//10]
+
 class User(BaseModel):
     '''
     Store a single user
@@ -147,17 +179,8 @@ class User(BaseModel):
     def is_admin(self):
         return self.role==ROLE_ADMINISTRATOR
 
-    @staticmethod
-    def get_role_name(role):
-        '''
-        Get role display name by role number.
-        
-        Args:
-            role: role number, constants defined as USER_ROLE_XXX.
-        Returns:
-            Role name as string.
-        '''
-        return ROLE_NAMES[role//10]
+    def get_role_name(self):
+        return get_user_role_name(self.role)
 
 ###############################################################################
 # Counter operation
@@ -430,3 +453,59 @@ class Comment(BaseModel):
     ip = db.StringProperty()
     approval = db.BooleanProperty(required=True, default=True)
     pending_time = db.DateTimeProperty()
+
+###############################################################################
+# Pagination operation
+###############################################################################
+
+def get_by_page(query, page_index, page_size=20):
+    '''
+    Get query results by page, located by page index (starts from 1) and page size.
+    
+    Args:
+        query: Query object.
+        page_index: Page index, starts from 1.
+        page_size: Page size, default to 20, maximum to 100.
+    Returns:
+        A tuple contains (results as list, next cursor position).
+    Raises:
+        Value error if page index < 1, or page_size < 1, or page_size > 100, or page_index*page_size>1000.
+    '''
+    if page_index < 1:
+        raise ValueError('Page index must start from 1.')
+    if page_size < 1 or page_size > 100:
+        raise ValueError('Page size must be 1 to 100.')
+    if page_index * page_size > 1000:
+        raise ValueError('Results out of 1000.')
+    result = query.fetch(page_size, (page_index - 1) * page_size)
+    cursor = query.cursor()
+    return (result, cursor,)
+
+def get_by_cursor(query, cursor=None, limit=20):
+    '''
+    Get query results by cursor.
+    
+    Args:
+        query: Query object.
+        cursor: current cursor, default to None.
+        limit: maximum results returned, default to 20.
+    Returns:
+        A tuple that contains (results as list, next cursor position).
+    '''
+    if cursor:
+        query.with_cursor(cursor)
+    result = query.fetch(limit)
+    return (result, query.cursor(),)
+
+def has_more(query, cursor):
+    '''
+    Get if query has more results from current cursor.
+    
+    Args:
+        query: Query object.
+        cursor: current cursor.
+    Returns:
+        True if has more results, otherwise False.
+    '''
+    query.with_cursor(cursor)
+    return len(query.fetch(1)) > 0
