@@ -228,7 +228,7 @@ def get_page(key, publish_only=True):
 def list_tags():
     return BlogTag.all().filter('tag_count >', 0).order('tag_name').fetch(1000)
 
-def create_post():
+def create_post(user, title, content, tags=''):
     pass
 
 def get_pages():

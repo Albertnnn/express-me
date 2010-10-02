@@ -1,13 +1,37 @@
-<!-- begin manage_add.html -->
+<!-- begin manage_editor.html -->
+<script type="text/javascript">
+	
+function func_success(result) {
+    if (result.error) {
+        $('#save').removeAttr('disabled');
+        $('#loading').hide();
+        set_error(result.error);
+    }
+    else {
+        $('#loading').html('Success! Redirecting...');
+        location.assign('/manage/?app=${app}&command=${command}');
+    }
+}
+
+function validate_form() {
+//#raw
+    $('#save').attr('disabled', 'disabled');
+    $('#loading').show();
+    $.post('/manage/', $('#edit_form').serialize(), func_success, 'json');
+    return false;
+//#end raw
+}
+</script>
+
 <div class="panel box-round">
-<form name="editing" action="/manage/" method="post">
+<form id="edit_form" name="edit_form" action="/manage/" method="post" onsubmit="return validate_form()">
   <input type="hidden" name="app" value="${app}" />
   <input type="hidden" name="command" value="${command}" />
   <input type="hidden" name="id" value="${post.id}" />
 
   <div class="panel-title">
     <div>
-    #if $static
+    #if $post.static
       #if $post.id
         Edit Page
       #else
@@ -27,11 +51,12 @@
       <div class="form-field-title">Title:</div>
       <div class="form-field-input"><input name="title" type="text" id="title" maxlength="100" style="width:100%" value="${post.title}" /></div>
     </div>
-    #if $varExists('categories')
+    #if not $post.static
     <div class="form-field">
       <div class="form-field-title">Category:</div>
       <div class="form-field-input">
         <select name="category" id="category" style="width:100%">
+          <option value="">- Select category -</option>
         #for $cat in $categories
           <option value="${cat.key}">${cat.name}</option>
         #end for
@@ -50,16 +75,19 @@
       oFCKeditor.Config["CustomConfigurationsPath"] = '/blog/static/js/fckconfig.js';
       oFCKeditor.ReplaceTextarea();
     </script>
+    #if not $post.static
     <div class="form-field">
       <div class="form-field-title">Tags: (seperated by ',')</div>
       <div class="form-field-input"><input name="tags" type="text" id="tags" maxlength="100" style="width:100%" value="${post.tags_as_string()}" placeholder="Tags are seperated by ','" /></div>
     </div>
+    #end if
     <div class="form-field">
       <div class="form-field-input">
-        <button type="submit" name="submit">Save</button>
+        <button type="submit" id="save" name="save">Save</button>
+        <span id="loading" class="loading">Saving... please wait...</span>
       </div>
     </div>
   </div>
 </form>
 </div>
-<!-- end manage_add.html -->
+<!-- end manage_editor.html -->
