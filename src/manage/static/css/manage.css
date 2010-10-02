@@ -54,8 +54,8 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 
 .panel-title div { padding:3px 6px; }
 
-.th { background-color:#f9f9f9; overflow:hidden; text-overflow:ellipsis; }
-.tr { overflow:hidden; text-overflow:ellipsis; }
+.th { background-color:#f9f9f9; word-break: break-all; word-wrap: break-word; }
+.tr { word-break: break-all; word-wrap: break-word; }
 
 .th div div {padding:6px; }
 .tr div div {padding:6px; }
