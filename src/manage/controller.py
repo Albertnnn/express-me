@@ -91,6 +91,8 @@ def do_manage(**kw):
     app_mod = __import__(app, fromlist=['appmanage']).appmanage
     # call app's manage method and get the embed model:
     embed_model = app_mod.manage(current_user, app, command, embed_context)
+    if isinstance(embed_model, basestring):
+        return embed_model
     embed_model['app'] = app
     embed_model['command'] = command
     embed_model['user'] = current_user
