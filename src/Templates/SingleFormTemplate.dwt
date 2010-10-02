@@ -17,7 +17,7 @@
   <div class="container" style="margin:3px auto">
     <div class="span-18 prepend-3 last" style="margin-bottom:24px">
       <div class="span-9" style="padding:12px 0px">
-        <a href="http://www.expressme.org/" target="_blank"><img src="/static/image/expressme.gif" width="326" height="60" /></a>
+        <a href="http://www.expressme.org/" target="_blank"><img src="/manage/static/image/expressme.gif" width="326" height="60" /></a>
 	  </div>
 	  <div class="span-9 last large" style="text-align:right"><a href="/">${site.name}</a> | <a href="/manage/register">Register</a> | <a href="/manage/signin">Sign In</a></div>
 	</div>
