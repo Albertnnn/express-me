@@ -68,16 +68,16 @@ $(function() {
 });
 //#end raw
 </script>
-<div class="span-20 panel box-round">
-  <div class="span-20 panel-title"><div>Registered Users</div></div>
-  <div class="span-20 panel-content">
+<div class="panel box-round">
+  <div class="panel-title"><div>Registered Users</div></div>
+  <div class="panel-content">
   <form id="edit_form" action="/manage/" method="post">
   	<input type="hidden" name="app" value="${app}" />
   	<input type="hidden" name="command" value="${command}" />
   	<input type="hidden" name="offset" value="${offset}" />
   	<input type="hidden" name="index" value="${index}" />
   	<input type="hidden" id="btn" name="btn" value="" />
-    <div class="span-20 th bottom-line">
+    <div class="th bottom-line">
       <div class="span-1"><input type="checkbox" id="select_all" name="select_all" /></div>
       <div class="span-6"><div>Email</div></div>
       <div class="span-5"><div>Nice Name</div></div>
@@ -86,15 +86,15 @@ $(function() {
       <div class="span-4 last"><div>Registered</div></div>
     </div>
   #if not $users
-    <div class="span-20 tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No user found that match the filter.</div></div></div>
+    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No user found that match the filter.</div></div></div>
   #end if
   #for $user in $users
-    <div class="span-20 tr tr-hover">
+    <div class="tr tr-hover">
       <div class="span-1">
       	<input type="checkbox" name="u" class="select-user" value="${user.id}" />
       </div>
       <div class="span-6">
-      	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=${command}&id=${user.id}">${user.email}</a></div>
+      	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=send_mail&id=${user.id}">${user.email}</a></div>
       </div>
       <div class="span-5"><div>${user.nicename}</div></div>
       <div class="span-3"><div>${user.get_role_name()}</div></div>
@@ -106,7 +106,7 @@ $(function() {
       <div class="span-4 last"><div>$utils.format_datetime($user.creation_date)</div></div>
     </div>
   #end for
-  	<div class="span-20 tr top-line">
+  	<div class="tr top-line">
       <div class="span-12">
         <div>
           <input type="hidden" id="role" name="role" value="${role}" />

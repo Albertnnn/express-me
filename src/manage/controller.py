@@ -69,7 +69,9 @@ def do_manage(**kw):
                             selected_menu = fm
                             break
     # check permission:
-    if selected_menu_item is None or selected_menu_item.role < current_user.role:
+    if selected_menu_item is None:
+        raise ApplicationError('No command found.')
+    if selected_menu_item.role < current_user.role:
         raise PermissionError('You do not have permission to access this resource.')
     model = {
             'user' : current_user,
@@ -86,7 +88,7 @@ def do_manage(**kw):
     embed_context.get_argument = lambda argument_name, default_value=None: req.get(argument_name, default_value)
     embed_context.get_arguments = lambda argument_name: req.get_all(argument_name)
     embed_context.arguments = lambda: req.arguments()
-    app_mod = __import__(appname, fromlist=['appmanage']).appmanage
+    app_mod = __import__(app, fromlist=['appmanage']).appmanage
     # call app's manage method and get the embed model:
     embed_model = app_mod.manage(current_user, app, command, embed_context)
     embed_model['app'] = app
