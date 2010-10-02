@@ -29,26 +29,35 @@ def get_menus():
     )
     return (user, setting,)
 
+def _get_edit_user(user, app, context):
+    role = context.get_argument('role', '')
+    if role=='':
+        role = None
+    else:
+        role = int(role)
+    offset = context.get_argument('offset', '')
+    index = 1
+    if offset:
+        index = int(context.get_argument('index'))
+    users, next_cursor = store.get_users(4, offset, role=role)
+    return {
+            '__view__' : 'manage_edit_user',
+            'users' : users,
+            'role' : role,
+            'offset' : offset,
+            'next' : next_cursor,
+            'index' : index,
+    }
+
 def _edit_user(user, app, context):
     if context.method=='get':
-        role = context.get_argument('role', '')
-        if role=='':
-            role = None
-        else:
-            role = int(role)
-        offset = context.get_argument('offset', '')
-        index = 1
-        if offset:
-            index = int(context.get_argument('index'))
-        users, next_cursor = store.get_users(4, offset, role=role)
-        return {
-                '__view__' : 'manage_edit_user',
-                'users' : users,
-                'role' : role,
-                'offset' : offset,
-                'next' : next_cursor,
-                'index' : index,
-        }
+        return _get_edit_user(user, app, context)
+    if context.method=='post':
+        btn = context.get_argument('btn')
+        if btn=='lock' or btn=='unlock':
+            user_ids = context.get_arguments('u')
+            store.lock_or_unlock_users(user_ids, btn=='lock')
+            return _get_edit_user(user, app, context)
 
 def _profile(user, app, context):
     if context.method=='post':

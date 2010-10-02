@@ -1,13 +1,45 @@
 <!-- begin manage_edit_user.html -->
 <script type="text/javascript">
 jQuery(function() {
-    jQuery('\#filter').click(function() {
-        location.assign('/manage/?app=${app}&command=${command}&role=' + jQuery('\#role').val())
-    });
     jQuery('\#role').val('${role}');
+    jQuery('\#filter').click(function() {
+        location.assign('/manage/?app=${app}&command=${command}&role=' + jQuery('\#select_role').val())
+    });
 });
 //#raw
 $(function() {
+    $('#lock').click(function() {
+        var selected_users = $('input.select-user:checked');
+        if (selected_users.length==0) {
+			alert('Please select users first.');
+		}
+		else {
+			var msg = 'Are you sure you want to lock this user?';
+			if (selected_users.length>1) {
+				msg = 'Are you sure you want to lock these users?';
+			}
+			if (confirm(msg)) {
+				$('#btn').val('lock');
+				$('#edit_form').submit();
+			}
+		}
+    });
+    $('#unlock').click(function() {
+        var selected_users = $('input.select-user:checked');
+        if (selected_users.length==0) {
+			alert('Please select users first.');
+		}
+		else {
+			var msg = 'Are you sure you want to unlock this user?';
+			if (selected_users.length>1) {
+				msg = 'Are you sure you want to unlock these users?';
+			}
+			if (confirm(msg)) {
+				$('#btn').val('unlock');
+				$('#edit_form').submit();
+			}
+		}
+    });
     $('#select_all').change(function() {
         if ($('#select_all').is(':checked')) {
             $('.select-user').attr('checked', 'checked');
@@ -38,12 +70,18 @@ $(function() {
 <div class="span-20 panel box-round">
   <div class="span-20 panel-title"><div>Registered Users</div></div>
   <div class="span-20 panel-content">
+  <form id="edit_form" action="/manage/" method="post">
+  	<input type="hidden" name="app" value="${app}" />
+  	<input type="hidden" name="command" value="${command}" />
+  	<input type="hidden" name="offset" value="${offset}" />
+  	<input type="hidden" name="index" value="${index}" />
+  	<input type="hidden" id="btn" name="btn" value="" />
     <div class="span-20 th bottom-line">
       <div class="span-1"><input type="checkbox" id="select_all" name="select_all" /></div>
       <div class="span-6"><div>Email</div></div>
-      <div class="span-4"><div>Nice Name</div></div>
+      <div class="span-5"><div>Nice Name</div></div>
       <div class="span-3"><div>Role</div></div>
-      <div class="span-2"><div>Status</div></div>
+      <div class="span-1"><div><img src="/manage/static/image/locked.png" width="16" height="16" alt="Locked" title="Locked" /></div></div>
       <div class="span-4 last"><div>Registered</div></div>
     </div>
   #if not $users
@@ -51,20 +89,27 @@ $(function() {
   #end if
   #for $user in $users
     <div class="span-20 tr tr-hover">
-      <div class="span-1"><input type="checkbox" name="select_user" class="select-user" value="${user.id}" /></div>
+      <div class="span-1">
+      	<input type="checkbox" name="u" class="select-user" value="${user.id}" />
+      </div>
       <div class="span-6">
       	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=${command}&id=${user.id}">${user.email}</a></div>
         <div>Edit | Delete</div></div>
-      <div class="span-4"><div>${user.nicename}</div></div>
+      <div class="span-5"><div>${user.nicename}</div></div>
       <div class="span-3"><div>${user.get_role_name()}</div></div>
-      <div class="span-2"><div>Status</div></div>
+      <div class="span-1"><div>
+      #if $user.locked
+        <img src="/manage/static/image/locked.png" width="16" height="16" alt="Locked" title="Locked" />
+      #end if
+      </div></div>
       <div class="span-4 last"><div>$utils.format_datetime($user.creation_date)</div></div>
     </div>
   #end for
   	<div class="span-20 tr top-line">
       <div class="span-15">
         <div>
-          <select name="role" id="role">
+          <input type="hidden" id="role" name="role" value="${role}" />
+          <select name="select_role" id="select_role">
             <option value="">All</option>
             <option value="0">Administrator</option>
             <option value="10">Editor</option>
@@ -74,6 +119,7 @@ $(function() {
           </select>
           <button type="button" name="filter" id="filter">Filter</button>
           <button type="button" name="lock" id="lock">Lock</button>
+          <button type="button" name="unlock" id="unlock">Unlock</button>
         </div>
       </div>
       <div class="span-4" style="text-align:right">
@@ -87,5 +133,6 @@ $(function() {
       <div class="span-1 last"></div>
   	</div>
   </div>
+  </form>
 </div>
 <!-- end manage_edit_user.html -->

@@ -111,6 +111,27 @@ def get_user_by_key(key):
     '''
     return User.get(key)
 
+def lock_or_unlock_users(keys, lock=True):
+    '''
+    Lock users by given keys or a single key.
+    
+    Args:
+        keys: a list of str-key, or a single str-key.
+    Returns:
+        Number of users updated.
+    '''
+    users = []
+    if  not isinstance(keys, list):
+        keys = [keys]
+    for key in keys:
+        user = get_user_by_key(key)
+        if (user is not None) and (lock!=user.locked) and (not user.is_admin()):
+            user.locked = lock
+            users.append(user)
+    for user in users:
+        user.put()
+    return len(users)
+
 def get_user_by_email(email):
     '''
     Get user by email, or None if not found.
