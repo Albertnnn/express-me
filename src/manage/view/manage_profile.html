@@ -1,6 +1,9 @@
 <!-- begin manage_profile.html -->
-#raw
 <script type="text/javascript">
+jQuery(function() {
+  jQuery('\#role').val('${user.role}');
+});
+//#raw
 function validate_form(){
     if (is_blank($('#nicename').val())) {
         set_error('Please enter your nice name.');
@@ -33,19 +36,19 @@ function validate_form(){
 	$('#loading').show();
     return true;
 }
+//#end raw
 </script>
-#end raw
-
-<div class="span-20 panel box-round">
+<div class="panel box-round">
   <form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
   <input type="hidden" name="app" value="${app}" />
   <input type="hidden" name="action" value="${command}" />
   <input type="hidden" name="passwd" id="passwd" />
-  <div class="span-20 panel-title"><div>Your Profile</div></div>
-  <div class="span-20 panel-content">
+  <div class="panel-title"><div>Your Profile</div></div>
+  <div class="panel-content">
     <div class="form-field">
       <div class="form-field-title">Role <em>(cannot change)</em>:</div>
-      <div class="form-field-input"><select name="role" id="role" value="${user.role}" style="width:360px" disabled="disabled">
+      <div class="form-field-input"><select name="role" id="role" style="width:360px" disabled="disabled">
+        <option value="">Detecting...</option>
         <option value="0">Administrator</option>
         <option value="10">Editor</option>
         <option value="20">Author</option>
