@@ -1,3 +1,9 @@
+/*
+ * fckconfig.js
+ * 
+ * Configure FCKEditor in management when adding/editing posts/pages.
+ */
+
 FCKConfig.EditorAreaCSS = FCKConfig.BasePath + 'css/fck_editorarea.css' ;
 FCKConfig.EditorAreaStyles = '' ;
 FCKConfig.ToolbarComboPreviewCSS = '' ;
