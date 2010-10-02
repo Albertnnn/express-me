@@ -36,6 +36,7 @@ class BlogPost(store.BaseModel):
     A single post
     '''
     ref = db.StringProperty(required=True) # user's key
+    author = db.StringProperty() # user's name
     state = db.IntegerProperty(required=True, default=POST_PUBLISHED)
     title = db.StringProperty(required=True)
     excerpt = db.TextProperty(required=True)
@@ -187,7 +188,7 @@ def get_categories():
     
     Returns: list of BlogCategory objects.
     '''
-    categories = BlogCategory.all().order('category_name').fetch(100)
+    categories = BlogCategory.all().order('name').fetch(100)
     if not categories:
         categories.append(create_category('Uncategorized'))
     return categories
