@@ -54,9 +54,11 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 
 .panel-title div { padding:3px 6px; }
 
-.th { background-color:#f9f9f9 }
-.th div div {padding:3px 6px; }
-.tr div div {padding:3px 6px; }
+.th { background-color:#f9f9f9; overflow:hidden; text-overflow:ellipsis; }
+.tr { overflow:hidden; text-overflow:ellipsis; }
+
+.th div div {padding:6px; }
+.tr div div {padding:6px; }
 
 .tr-selected { background-color:#f9f9f9 !important; }
 .tr-hover:hover { background-color:#f9f9f9; }

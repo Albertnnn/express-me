@@ -2,6 +2,7 @@
 <script type="text/javascript">
 jQuery(function() {
     jQuery('\#role').val('${role}');
+    jQuery('\#select_role').val('${role}');
     jQuery('\#filter').click(function() {
         location.assign('/manage/?app=${app}&command=${command}&role=' + jQuery('\#select_role').val())
     });
@@ -94,7 +95,7 @@ $(function() {
       </div>
       <div class="span-6">
       	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=${command}&id=${user.id}">${user.email}</a></div>
-        <div>Edit | Delete</div></div>
+      </div>
       <div class="span-5"><div>${user.nicename}</div></div>
       <div class="span-3"><div>${user.get_role_name()}</div></div>
       <div class="span-1"><div>
@@ -106,7 +107,7 @@ $(function() {
     </div>
   #end for
   	<div class="span-20 tr top-line">
-      <div class="span-15">
+      <div class="span-12">
         <div>
           <input type="hidden" id="role" name="role" value="${role}" />
           <select name="select_role" id="select_role">
@@ -122,8 +123,11 @@ $(function() {
           <button type="button" name="unlock" id="unlock">Unlock</button>
         </div>
       </div>
-      <div class="span-4" style="text-align:right">
+      <div class="span-7" style="text-align:right">
         <div>
+          #if $index>1
+            <a href="/manage/?app=${app}&command=${command}&role=${role}">First Page</a> |
+          #end if
           Page ${index}
           #if $next
             | <a href="/manage/?app=${app}&command=${command}&index=${index+1}&role=${role}&offset=${next}">Next Page »</a>

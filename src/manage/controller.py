@@ -275,6 +275,7 @@ def show_signin(**kw):
     return {
             '__view__' : 'signin',
             'error' : '',
+            'email' : '',
             'redirect' : redirect,
             'google_signin_url' : google_signin_url,
             'site' : _get_site_info(),
@@ -292,7 +293,9 @@ def do_signin(**kw):
     try:
         user = store.get_user_by_email(email)
         if user is None or user.password!=password:
-            error = r'Bad email or password'
+            error = r'Bad email or password.'
+        elif user.locked:
+            error = r'Your account has been locked. Please contact administrator.'
     except StandardError, e:
         logging.exception('failed to sign in')
         error = 'Unexpected error occurred: %s' % e.message
@@ -300,6 +303,7 @@ def do_signin(**kw):
         return {
                 '__view__' : 'signin',
                 'error' : error,
+                'email' : email,
                 'redirect' : redirect,
                 'site' : _get_site_info(),
                 'version' : get_version(),
