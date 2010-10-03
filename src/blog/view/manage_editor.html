@@ -82,8 +82,16 @@ function validate_form() {
     </div>
     #end if
     <div class="form-field">
+      <div class="form-field-title">Save as draft: (Will not visible to public)</div>
+      <div class="form-field-input"><label><input name="draft" type="checkbox" value="True" />Save as draft</label></div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Allow comments:</div>
+      <div class="form-field-input"><label><input name="allow_comment" type="checkbox" value="True" />Allow comments</label></div>
+    </div>
+    <div class="form-field">
       <div class="form-field-input">
-        <button type="submit" id="save" name="save">Save</button>
+        <button type="submit" id="save" name="save" class="normal">Save</button>
         <span id="loading" class="loading">Saving... please wait...</span>
       </div>
     </div>

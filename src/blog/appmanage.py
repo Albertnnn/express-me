@@ -55,7 +55,29 @@ def _add_post(user, app, context):
         content = context.get_argument('content')
         category = context.get_argument('category')
         tags = context.get_argument('tags')
-        model.create_post()
+        draft = context.get_argument('draft')=='True'
+        allow_comment = context.get_argument('allow_comment')=='True'
+        state = model.POST_PUBLISHED
+        if draft:
+            state = model.POST_DRAFT
+        elif user.role>=store.ROLE_AUTHOR:
+            state = model.POST_PENDING
+        post = model.create_post(user, state, title, content, model.get_category(category), tags, allow_comment)
+        msg_title, msg = {
+                model.POST_PUBLISHED : ('Post published', r'Your post "%s" has been published.' % title,),
+                model.POST_DRAFT : ('Post saved as draft', r'Your post "%s" has been saved as draft.' % title,),
+                model.POST_PENDING : ('Post saved and pending for approval', r'Your post "%s" has been saved and pending for approval.' % title,),
+        }[state]
+        buttons = [('View Post', '/blog/post/%s' % post.id, True)]
+        if state==model.POST_DRAFT or state==model.POST_PENDING:
+            buttons = [('Edit Post', '/manage/?app=blog&command=edit_post&id=%s' % post.id, False)]
+        buttons.append(('Add Another', '/manage/?app=blog&command=add_post', False))
+        return {
+                '__view__' : 'manage_message',
+                'title' : msg_title,
+                'message' : msg,
+                'buttons' : buttons,
+        }
 
 def _add_page(user, app, context):
     if context.method=='get':

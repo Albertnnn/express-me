@@ -1,0 +1,34 @@
+<!-- begin manage_message.html -->
+<script type="text/javascript">
+jQuery(function() {
+  //#set $n=0
+  //#for $label, $link, $new_window in $buttons
+    jQuery('\#btn-${n}').click(function() {
+        if ('${new_window}' == 'True') {
+            window.open('${link}');
+        }
+        else {
+            location.assign('${link}');
+        }
+    });
+  //#set $n=$n+1
+  //#end for
+});
+</script>
+<div class="panel box-round">
+  <div class="panel-title"><div>${title}</div></div>
+  <div class="panel-content">
+    <div class="span-18 prepend-1 last">
+      <div style="padding:12px; font-size:1.2em">${message}</div>
+      <div style="padding:12px; text-align:center">
+#set $n=0
+#for $label, $link, $new_window in $buttons
+        <button id="btn-${n}" name="btn-${n}" type="button" class="normal">${label}</button>
+#set $n=$n+1
+#end for
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+<!-- end manage_message.html -->
