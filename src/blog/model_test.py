@@ -6,33 +6,42 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 import time
 import unittest
 
-from google.appengine.ext import db as db
-
 from framework.gaeunit import GaeTestCase
-
+from framework import store
 from blog import model
+
+def _create_user():
+    return store.create_user(store.ROLE_ADMINISTRATOR, 'test@email.com', 'password', 'Bob')
 
 def _create_post(num, ref_user, title_prefix, tag, category, func_state=lambda x: model.POST_PUBLISHED):
     ' create number of posts '
     for i in range(num-1, -1, -1):
-        post = model.BlogPost(
-                ref=ref_user,
-                state=func_state(i),
-                title='%s-%d' % (title_prefix, i,),
-                excerpt = 'just a test. no. %d' % i,
-                content = 'just a test. no. %d' % i,
-                tags=[tag],
-                category=category
+        model.create_post(
+                ref_user,
+                func_state(i),
+                '%s-%d' % (title_prefix, i,),
+                'just a test. no. %d' % i,
+                category,
+                tag,
+                True
         )
-        post.put()
         time.sleep(0.01)
 
 class Test(GaeTestCase):
 
+    def test_create_post(self):
+        user = _create_user()
+        p = model.create_post(user, model.POST_PUBLISHED, 'test post', 'test content', model.get_category(), 'aa,bb,cc', True)
+        self.assertEquals(user.id, p.ref)
+        self.assertEquals(user.nicename, p.author)
+        p2 = model.get_post(p.id)
+        self.assertEquals(user.id, p2.ref)
+        self.assertEquals(user.nicename, p2.author)
+
     def test_get_all_posts(self):
         # prepare 20 posts:
         category = model.create_category('get_all')
-        _create_post(20, 'user_abc', 'test', 'abc', category)
+        _create_post(20, _create_user(), 'test', 'abc', category)
         # get first 5: test-0, ..., test-4
         posts, cursor = model.get_all_posts(5)
         self.assertEquals(['test-%d' % d for d in range(5)], [str(p.title) for p in posts])
@@ -50,7 +59,7 @@ class Test(GaeTestCase):
             if n % 2==0:
                 return model.POST_PUBLISHED
             return model.POST_DRAFT
-        _create_post(20, 'user_abc', 'test', 'abc', category, _get_state)
+        _create_post(20, _create_user(), 'test', 'abc', category, _get_state)
         # get first 5: test-0, test-2, test-4, test-6, test-8
         posts, cursor = model.get_published_posts(5)
         self.assertEquals(['test-%d' % d for d in range(0, 9, 2)], [str(p.title) for p in posts])

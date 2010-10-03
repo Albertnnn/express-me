@@ -49,6 +49,41 @@ class BlogPost(store.BaseModel):
     def tags_as_string(self):
         return ','.join(self.post_tags)
 
+def create_post(user, state, title, content, category, tags_str='', allow_comment=True):
+    '''
+    Create a post by given user, state, title, etc.
+    
+    Args:
+        user: User object.
+        state: Post state.
+        title: Post title.
+        content: Post content.
+        category: Post category.
+        tags_str: Post tags as a string, default to ''.
+        allow_comment: True if allow comment, default to True.
+    
+    Returns:
+        The created BlogPost object.
+    '''
+    tags = [t.strip() for t in tags_str.split(',')]
+    tags = [t for t in tags if t]
+    # TODO: fix me...
+    excerpt = content
+    p = BlogPost(
+            ref = user.id,
+            author = user.nicename,
+            state = state,
+            title = title,
+            excerpt = excerpt,
+            content = content,
+            category = category,
+            tags = tags,
+            static = False,
+            allow_comment = allow_comment
+    )
+    p.put()
+    return p
+
 def _query_posts(limit, cursor, ref_user=None, state=None, static=None, category=None, tag=None, order='-creation_date'):
     '''
     Low-level query with specific limit, cursor, filter and order.
@@ -72,6 +107,17 @@ def _query_posts(limit, cursor, ref_user=None, state=None, static=None, category
         q.with_cursor(cursor)
     result = q.fetch(limit)
     return result, q.cursor()
+
+def get_post(key):
+    '''
+    Get post by key.
+    
+    Args:
+        key: post key as str.
+    Returns:
+        BlogPost object.
+    '''
+    return BlogPost.get(key)
 
 def get_all_posts(limit=50, cursor=None):
     '''
@@ -227,9 +273,6 @@ def get_page(key, publish_only=True):
 
 def list_tags():
     return BlogTag.all().filter('tag_count >', 0).order('tag_name').fetch(1000)
-
-def create_post(user, title, content, tags=''):
-    pass
 
 def get_pages():
     return BlogPost.all().filter('post_static =', True).order('-post_date').fetch(1000)
