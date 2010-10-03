@@ -91,6 +91,29 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 .top-line { border-top:1px solid #e3e3e3 }
 .bottom-line { border-bottom:1px solid #e3e3e3 }
 
+button.normal {
+  margin: 0px;
+  border: solid 1px #298cba;
+  color: #fff;
+  background: #21759b url(/manage/static/image/button.png) repeat-x scroll 0% 0%;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 14px;
+  font-size: 12px !important;
+  padding: 3px 8px;
+  text-decoration: none;
+  border-bottom-left-radius: 11px 11px;
+  border-bottom-right-radius: 11px 11px;
+  border-top-left-radius: 11px 11px;
+  border-top-right-radius: 11px 11px;
+  -webkit-box-sizing: content-box;
+  -webkit-appearance: push-button;
+}
+button.normal:hover {
+  border-color: #13455b;
+  color: #eaf2fa;
+}
+
 .form-field { padding:3px 6px; margin:12px 0px; width:95% }
 .form-field-title { font-size:1.1em }
 .form-field-input { width: 95% }
