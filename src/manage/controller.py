@@ -238,9 +238,11 @@ def signout(**kw):
 
 @get('/register')
 def show_register(**kw):
+    google_signin_url = _get_google_signin_url('/manage/g_signin')
     return {
             '__view__' : 'register',
             'error' : '',
+            'google_signin_url' : google_signin_url,
             'site' : _get_site_info(),
             'version' : get_version(),
     }

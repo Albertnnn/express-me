@@ -82,7 +82,7 @@ jQuery(function() {
           <p><input type="hidden" id="password" name="password" /><input id="register" type="submit" value="Register" /><span id="loading" class="loading">Register new account, please wait...</span></p>
         </fieldset>
       </form>
-      <p><a href="register">Register</a> | <a href="#">Lost your password?</a></p>
+      <p>Already has an account? <a href="/manage/signin">Sign in</a> | <a href="/manage/forgot">Lost your password?</a></p>
       #if $varExists('google_signin_url')
       <p>Don't want to register? <a href="${google_signin_url}">Sign in with a Google account!</a></p>
       #end if
@@ -90,8 +90,9 @@ jQuery(function() {
 	</div>
     <div class="span-16 prepend-4 last" style="margin:5px 0px"><hr/></div>
     <div class="span-14 prepend-5 last">
-	  <div class="span-9" style="line-height:30px; text-align:center"><a href="http://www.expressme.org/" target="_blank">ExpressMe</a> version ${version}, copyright&copy;2010.</div>
-	  <div class="span-4 last"><a href="http://code.google.com/appengine/" target="_blank"><img src="http://code.google.com/appengine/images/appengine-silver-120x30.gif" 
+	  <div class="span-7" style="line-height:30px; text-align:left"><a href="http://www.expressme.org/" target="_blank">ExpressMe</a> version ${version}, copyright&copy;2010.</div>
+	  <div class="span-7 last" style="text-align:right"><a href="http://www.expressme.org/" target="_blank"><img src="/static/image/expressme-120x30.gif" 
+alt="Powered by ExpressMe" width="120" height="30" align="absmiddle"/></a>&nbsp;&nbsp;&nbsp;<a href="http://code.google.com/appengine/" target="_blank"><img src="http://code.google.com/appengine/images/appengine-silver-120x30.gif" 
 alt="Powered by Google App Engine" width="120" height="30" align="absmiddle"/></a></div>
 	</div>
   </div>
