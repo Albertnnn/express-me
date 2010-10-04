@@ -1,7 +1,7 @@
 @charset "utf-8";
 /* Custom CSS Document */
 
-body { background-image:url(/manage/static/image/single-bg.png); background-repeat:repeat-x; }
+body { background-image:url(/manage/static/image/single-bg.png); font-family:'Lucida Grande', Verdana, Arial, 'Bitstream Vera Sans', sans-serif; background-repeat:repeat-x; }
 
 a:link    {color: #2175ac; text-decoration:none}
 a:visited {color: #2175ac; text-decoration:none}

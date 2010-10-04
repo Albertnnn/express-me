@@ -1,6 +1,6 @@
 @charset "utf-8";
 /* Custom CSS Document */
-body { background:#f9f9f9 url(/manage/static/bg.gif) repeat-x; font-family:Arial; font-size:12px; height:100%; }
+body { background:#f9f9f9 url(/manage/static/bg.gif) repeat-x; font-family:'Lucida Grande', Verdana, Arial, 'Bitstream Vera Sans', sans-serif; font-size:12px; height:100%; }
 
 #container { min-height: 100% }
 
@@ -83,7 +83,7 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 }
 
 .th div div {padding:6px; }
-.tr div div {padding:6px; }
+.tr div div {margin:6px; }
 
 .tr-selected { background-color:#f9f9f9 !important; }
 .tr-hover:hover { background-color:#f9f9f9; }
@@ -91,16 +91,18 @@ a.app-menu-item-selected:visited { color:#d54e4d; }
 .top-line { border-top:1px solid #e3e3e3 }
 .bottom-line { border-bottom:1px solid #e3e3e3 }
 
+button.submit {
+  font-weight: bold;
+}
 button.normal {
   margin: 0px;
-  border: solid 1px #298cba;
-  color: #fff;
-  background: #21759b url(/manage/static/image/button.png) repeat-x scroll 0% 0%;
-  font-weight: bold;
+  border: solid 1px #bbb;
+  color: #464646;
+  background: #f2f2f2 url(/manage/static/image/button.png) repeat-x scroll 0% 0%;
   cursor: pointer;
   line-height: 14px;
   font-size: 12px !important;
-  padding: 3px 8px;
+  padding: 3px 12px;
   text-decoration: none;
   border-bottom-left-radius: 11px 11px;
   border-bottom-right-radius: 11px 11px;
@@ -110,8 +112,7 @@ button.normal {
   -webkit-appearance: push-button;
 }
 button.normal:hover {
-  border-color: #13455b;
-  color: #eaf2fa;
+  border-color: #464646;
 }
 
 .form-field { padding:3px 6px; margin:12px 0px; width:95% }

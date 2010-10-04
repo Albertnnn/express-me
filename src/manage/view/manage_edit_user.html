@@ -8,7 +8,34 @@ jQuery(function() {
     });
 });
 //#raw
+var ROLE_NAME = {
+    '0' : 'Administrator',
+	'10' : 'Editor',
+	'20' : 'Author',
+	'30' : 'Contributor',
+	'40' : 'Subscriber'
+}
 $(function() {
+    $('#set_role').change(function() {
+		var role = $('#set_role').val();
+		if (role=='') {
+			return;
+		}
+        var selected_users = $('input.select-user:checked');
+        if (selected_users.length==0) {
+            alert('Please select users first.');
+        }
+        else {
+            var msg = 'Are you sure you want to set this user to ' + ROLE_NAME[role] + '?';
+            if (selected_users.length>1) {
+                msg = 'Are you sure you want to set these users to ' + ROLE_NAME[role] + '?';
+            }
+            if (confirm(msg)) {
+				$('#btn').val('set_role');
+				$('#edit_form').submit();
+			}
+		}
+    });
     $('#lock').click(function() {
         var selected_users = $('input.select-user:checked');
         if (selected_users.length==0) {
@@ -121,6 +148,14 @@ $(function() {
           <button type="button" name="filter" id="filter">Filter</button>
           <button type="button" name="lock" id="lock">Lock</button>
           <button type="button" name="unlock" id="unlock">Unlock</button>
+          <select name="set_role" id="set_role">
+            <option value="">- Set to new role -</option>
+            <option value="0">Set to Administrator</option>
+            <option value="10">Set to Editor</option>
+            <option value="20">Set to Author</option>
+            <option value="30">Set to Contributor</option>
+            <option value="40">Set to Subscriber</option>
+          </select>
         </div>
       </div>
       <div class="span-7" style="text-align:right">

@@ -93,6 +93,8 @@ def do_manage(**kw):
     embed_model = app_mod.manage(current_user, app, command, embed_context)
     if isinstance(embed_model, basestring):
         return embed_model
+    if not isinstance(embed_model, dict):
+        raise ApplicationError(r'"%s.appmanage()" must return a dict or basestring.' % app)
     embed_model['app'] = app
     embed_model['command'] = command
     embed_model['user'] = current_user

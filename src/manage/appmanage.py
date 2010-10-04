@@ -54,9 +54,16 @@ def _edit_user(user, app, context):
         return _get_edit_user(user, app, context)
     if context.method=='post':
         btn = context.get_argument('btn')
+        user_ids = context.get_arguments('u')
         if btn=='lock' or btn=='unlock':
-            user_ids = context.get_arguments('u')
             store.lock_or_unlock_users(user_ids, btn=='lock')
+            return _get_edit_user(user, app, context)
+        if btn=='set_role':
+            role = int(context.get_argument('set_role'))
+            for id in user_ids:
+                user = store.get_user_by_key(id)
+                user.role = role
+                user.put()
             return _get_edit_user(user, app, context)
 
 def _profile(user, app, context):
