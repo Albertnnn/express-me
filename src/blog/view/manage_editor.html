@@ -1,6 +1,6 @@
 <!-- begin manage_editor.html -->
 <script type="text/javascript">
-	
+
 function func_success(result) {
     if (result.error) {
         $('#save').removeAttr('disabled');
@@ -83,11 +83,19 @@ function validate_form() {
     #end if
     <div class="form-field">
       <div class="form-field-title">Save as draft: (Will not visible to public)</div>
-      <div class="form-field-input"><label><input name="draft" type="checkbox" value="True" />Save as draft</label></div>
+      <div class="form-field-input"><label><input name="draft" type="checkbox" value="True"
+      #if $post.state==2
+        checked="checked"
+      #end if
+      />Save as draft</label></div>
     </div>
     <div class="form-field">
       <div class="form-field-title">Allow comments:</div>
-      <div class="form-field-input"><label><input name="allow_comment" type="checkbox" value="True" />Allow comments</label></div>
+      <div class="form-field-input"><label><input name="allow_comment" type="checkbox" value="True"
+      #if $post.allow_comment
+        checked="checked"
+      #end if
+      />Allow comments</label></div>
     </div>
     <div class="form-field">
       <div class="form-field-input">

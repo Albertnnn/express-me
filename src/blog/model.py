@@ -13,6 +13,7 @@ from framework import ApplicationError
 POST_PUBLISHED = 0
 POST_PENDING = 1
 POST_DRAFT = 2
+POST_DELETED = 3
 
 CATEGORY_UNCATEGORIED = 'Uncategorized'
 
@@ -47,7 +48,10 @@ class BlogPost(store.BaseModel):
     allow_comment = db.BooleanProperty(required=True, default=True)
 
     def tags_as_string(self):
-        return ','.join(self.post_tags)
+        return ','.join(self.tags)
+
+    def url(self):
+        return '%s/%s' % (self.static and 'page' or 'post', self.id)
 
 def create_post(user, state, title, content, category, tags_str='', allow_comment=True):
     '''
@@ -106,30 +110,10 @@ def _query_posts(limit, cursor, ref_user=None, state=None, static=None, category
     if cursor:
         q.with_cursor(cursor)
     result = q.fetch(limit)
-    return result, q.cursor()
-
-def get_post(key):
-    '''
-    Get post by key.
-    
-    Args:
-        key: post key as str.
-    Returns:
-        BlogPost object.
-    '''
-    return BlogPost.get(key)
-
-def get_all_posts(limit=50, cursor=None):
-    '''
-    Get all posts with specific condition satisfied.
-    
-    Args:
-        limit: maximum number of posts returned, default to 50.
-        cursor: the last position of query.
-    Returns:
-        Posts list and a cursor to indicate the next position.
-    '''
-    return _query_posts(limit, cursor, static=False)
+    cursor = q.cursor()
+    if not store.has_more(q, cursor):
+        cursor = None
+    return result, cursor
 
 def get_published_posts(limit=50, cursor=None):
     '''
@@ -159,12 +143,15 @@ def get_posts_by_tag(tag, limit=50, cursor=None):
         tag = tag.lower()
     return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, tag=tag)
 
-def get_posts_by_category(category, limit=50, cursor=None, published_only=True):
+def get_posts(limit=50, cursor=None, category=None, published_only=True):
     '''
-    get all posts by category.
+    get posts by category, published state, etc.
+    
+    Returns:
+        A tuple (Posts as list, cursor for next query).
     '''
     if published_only:
-        return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, category=category)
+        return _query_posts(limit, cursor, static=False, category=category, state=POST_PUBLISHED)
     else:
         return _query_posts(limit, cursor, static=False, category=category)
 
@@ -239,19 +226,106 @@ def get_categories():
         categories.append(create_category('Uncategorized'))
     return categories
 
-def get_post(key, publish_only=True):
+def undelete_post(key):
+    '''
+    Undelete a post.
+    
+    Args:
+        key: key of post.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=False)
+    if post and post.state==POST_DELETED:
+        post.state = POST_DRAFT
+        post.put()
+        return True
+    return False
+
+def publish_post(key):
+    '''
+    Publish a post.
+    
+    Args:
+        key: key of post.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=False)
+    if post and post.state==POST_DRAFT:
+        post.state = POST_PUBLISHED
+        post.put()
+        return True
+    return False
+
+def unpublish_post(key):
+    '''
+    Unpublish a post.
+    
+    Args:
+        key: key of post.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=True)
+    if post:
+        post.state = POST_DRAFT
+        post.put()
+        return True
+    return False
+
+def approve_post(key):
+    '''
+    Approve a pending post.
+    Args:
+        key: key of post.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=False)
+    if post and post.state==POST_PENDING:
+        post.state = POST_PUBLISHED
+        post.put()
+        return True
+    return False
+    
+def delete_post(key, permanent=False):
+    '''
+    Delete a post.
+    
+    Args:
+        key: key of post.
+        permanent: True if delete permanently, default to False.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=False)
+    if post:
+        if not permanent and post.state!=POST_DELETED:
+            post.state = POST_DELETED
+            post.put()
+            return True
+        # only DELETED post can be deleted permanently:
+        elif permanent and post.state==POST_DELETED:
+            post.delete()
+            return True
+    return False
+
+def get_post(key, static=False, published_only=True):
     '''
     get BlogPost by key.
     
     Args:
         key: key of post.
-        publish_only: if post is published.
+        published_only: if post is published.
     Return: BlogPost object, or None if no such post.
     '''
     p = BlogPost.get(key)
-    if p is None or p.static:
+    if p is None:
         return None
-    if publish_only and p.state!=POST_PUBLISHED:
+    if p.static!=static:
+        return None
+    if published_only and p.state!=POST_PUBLISHED:
         return None
     return p
 

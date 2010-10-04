@@ -1,0 +1,150 @@
+<!-- begin manage_list.html -->
+<script type="text/javascript">
+jQuery(function() {
+    jQuery('#add').click(function() {
+        location.assign('/manage/?app=${app}&command=add_post');
+    });
+    jQuery('\#category').val('${category}');
+    jQuery('\#select_category').val('${category}');
+    jQuery('\#filter').click(function() {
+        location.assign('/manage/?app=${app}&command=${command}&category=' + jQuery('\#select_category').val())
+    });
+});
+//#raw
+function submit_form(btn, id) {
+    $('#btn').val(btn);
+    $('#pid').val(id);
+    $('#edit_form').submit();
+}
+$(function() {
+    $('#delete').click(function() {
+        var selected_ps = $('input.select-p:checked');
+        if (selected_ps.length==0) {
+			alert('Please select posts first.');
+		}
+		else {
+			var msg = 'Are you sure you want to delete this post?';
+			if (selected_ps.length>1) {
+				msg = 'Are you sure you want to delete these posts?';
+			}
+			if (confirm(msg)) {
+				$('#btn').val('delete');
+				$('#edit_form').submit();
+			}
+		}
+    });
+    $('#select_all').change(function() {
+        if ($('#select_all').is(':checked')) {
+            $('.select-p').attr('checked', 'checked');
+            $('.tr-hover').addClass('tr-selected');
+        }
+        else {
+            $('.select-p').removeAttr('checked');
+            $('.tr-hover').removeClass('tr-selected');
+        }
+    });
+    $('.select-p').click(function() {
+        if ($(this).is(':checked')) {
+            $(this).parent().parent().parent().addClass('tr-selected');
+        }
+        else {
+            $(this).parent().parent().parent().removeClass('tr-selected');
+        }
+        if ($('input.select-p:checked').length==$('input.select-p').length) {
+            $('#select_all').attr('checked', 'checked');
+        }
+        else {
+            $('#select_all').removeAttr('checked');
+        }
+	});
+});
+//#end raw
+</script>
+<div class="panel box-round">
+  <div class="panel-title"><div>
+  #if $static
+    All Pages
+  #else
+    All Posts
+  #end if
+  </div></div>
+  <div class="panel-content">
+  <form id="edit_form" action="/manage/" method="post">
+  	<input type="hidden" name="app" value="${app}" />
+  	<input type="hidden" name="command" value="${command}" />
+  	<input type="hidden" name="offset" value="${offset}" />
+  	<input type="hidden" name="index" value="${index}" />
+  	<input type="hidden" id="btn" name="btn" value="" />
+  	<input type="hidden" id="pid" name="id" value="" />
+    <div class="th bottom-line">
+      <div class="span-1"><div><input type="checkbox" id="select_all" name="select_all" /></div></div>
+      <div class="span-8"><div>Title</div></div>
+      <div class="span-4"><div>Author</div></div>
+      <div class="span-3"><div>Category</div></div>
+      <div class="span-1"><div><img src="/blog/static/image/comment.png" width="16" height="16" alt="Comments" title="Comments" /></div></div>
+      <div class="span-3 last"><div>Date</div></div>
+    </div>
+  #if not $ps
+    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No post found that match the filter.</div></div></div>
+  #end if
+  #for $p in $ps
+    <div class="tr tr-hover">
+      <div class="span-1"><div><input type="checkbox" name="u" class="select-p" value="${p.id}" /></div></div>
+      <div class="span-8">
+      	<div style="font-weight:bold">
+          <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">${p.title}</a>
+        </div>
+        <div>
+          #if $p.state==0
+            <strong>Published</strong>: <a href="javascript:submit_form('unpublish', '${p.id}')">Unpublish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a> | <a href="/blog/${p.url()}" target="_blank">View</a>
+          #elif $p.state==1
+            <strong>Pending</strong>: <a href="javascript:submit_form('approve', '${p.id}')">Approve</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a>
+          #elif $p.state==2
+            <strong>Draft</strong>: <a href="javascript:submit_form('publish', '${p.id}')">Publish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a>
+          #elif $p.state==3
+		    <strong>Deleted</strong>: <a href="javascript:submit_form('undelete', '${p.id}')">Restore</a> | <a href="javascript:submit_form('perm_delete', '${p.id}')">Delete Permanently</a>
+          #end if
+        </div>
+      </div>
+      <div class="span-4"><div>${p.author}</div></div>
+      <div class="span-3"><div>${p.category.name}</div></div>
+      <div class="span-1"><div>0</div></div>
+      <div class="span-3 last">
+      	<div>$utils.format_date($p.creation_date)</div>
+        <div>$utils.format_time($p.creation_date)</div>
+      </div>
+    </div>
+  #end for
+  	<div class="tr top-line">
+      <div class="span-12">
+        <div>
+        
+          <button type="button" name="add" id="add">Add New</button>
+          <input type="hidden" id="category" name="category" value="${category}" />
+          <select name="select_category" id="select_category">
+            <option value="">All categories</option>
+		  #for $c in $categories
+            <option value="${c.id}">${c.name}</option>
+          #end for
+          </select>
+          <button type="button" name="filter" id="filter">Filter</button>
+          <button type="button" name="delete" id="delete">Delete</button>
+        </div>
+      </div>
+      <div class="span-7" style="text-align:right">
+        <div>
+          #if $index>1
+            <a href="/manage/?app=${app}&command=${command}&category=${category}">First Page</a> |
+          #end if
+          Page ${index}
+          #if $next
+            | <a href="/manage/?app=${app}&command=${command}&category=${category}&index=${index+1}&offset=${next}">Next Page »</a>
+          #end if
+        </div>
+      </div>
+      <div class="span-1 last"></div>
+  	</div>
+  </div>
+  </form>
+</div>
+<!-- end manage_list.html -->

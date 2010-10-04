@@ -38,18 +38,26 @@ class Test(GaeTestCase):
         self.assertEquals(user.id, p2.ref)
         self.assertEquals(user.nicename, p2.author)
 
-    def test_get_all_posts(self):
+    def test_get_posts_by_category(self):
+        # prepare 20 posts:
+        python = model.create_category('python')
+        java = model.create_category('java')
+        _create_post(10, _create_user(), 'python test', 'this is a python test', python)
+        _create_post(10, _create_user(), 'java test', 'this is a java test', java)
+        ps, cursor = model.get_posts(limit, cursor, category, published_only)
+
+    def test_get_posts(self):
         # prepare 20 posts:
         category = model.create_category('get_all')
         _create_post(20, _create_user(), 'test', 'abc', category)
         # get first 5: test-0, ..., test-4
-        posts, cursor = model.get_all_posts(5)
+        posts, cursor = model.get_posts(5)
         self.assertEquals(['test-%d' % d for d in range(5)], [str(p.title) for p in posts])
         # get next 10: test-5, ..., test-14:
-        posts, cursor = model.get_all_posts(10, cursor)
+        posts, cursor = model.get_posts(10, cursor)
         self.assertEquals(['test-%d' % d for d in range(5, 15)], [str(p.title) for p in posts])
         # get next 5: test-15, ..., test-19:
-        posts, cursor = model.get_all_posts(10, cursor)
+        posts, cursor = model.get_posts(10, cursor)
         self.assertEquals(['test-%d' % d for d in range(15, 20)], [str(p.title) for p in posts])
 
     def test_get_published_posts(self):

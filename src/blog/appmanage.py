@@ -7,6 +7,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Blog app management.
 '''
 
+import logging
+
 from framework import store
 
 from blog import model
@@ -29,8 +31,60 @@ def get_menus():
     )
     return (post, page,)
 
+def __get_post_list(context):
+    category = None
+    cat = context.get_argument('category', '')
+    if cat:
+        category = model.get_category(cat)
+    offset = context.get_argument('offset', '')
+    if not offset:
+        offset = None
+    index = 1
+    if offset:
+        index = int(context.get_argument('index'))
+    categories = model.get_categories()
+    ps, next_cursor = model.get_posts(5, offset, category, published_only=False)
+    return {
+            '__view__' : 'manage_list',
+            'static' : False,
+            'ps' : ps,
+            'category' : cat,
+            'categories' : categories,
+            'offset' : offset,
+            'next' : next_cursor,
+            'index' : index,
+    }
+
 def _edit_post(user, app, context):
-    pass
+    if context.method=='get':
+        btn = context.get_argument('btn', '')
+        if btn=='edit':
+            return {
+                    '__view__' : 'manage_editor',
+                    'post' : model.get_post(context.get_argument('id'), published_only=False),
+                    'categories' : model.get_categories(),
+            }
+        return __get_post_list(context)
+
+    if context.method=='post':
+        btn = context.get_argument('btn', '')
+        id = context.get_argument('id', '')
+        ok = False
+        if btn=='publish':
+            ok = model.publish_post(id)
+        elif btn=='unpublish':
+            ok = model.unpublish_post(id)
+        elif btn=='approve':
+            ok = model.approve_post(id)
+        elif btn=='delete':
+            ok = model.delete_post(id)
+        elif btn=='perm_delete':
+            ok = model.delete_post(id, permanent=True)
+        elif btn=='undelete':
+            ok = model.undelete_post(id)
+        if not ok:
+            logging.warning('Operation failed: %s, id=%s' % (btn, id,))
+        return __get_post_list(context)
 
 def _empty_post(user, static):
     return {
@@ -41,6 +95,8 @@ def _empty_post(user, static):
             'ref' : user.id,
             'author' : user.nicename,
             'tags_as_string' : lambda : '',
+            'state' : 0,
+            'allow_comment' : True,
     }
 
 def _add_post(user, app, context):
