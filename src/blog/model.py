@@ -143,17 +143,17 @@ def get_posts_by_tag(tag, limit=50, cursor=None):
         tag = tag.lower()
     return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, tag=tag)
 
-def get_posts(limit=50, cursor=None, category=None, published_only=True):
+def get_posts(limit=50, cursor=None, ref_user=None, category=None, published_only=True):
     '''
-    get posts by category, published state, etc.
+    get posts by user's key, category, published state, etc.
     
     Returns:
         A tuple (Posts as list, cursor for next query).
     '''
     if published_only:
-        return _query_posts(limit, cursor, static=False, category=category, state=POST_PUBLISHED)
+        return _query_posts(limit, cursor, ref_user=ref_user, static=False, category=category, state=POST_PUBLISHED)
     else:
-        return _query_posts(limit, cursor, static=False, category=category)
+        return _query_posts(limit, cursor, ref_user=ref_user, static=False, category=category)
 
 def get_tag(key):
     '''
@@ -238,6 +238,22 @@ def undelete_post(key):
     post = get_post(key, published_only=False)
     if post and post.state==POST_DELETED:
         post.state = POST_DRAFT
+        post.put()
+        return True
+    return False
+
+def pending_post(key):
+    '''
+    Pending a post and wait for approval.
+    
+    Args:
+        key: key of post.
+    Returns:
+        True if operation successfully, otherwise False.
+    '''
+    post = get_post(key, published_only=False)
+    if post and post.state==POST_DRAFT:
+        post.state = POST_PENDING
         post.put()
         return True
     return False

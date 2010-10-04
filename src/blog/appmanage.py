@@ -10,6 +10,7 @@ Blog app management.
 import logging
 
 from framework import store
+from framework.encode import encode_html
 
 from blog import model
 
@@ -31,7 +32,7 @@ def get_menus():
     )
     return (post, page,)
 
-def __get_post_list(context):
+def __get_post_list(user, context):
     category = None
     cat = context.get_argument('category', '')
     if cat:
@@ -43,7 +44,10 @@ def __get_post_list(context):
     if offset:
         index = int(context.get_argument('index'))
     categories = model.get_categories()
-    ps, next_cursor = model.get_posts(5, offset, category, published_only=False)
+    ref = None
+    if user.role >= store.ROLE_AUTHOR:
+        ref = user.id
+    ps, next_cursor = model.get_posts(5, offset, ref, category, published_only=False)
     return {
             '__view__' : 'manage_list',
             'static' : False,
@@ -64,27 +68,29 @@ def _edit_post(user, app, context):
                     'post' : model.get_post(context.get_argument('id'), published_only=False),
                     'categories' : model.get_categories(),
             }
-        return __get_post_list(context)
+        return __get_post_list(user, context)
 
     if context.method=='post':
         btn = context.get_argument('btn', '')
         id = context.get_argument('id', '')
         ok = False
-        if btn=='publish':
+        if btn=='publish' and user.role >= store.ROLE_AUTHOR:
+            ok = model.pending_post(id)
+        if btn=='publish' and user.role <= store.ROLE_EDITOR:
             ok = model.publish_post(id)
-        elif btn=='unpublish':
+        elif btn=='unpublish' and user.role <= store.ROLE_EDITOR:
             ok = model.unpublish_post(id)
-        elif btn=='approve':
+        elif btn=='approve' and user.role <= store.ROLE_EDITOR:
             ok = model.approve_post(id)
-        elif btn=='delete':
+        elif btn=='delete' and user.role <= store.ROLE_EDITOR:
             ok = model.delete_post(id)
-        elif btn=='perm_delete':
+        elif btn=='perm_delete' and user.role <= store.ROLE_EDITOR:
             ok = model.delete_post(id, permanent=True)
-        elif btn=='undelete':
+        elif btn=='undelete' and user.role <= store.ROLE_EDITOR:
             ok = model.undelete_post(id)
         if not ok:
             logging.warning('Operation failed: %s, id=%s' % (btn, id,))
-        return __get_post_list(context)
+        return __get_post_list(user, context)
 
 def _empty_post(user, static):
     return {
@@ -119,21 +125,8 @@ def _add_post(user, app, context):
         elif user.role>=store.ROLE_AUTHOR:
             state = model.POST_PENDING
         post = model.create_post(user, state, title, content, model.get_category(category), tags, allow_comment)
-        msg_title, msg = {
-                model.POST_PUBLISHED : ('Post published', r'Your post "%s" has been published.' % title,),
-                model.POST_DRAFT : ('Post saved as draft', r'Your post "%s" has been saved as draft.' % title,),
-                model.POST_PENDING : ('Post saved and pending for approval', r'Your post "%s" has been saved and pending for approval.' % title,),
-        }[state]
-        buttons = [('View Post', '/blog/post/%s' % post.id, True)]
-        if state==model.POST_DRAFT or state==model.POST_PENDING:
-            buttons = [('Edit Post', '/manage/?app=blog&command=edit_post&id=%s' % post.id, False)]
-        buttons.append(('Add Another', '/manage/?app=blog&command=add_post', False))
-        return {
-                '__view__' : 'manage_message',
-                'title' : msg_title,
-                'message' : msg,
-                'buttons' : buttons,
-        }
+        return r'json:{"add":true,"id":"%s","title":"%s","state":%s,"url":"/blog/%s"}' \
+                % (post.id, encode_html(post.title), state, post.url())
 
 def _add_page(user, app, context):
     if context.method=='get':

@@ -95,6 +95,17 @@ $(function() {
           <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">${p.title}</a>
         </div>
         <div>
+        #if $user.role>=20
+          #if $p.state==0
+            <strong>Published</strong>
+          #elif $p.state==1
+            <strong>Pending</strong>: <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a>
+          #elif $p.state==2
+            <strong>Draft</strong>: <a href="javascript:submit_form('publish', '${p.id}')">Publish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a>
+          #elif $p.state==3
+            <strong>Deleted</strong>
+          #end if
+        #else
           #if $p.state==0
             <strong>Published</strong>: <a href="javascript:submit_form('unpublish', '${p.id}')">Unpublish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a> | <a href="/blog/${p.url()}" target="_blank">View</a>
           #elif $p.state==1
@@ -104,7 +115,8 @@ $(function() {
           #elif $p.state==3
 		    <strong>Deleted</strong>: <a href="javascript:submit_form('undelete', '${p.id}')">Restore</a> | <a href="javascript:submit_form('perm_delete', '${p.id}')">Delete Permanently</a>
           #end if
-        </div>
+        #end if
+		</div>
       </div>
       <div class="span-4"><div>${p.author}</div></div>
       <div class="span-3"><div>${p.category.name}</div></div>

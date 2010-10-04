@@ -1,6 +1,8 @@
 <!-- begin manage_editor.html -->
 <script type="text/javascript">
-
+var g_app='${app}';
+var g_command='${command}';
+//#raw
 function func_success(result) {
     if (result.error) {
         $('#save').removeAttr('disabled');
@@ -8,22 +10,51 @@ function func_success(result) {
         set_error(result.error);
     }
     else {
-        $('#loading').html('Success! Redirecting...');
-        location.assign('/manage/?app=${app}&command=${command}');
+		msg = 'Your post "<strong>' + result.title + '</strong>" has been published successfully!';
+		if (result.state==1) {
+			msg = 'Your post "<strong>' + result.title + '</strong>" has been saved and pending for approval.';
+		}
+		else if (result.state==2) {
+			msg = 'Your post "<strong>' + result.title + '</strong>" has been saved as draft.';
+		}
+		$('#message_title').html(result.title);
+		$('#message_content').html(msg);
+		$('#message').show();
+		$('#editor').hide();
+		$('#add_another').click(function() {
+            location.assign('/manage/?app=' + g_app + '&command=' + g_command);
+		});
+		if (result.state==0) {
+			$('#preview').show().click(function() {
+				window.open(result.url);
+			});
+		}
     }
 }
 
 function validate_form() {
-//#raw
     $('#save').attr('disabled', 'disabled');
     $('#loading').show();
-    $.post('/manage/', $('#edit_form').serialize(), func_success, 'json');
+	alert($('#edit_form').serialize() + '&content=' + encodeURIComponent(FCKeditorAPI.GetInstance('fckeditor').GetHTML()));
+    $.post('/manage/', $('#edit_form').serialize() + '&content=' + encodeURIComponent(FCKeditorAPI.GetInstance('fckeditor').GetHTML()), func_success, 'json');
     return false;
 //#end raw
 }
 </script>
+<div id="message" class="panel box-round" style="display:none">
+  <div class="panel-title"><div id="message_title"></div></div>
+  <div class="panel-content">
+    <div class="span-18 prepend-1 last">
+      <div id="message_content" style="padding:12px; font-size:1.2em"></div>
+      <div id="message_button" style="padding:12px 12px 12px 40px;">
+	    <button id="add_another" name="add_another" type="button" class="normal">Add Another</button>
+	    <button id="preview" name="preview" type="button" class="normal" style="display:none">View</button>
+	  </div>
+    </div>
+  </div>
+</div>
 
-<div class="panel box-round">
+<div id="editor" class="panel box-round">
 <form id="edit_form" name="edit_form" action="/manage/" method="post" onsubmit="return validate_form()">
   <input type="hidden" name="app" value="${app}" />
   <input type="hidden" name="command" value="${command}" />
@@ -67,7 +98,7 @@ function validate_form() {
     <script type="text/javascript" src="/static/js/fckeditor/fckeditor.js"></script>
     <div class="form-field">
       <div class="form-field-title">Content:</div>
-      <div class="form-field-input"><textarea name="content" id="fckeditor" style="width:100%">${post.content__raw__}</textarea></div>
+      <div class="form-field-input"><textarea name="pcontent" id="fckeditor" style="width:100%">${post.content__raw__}</textarea></div>
     </div>
     <script type="text/javascript">
       var oFCKeditor = new FCKeditor('fckeditor','100%','480');
