@@ -80,10 +80,10 @@ $(function() {
     });
     $('.select-user').click(function() {
         if ($(this).is(':checked')) {
-            $(this).parent().parent().addClass('tr-selected');
+            $(this).parent().parent().parent().addClass('tr-selected');
         }
         else {
-            $(this).parent().parent().removeClass('tr-selected');
+            $(this).parent().parent().parent().removeClass('tr-selected');
         }
         if ($('input.select-user:checked').length==$('input.select-user').length) {
             $('#select_all').attr('checked', 'checked');
@@ -105,7 +105,7 @@ $(function() {
   	<input type="hidden" name="index" value="${index}" />
   	<input type="hidden" id="btn" name="btn" value="" />
     <div class="th bottom-line">
-      <div class="span-1"><input type="checkbox" id="select_all" name="select_all" /></div>
+      <div class="span-1"><div><input type="checkbox" id="select_all" name="select_all" /></div></div>
       <div class="span-6"><div>Email</div></div>
       <div class="span-5"><div>Nice Name</div></div>
       <div class="span-3"><div>Role</div></div>
@@ -117,9 +117,7 @@ $(function() {
   #end if
   #for $user in $users
     <div class="tr tr-hover">
-      <div class="span-1">
-      	<input type="checkbox" name="u" class="select-user" value="${user.id}" />
-      </div>
+      <div class="span-1"><div><input type="checkbox" name="u" class="select-user" value="${user.id}" /></div></div>
       <div class="span-6">
       	<div style="font-size:1.1em;font-weight:bold"><a href="?app=${app}&command=send_mail&id=${user.id}">${user.email}</a></div>
       </div>
