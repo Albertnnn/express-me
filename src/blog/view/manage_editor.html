@@ -35,7 +35,7 @@ function func_success(result) {
 function validate_form() {
     $('#save').attr('disabled', 'disabled');
     $('#loading').show();
-	alert($('#edit_form').serialize() + '&content=' + encodeURIComponent(FCKeditorAPI.GetInstance('fckeditor').GetHTML()));
+	//alert($('#edit_form').serialize() + '&content=' + encodeURIComponent(FCKeditorAPI.GetInstance('fckeditor').GetHTML()));
     $.post('/manage/', $('#edit_form').serialize() + '&content=' + encodeURIComponent(FCKeditorAPI.GetInstance('fckeditor').GetHTML()), func_success, 'json');
     return false;
 //#end raw

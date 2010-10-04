@@ -9,6 +9,7 @@ Blog app management.
 
 import logging
 
+from framework import ApplicationError
 from framework import store
 from framework.encode import encode_html
 
@@ -63,9 +64,12 @@ def _edit_post(user, app, context):
     if context.method=='get':
         btn = context.get_argument('btn', '')
         if btn=='edit':
+            p =  model.get_post(context.get_argument('id'), published_only=False)
+            if user.role >= store.ROLE_AUTHOR and p.ref != user.id:
+                raise ApplicationError('Permission denied.')
             return {
                     '__view__' : 'manage_editor',
-                    'post' : model.get_post(context.get_argument('id'), published_only=False),
+                    'post' : p,
                     'categories' : model.get_categories(),
             }
         return __get_post_list(user, context)
@@ -75,7 +79,9 @@ def _edit_post(user, app, context):
         id = context.get_argument('id', '')
         ok = False
         if btn=='publish' and user.role >= store.ROLE_AUTHOR:
-            ok = model.pending_post(id)
+            p = model.get_post(id, False, False)
+            if p and p.ref==user.id:
+                ok = model.pending_post(id)
         if btn=='publish' and user.role <= store.ROLE_EDITOR:
             ok = model.publish_post(id)
         elif btn=='unpublish' and user.role <= store.ROLE_EDITOR:
