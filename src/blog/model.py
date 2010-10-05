@@ -42,7 +42,7 @@ class BlogPost(store.BaseModel):
     title = db.StringProperty(required=True)
     excerpt = db.TextProperty(required=True)
     content = db.TextProperty(required=True)
-    category = db.ReferenceProperty(required=True, reference_class=BlogCategory)
+    category = db.ReferenceProperty(reference_class=BlogCategory)
     tags = db.StringListProperty()
     static = db.BooleanProperty(default=False)
     allow_comment = db.BooleanProperty(required=True, default=True)
@@ -52,6 +52,70 @@ class BlogPost(store.BaseModel):
 
     def url(self):
         return '%s/%s' % (self.static and 'page' or 'post', self.id)
+
+def update_page(id, user, state, title, content, allow_comment):
+    '''
+    Update a page.
+    '''
+    p = get_post(id, static=True, published_only=False)
+    if p:
+        p.ref = user.id
+        p.author = user.nicename
+        p.state = state
+        p.title = title
+        p.content = content
+        p.allow_comment = allow_comment
+        p.put()
+        return p
+    return None
+
+def create_page(user, state, title, content, allow_comment=True):
+    '''
+    Create a page by given user, state, title, etc.
+    
+    Args:
+        user: User object.
+        state: Page state.
+        title: Page title.
+        content: Page content.
+        allow_comment: True if allow comment, default to True.
+    Returns:
+        The created BlogPost object.
+    '''
+    p = BlogPost(
+            ref = user.id,
+            author = user.nicename,
+            state = state,
+            title = title,
+            excerpt = 'No excerpt for page.',
+            content = content,
+            category = None,
+            tags = [],
+            static = True,
+            allow_comment = allow_comment
+    )
+    p.put()
+    return p
+
+def update_post(id, user, state, title, content, category, tags_str, allow_comment):
+    '''
+    Update a post.
+    '''
+    tags = [t.strip() for t in tags_str.split(',')]
+    tags = [t for t in tags if t]
+    p = get_post(id, static=False, published_only=False)
+    if p:
+        p.ref = user.id
+        p.author = user.nicename
+        p.state = state
+        p.title = title
+        p.content = content
+        p.category = category
+        p.tags = tags
+        p.allow_comment = allow_comment
+        p.put()
+        return p
+    return None
 
 def create_post(user, state, title, content, category, tags_str='', allow_comment=True):
     '''
@@ -143,6 +207,18 @@ def get_posts_by_tag(tag, limit=50, cursor=None):
         tag = tag.lower()
     return _query_posts(limit, cursor, state=POST_PUBLISHED, static=False, tag=tag)
 
+def get_pages(published_only=True):
+    '''
+    get pages by published state.
+    
+    Returns:
+        Posts as list.
+    '''
+    q = BlogPost.all().filter('static =', True)
+    if published_only:
+        q = q.filter('state =', POST_PUBLISHED)
+    return q.fetch(100)
+
 def get_posts(limit=50, cursor=None, ref_user=None, category=None, published_only=True):
     '''
     get posts by user's key, category, published state, etc.
@@ -150,10 +226,10 @@ def get_posts(limit=50, cursor=None, ref_user=None, category=None, published_onl
     Returns:
         A tuple (Posts as list, cursor for next query).
     '''
+    state = None
     if published_only:
-        return _query_posts(limit, cursor, ref_user=ref_user, static=False, category=category, state=POST_PUBLISHED)
-    else:
-        return _query_posts(limit, cursor, ref_user=ref_user, static=False, category=category)
+        state = POST_PUBLISHED
+    return _query_posts(limit, cursor, ref_user=ref_user, static=False, category=category, state=state)
 
 def get_tag(key):
     '''
@@ -226,16 +302,17 @@ def get_categories():
         categories.append(create_category('Uncategorized'))
     return categories
 
-def undelete_post(key):
+def undelete_post(key, static=False):
     '''
     Undelete a post.
     
     Args:
         key: key of post.
+        static: if static is True, this post is a Page.
     Returns:
         True if operation successfully, otherwise False.
     '''
-    post = get_post(key, published_only=False)
+    post = get_post(key, static=static, published_only=False)
     if post and post.state==POST_DELETED:
         post.state = POST_DRAFT
         post.put()
@@ -258,7 +335,7 @@ def pending_post(key):
         return True
     return False
 
-def publish_post(key):
+def publish_post(key, static=False):
     '''
     Publish a post.
     
@@ -267,14 +344,14 @@ def publish_post(key):
     Returns:
         True if operation successfully, otherwise False.
     '''
-    post = get_post(key, published_only=False)
+    post = get_post(key, static=static, published_only=False)
     if post and post.state==POST_DRAFT:
         post.state = POST_PUBLISHED
         post.put()
         return True
     return False
 
-def unpublish_post(key):
+def unpublish_post(key, static=False):
     '''
     Unpublish a post.
     
@@ -283,7 +360,7 @@ def unpublish_post(key):
     Returns:
         True if operation successfully, otherwise False.
     '''
-    post = get_post(key, published_only=True)
+    post = get_post(key, static=static, published_only=True)
     if post:
         post.state = POST_DRAFT
         post.put()
@@ -305,17 +382,18 @@ def approve_post(key):
         return True
     return False
     
-def delete_post(key, permanent=False):
+def delete_post(key, static=False, permanent=False):
     '''
     Delete a post.
     
     Args:
         key: key of post.
+        static: if static, this post is a Page.
         permanent: True if delete permanently, default to False.
     Returns:
         True if operation successfully, otherwise False.
     '''
-    post = get_post(key, published_only=False)
+    post = get_post(key, static=static, published_only=False)
     if post:
         if not permanent and post.state!=POST_DELETED:
             post.state = POST_DELETED
@@ -333,8 +411,10 @@ def get_post(key, static=False, published_only=True):
     
     Args:
         key: key of post.
+        static: if True, this post is a Page.
         published_only: if post is published.
-    Return: BlogPost object, or None if no such post.
+    Return:
+        BlogPost object, or None if no such post.
     '''
     p = BlogPost.get(key)
     if p is None:
@@ -345,27 +425,8 @@ def get_post(key, static=False, published_only=True):
         return None
     return p
 
-def get_page(key, publish_only=True):
-    '''
-    get BlogPost as static page by key.
-    
-    Args:
-        key: key of post.
-        publish_only: if post is published.
-    Return: BlogPost object, or None if no such post.
-    '''
-    p = BlogPost.get(key)
-    if p is None or not p.static:
-        return None
-    if publish_only and p.state!=POST_PUBLISHED:
-        return None
-    return p
-
 def list_tags():
     return BlogTag.all().filter('tag_count >', 0).order('tag_name').fetch(1000)
-
-def get_pages():
-    return BlogPost.all().filter('post_static =', True).order('-post_date').fetch(1000)
 
 def create_tag(nicename, increase=1):
     '''
