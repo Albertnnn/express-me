@@ -57,7 +57,7 @@ def __get_post_list(user, context):
         ref = user.id
     ps, next_cursor = model.get_posts(5, offset, ref, category, published_only=False)
     return {
-            '__view__' : 'manage_list',
+            '__view__' : 'manage_post_list',
             'static' : False,
             'ps' : ps,
             'category' : cat,
