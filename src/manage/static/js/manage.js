@@ -23,30 +23,42 @@ function toggle_menu(v, no_ani){
   }
 }
 
-function set_info(msg){
+function set_info(msg, set_focus){
 	m = '#info_msg'
 	if (msg) {
 		$(m).html(msg).show();
+		if (set_focus) {
+			location.hash = '';
+			location.hash = m;
+		}
 	}
 	else {
 		$(m).hide();
 	}
 }
 
-function set_warning(msg){
+function set_warning(msg, set_focus){
 	m = '#warning_msg'
 	if (msg) {
 		$(m).html(msg).show();
+		if (set_focus) {
+			location.hash = '';
+			location.hash = m;
+		}
 	}
 	else {
 		$(m).hide();
 	}
 }
 
-function set_error(msg){
+function set_error(msg, set_focus){
 	m = '#error_msg'
 	if (msg) {
 		$(m).html(msg).show();
+		if (set_focus) {
+			location.hash = '';
+			location.hash = m;
+		}
 	}
 	else {
 		$(m).hide();
