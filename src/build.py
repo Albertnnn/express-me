@@ -1,12 +1,18 @@
-'''
-Created on Sep 8, 2010
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-@author: Michael Liao
+__author__ = 'Michael Liao (askxuefeng@gmail.com)'
+
+'''
+build.py
+
+- pre-compile all views for speed
+
+- make package (.zip) file for publish.
 '''
 
 import re
 import os
-import logging
 from framework import view
 
 PACKAGE_EXCLUDES = (
@@ -37,21 +43,23 @@ def package(root_path):
 
 def compile_view(root_path):
     all_appdirs = os.listdir(root_path)
-    appdirs = [app for app in all_appdirs if os.path.isdir(os.path.join(root_path, app, 'view'))]
+    appdirs = [app for app in all_appdirs if not app.endswith('test') and os.path.isdir(os.path.join(root_path, app, 'view'))]
     appdirs.sort()
     count = 0
     for app in appdirs:
         count += _compile_dir(root_path, app)
     # make sure __init__.py under root_path/compiled:
     _gen_init_py(os.path.join(root_path, 'compiled'))
-    logging.info('%d files compiled.' % count)
+    print 'total %d view(s) compiled.' % count
 
 def _compile_dir(root_path, app):
+    print 'compile views for app "%s"...' % app
     all_views = os.listdir(os.path.join(root_path, app, 'view'))
     views = [v for v in all_views if os.path.isfile(os.path.join(root_path, app, 'view', v))]
     count = 0
     for v in views:
         if v.endswith('.html'):
+            print '  compile "%s"...' % v
             mod_name = v[:-5]
             content = view.compile_template(app, mod_name)
             content_dir = os.path.join(root_path, 'compiled', app)
@@ -62,6 +70,7 @@ def _compile_dir(root_path, app):
             f.write(content)
             f.close()
             count += 1
+    print '%d view(s) compiled.' % count
     return count
 
 def _filter(path, root_path):
