@@ -27,6 +27,15 @@ class Test(GaeTestCase):
         self.assertEquals(value, d[name])
         self.assertEquals(value2, d[name2])
 
+    def test_get_settings(self):
+        group = 'test_grp'
+        for i in range(10):
+            store.set_setting('key-%d' % i, 'value-%d' % i, group)
+        ss = store.get_settings(group)
+        for i in range(10):
+            self.assertTrue('key-%d' % i in ss)
+            self.assertEquals('value-%d' % i, ss['key-%d' % i])
+
     def test_error(self):
         self.assertRaises(ValueError, lambda: store.set_setting(123, 'abc'))
         self.assertRaises(ValueError, lambda: store.set_setting('abc', 123))

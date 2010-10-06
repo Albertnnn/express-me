@@ -308,6 +308,19 @@ def get_setting(name, group=DEFAULT_GROUP, default_value=None):
         return default_value
     return setting.value
 
+def delete_settings(group):
+    '''
+    Delete settings by group.
+    
+    Args:
+        group: setting group as string.
+    '''
+    if not isinstance(group, basestring):
+        raise ValueError('Group must be basestring.')
+    ss = get_settings(group)
+    for key in ss.keys():
+        delete_setting(key, group)
+
 def delete_setting(name, group=DEFAULT_GROUP):
     '''
     Delete a setting value for specified name and group.
@@ -364,7 +377,7 @@ def get_settings(group=DEFAULT_GROUP):
     settings = Setting.all().filter('group =', group).fetch(100)
     d = {}
     for setting in settings:
-        d[str(setting.name)] = setting.value
+        d[setting.name] = setting.value
     return d
 
 class Setting(db.Model):
