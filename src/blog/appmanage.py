@@ -33,6 +33,16 @@ def get_menus():
     )
     return (post, page,)
 
+def get_navigation():
+    '''
+    Get navigation menu.
+    '''
+    L = [('blog', '/',)]
+    pages = model.get_pages(True)
+    for page in pages:
+        L.append((page.title, '/page/%s' % page.id,))
+    return L
+
 def __get_page_list(context):
     ps = model.get_pages(published_only=False)
     return {
