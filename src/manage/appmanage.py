@@ -7,6 +7,9 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 app management for user, global settings.
 '''
 
+import appconfig
+import navigation
+
 from framework import store
 
 from manage.common import AppMenu
@@ -29,7 +32,7 @@ def get_menus():
     )
     return (user, setting,)
 
-def _get_edit_user(user, app, context):
+def __get_edit_user(user, app, context):
     role = context.get_argument('role', '')
     if role=='':
         role = None
@@ -51,20 +54,51 @@ def _get_edit_user(user, app, context):
 
 def _edit_user(user, app, context):
     if context.method=='get':
-        return _get_edit_user(user, app, context)
+        return __get_edit_user(user, app, context)
     if context.method=='post':
         btn = context.get_argument('btn')
         user_ids = context.get_arguments('u')
         if btn=='lock' or btn=='unlock':
             store.lock_or_unlock_users(user_ids, btn=='lock')
-            return _get_edit_user(user, app, context)
+            return __get_edit_user(user, app, context)
         if btn=='set_role':
             role = int(context.get_argument('set_role'))
             for id in user_ids:
                 user = store.get_user_by_key(id)
                 user.role = role
                 user.put()
-            return _get_edit_user(user, app, context)
+            return __get_edit_user(user, app, context)
+
+def __get_navigation(context):
+    selections = [('- Select -', '#'), ('Home', '/')]
+    for appname in appconfig.apps:
+        mod = __import__(appname, fromlist=['appmanage']).appmanage
+        get_nav = getattr(mod, 'get_navigation', None)
+        if callable(get_nav):
+            selections.extend([(title, '/' + appname + url) for title, url in get_nav()])
+    selections.append(('Custom', ''))
+    navs = navigation.get_navigation(False)
+    if len(navs)<10:
+        for i in range(10 - len(navs)):
+            navs.append(('', '',))
+    return {
+            '__view__' : 'manage_navigation',
+            'selections' : selections,
+            'navigations' : navs,
+    }
+
+def _navigation(user, app, context):
+    if context.method=='get':
+        return __get_navigation(context)
+    if context.method=='post':
+        L = []
+        for i in range(10):
+            title = context.get_argument('title_%d' % i)
+            url = context.get_argument('url_%d' % i)
+            if title and url:
+                L.append((title, url,))
+        navigation.set_navigation(L)
+        return __get_navigation(context)
 
 def _profile(user, app, context):
     if context.method=='post':
@@ -95,5 +129,6 @@ def manage(user, app, command, context):
     map = {
            'edit_user' : _edit_user,
            'profile' : _profile,
+           'navigation' : _navigation,
     }
     return map[command](user, app, context)

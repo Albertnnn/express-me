@@ -1,0 +1,94 @@
+<!-- begin manage_navigation.html -->
+
+<script type="text/javascript">
+//#raw
+function has_value(opts, v) {
+	var found = false;
+	opts.each(function(index) {
+		if ($(this).val()==v) {
+			found = true;
+		}
+	});
+	return found;
+}
+
+$(function() {
+	for (var i=0; i<10; i++) {
+		var v = $('#url_' + i).val();
+		if (v!='') {
+			if (has_value($('#choose_' + i + ' option'), v)) {
+				$('#choose_' + i).val(v);
+			}
+			else {
+				$('#choose_' + i).val('');
+			}
+		}
+		$('#choose_' + i).data('INDEX', '' + i);
+		$('#choose_' + i).change(function() {
+			var idx = $(this).data('INDEX');
+			var p = $('#choose_' + idx + ' option:selected');
+			if (p.val() != '#') {
+				$('#title_' + idx).val(p.text());
+				$('#url_' + idx).val(p.val());
+			}
+		});
+	}
+});
+
+function validate_form() {
+	$('#save').attr('disabled', 'disabled');
+	$('#loading').show();
+	return true;
+}
+//#end raw
+</script>
+
+<div class="panel box-round">
+<form name="nav_form" action="/manage/" method="post" onsubmit="return validate_form()">
+  <input type="hidden" name="app" value="${app}" />
+  <input type="hidden" name="command" value="${command}" />
+  <div class="panel-title"><div>Navigation</div></div>
+  <div class="panel-content">
+    <div class="th bottom-line">
+      <div class="span-5"><div>Select</div></div>
+      <div class="span-5"><div>Title</div></div>
+      <div class="span-9 last"><div>URL</div></div>
+    </div>
+	#set $i=0
+    #for $title, $url in $navigations
+    <div class="tr">
+      <div class="span-5">
+        <div>
+          <select name="choose_${i}" id="choose_${i}" style="width:95%">
+          #for $n, $v in $selections
+            <option value="${v}">${n}</option>
+          #end for
+          </select>
+        </div>
+      </div>
+      <div class="span-5">
+        <div>
+          <input name="title_${i}" type="text" id="title_${i}" maxlength="20" style="width:95%" value="${title}" />
+        </div>
+      </div>
+      <div class="span-9 last">
+        <div>
+          <input name="url_${i}" type="text" id="url_${i}" maxlength="1000" style="width:95%" value="${url}" />
+        </div>
+      </div>
+    </div>
+	#set $i = $i + 1
+    #end for
+    <div class="tr top-line">
+      <div class="span-12">
+        <div>
+          <button type="submit" name="save" id="save">Save</button>
+          <span id="loading" class="loading">Saving, please wait...</span>
+		</div>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+
+<!-- end manage_navigation.html -->
