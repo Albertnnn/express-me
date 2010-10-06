@@ -64,7 +64,7 @@ def _count_dir(app, path):
         else:
             code_lines += n
     if app:
-        print '  app "%s" contains about %d lines: logic / test = %d / %d.' % (app, code_lines + test_lines, code_lines, test_lines)
+        print '  dir "%s" contains about %d lines: logic / test = %d / %d.' % (app, code_lines + test_lines, code_lines, test_lines)
     return code_lines, test_lines
 
 def _count_file(file_path):
