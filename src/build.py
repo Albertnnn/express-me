@@ -32,8 +32,50 @@ def main():
     Build ExpressMe by package() and deploy().
     '''
     root = os.path.split(__file__)[0]
+    count_line(root)
     compile_view(root)
     package(root)
+
+def count_line(root_path):
+    print 'counting lines of code...'
+    ignores = ('atom', 'Cheetah', 'compiled', 'gdata', 'static', 'Templates', 'theme')
+    all_dirs = os.listdir(root_path)
+    valid_dirs = [d for d in all_dirs if d not in ignores and os.path.isdir(os.path.join(root_path, d))]
+    total_code = 0
+    total_test = 0
+    c, t = _count_dir('', root_path)
+    total_code += c
+    total_test += t
+    for d in valid_dirs:
+        c, t = _count_dir(d, os.path.join(root_path, d))
+        total_code += c
+        total_test += t
+    print 'total about %d lines: logic / test = %d / %d.' % ((total_code + total_test), total_code, total_test,)
+
+def _count_dir(app, path):
+    code_lines = 0
+    test_lines = 0
+    all_files = os.listdir(path)
+    py_files = [f for f in all_files if f.endswith('.py')]
+    for f in py_files:
+        n = _count_file(os.path.join(path, f))
+        if f.endswith('test.py'):
+            test_lines += n
+        else:
+            code_lines += n
+    if app:
+        print '  app "%s" contains about %d lines: logic / test = %d / %d.' % (app, code_lines + test_lines, code_lines, test_lines)
+    return code_lines, test_lines
+
+def _count_file(file_path):
+    lines = 0
+    f = open(file_path, 'r')
+    for l in f:
+        s = l.strip()
+        if s and not s.startswith('#'):
+            lines = lines + 1
+    f.close()
+    return lines
 
 def package(root_path):
     '''
