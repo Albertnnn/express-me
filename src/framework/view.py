@@ -27,21 +27,20 @@ def get_template_path(appname, view_name, ext='.html'):
     web_root = os.path.split(os.path.dirname(__file__))[0]
     return os.path.join(web_root, appname, 'view', '%s%s' % (view_name, ext,))
 
-def import_compiled_template(appname, view_name):
+def import_compiled_template(mod_name):
     '''
     Try to import a compiled template, or None if no such class.
     
     Args:
-        appname: app name.
+        mod_name: module name.
         view_name: view's logic name.
     Return:
         CompiledTemplate class.
     '''
-    p = 'compiled.%s.%s' % (appname, view_name)
     try:
-        return __import__(p, fromlist=['CompiledTemplate']).CompiledTemplate
+        return __import__(mod_name, fromlist=['CompiledTemplate']).CompiledTemplate
     except ImportError:
-        logging.warn('Import %s.%s failed.' % (p, 'CompiledTemplate'))
+        logging.warn('Import %s.%s failed.' % (mod_name, 'CompiledTemplate'))
         return None
 
 def compile_template(appname, view_name, ext='.html'):
@@ -69,7 +68,7 @@ def render(appname, model):
     view_name = model.get('__view__')
     if view_name is None:
         raise RenderError('View is not set.')
-    cc = import_compiled_template(appname, view_name)
+    cc = import_compiled_template('compiled.%s.%s' % (appname, view_name))
     if cc is not None:
         return cc(searchList=[model], filter='WebSafe')
     view_path = get_template_path(appname, view_name)

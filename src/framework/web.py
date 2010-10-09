@@ -15,11 +15,20 @@ import logging
 
 from google.appengine.ext import webapp
 
+from framework import ApplicationError
 from framework import view
+
 import interceptor
+import theme
 
 COOKIE_EXPIRES_MIN = 86400
 COOKIE_EXPIRES_MAX = 31536000
+
+class WebError(ApplicationError):
+    pass
+
+class NotFoundError(WebError):
+    pass
 
 class Context(dict):
     '''
@@ -108,11 +117,11 @@ class Dispatcher(webapp.RequestHandler):
                     result = func(*args, **kw)
                 else:
                     result = func(*args)
-                return self._response(appname, result);
+                return self._response(kw, appname, result);
         # 404 error:
         self._error(404)
 
-    def _response(self, appname, result):
+    def _response(self, kw, appname, result):
         '''
         Handle result and send response.
         Args:
@@ -124,16 +133,20 @@ class Dispatcher(webapp.RequestHandler):
         if isinstance(result, basestring):
             return self._render_string(result)
         if isinstance(result, dict):
-            return self._render_template(appname, result)
+            return self._render_template(kw, appname, result)
 
-    def _render_template(self, appname, model):
+    def _render_template(self, kw, appname, model):
         '''
         Render a template using the given model.
         
         Args:
             model: model as dict.
         '''
-        t = view.render(appname, model)
+        use_theme = model.get('__theme__', False)==True
+        if use_theme:
+            t = theme.render(appname, model, **kw)
+        else:
+            t = view.render(appname, model)
         content_type = model.get('__content_type__')
         if content_type:
             self.response.content_type = content_type
@@ -271,7 +284,7 @@ def _has_varkw(func):
     argsspec = inspect.getargspec(func)
     return argsspec[2] is not None
 
-def get(pattern=None):
+def get(pattern):
     '''
     decorator of @get() that support get only
     
@@ -284,10 +297,7 @@ def get(pattern=None):
     def execute(f):
         def _wrapper(*args, **kw):
             return f(*args, **kw)
-        if pattern==None:
-            _wrapper.pattern = '/' + f.__name__
-        else:
-            _wrapper.pattern = pattern
+        _wrapper.pattern = pattern
         _wrapper.support_get = True
         _wrapper.support_post = False
         _wrapper.raw_mapping = False
@@ -297,7 +307,7 @@ def get(pattern=None):
         return _wrapper
     return execute
 
-def post(pattern=None):
+def post(pattern):
     '''
     decorator of @post() that support post only
     
@@ -310,10 +320,7 @@ def post(pattern=None):
     def execute(f):
         def wrapper(*args, **kw):
             return f(*args, **kw)
-        if pattern==None:
-            wrapper.pattern = '/' + f.__name__
-        else:
-            wrapper.pattern = pattern
+        wrapper.pattern = pattern
         wrapper.support_get = False
         wrapper.support_post = True
         wrapper.raw_mapping = False
@@ -323,7 +330,7 @@ def post(pattern=None):
         return wrapper
     return execute
 
-def mapping(pattern=None):
+def mapping(pattern):
     '''
     decorator of @mapping() that support get and post
     
@@ -336,10 +343,7 @@ def mapping(pattern=None):
     def execute(f):
         def wrapper(*args, **kw):
             return f(*args, **kw)
-        if pattern==None:
-            wrapper.pattern = '/' + f.__name__
-        else:
-            wrapper.pattern = pattern
+        wrapper.pattern = pattern
         wrapper.support_get = True
         wrapper.support_post = True
         wrapper.raw_mapping = False

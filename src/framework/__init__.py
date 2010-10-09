@@ -14,3 +14,9 @@ class ValidationError(ApplicationError):
     Validation failed.
     '''
     pass
+
+class PermissionError(ApplicationError):
+    '''
+    Permission denied.
+    '''
+    pass

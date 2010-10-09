@@ -19,7 +19,11 @@ class GaeTestCase(unittest.TestCase):
     def setUp(self):
         super(GaeTestCase, self).setUp()
         gae_home = self._lookup_gae_home()
-        sys.path = _get_extra_path(gae_home) + sys.path
+        gae_lib_path = os.pathsep.join(_get_extra_path(gae_home))
+        python_path = os.environ['PYTHONPATH']
+        if python_path.find(gae_lib_path)==(-1):
+            os.environ['PYTHONPATH'] = python_path + os.pathsep + gae_lib_path
+        #sys.path = _get_extra_path(gae_home) + sys.path
 
         from google.appengine.api import apiproxy_stub_map
 

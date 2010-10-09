@@ -10,7 +10,7 @@ from framework.web import get
 from framework.web import post
 from framework.web import raw_mapping
 
-@get() # using default url '/say'
+@get('/say')
 def say():
     return 'hello'
 
