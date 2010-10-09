@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+__author__ = 'Michael Liao (askxuefeng@gmail.com)'
+
 '''
 Configuration of web application.
-
-@author: Michael Liao (askxuefeng@gmail.com)
 '''
 
 # installed app list:
 
-apps = ('blog', 'manage',) #('blog', 'wiki', 'manage', 'widget', 'util' )
+apps = ('blog', 'manage', 'theme') #('blog', 'wiki', 'manage', 'widget', 'util' )
