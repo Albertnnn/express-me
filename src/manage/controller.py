@@ -16,6 +16,7 @@ import urllib
 from google.appengine.api import users
 
 from framework import ApplicationError
+from framework import PermissionError
 from framework import store
 from framework import web
 from framework import mail
@@ -25,7 +26,6 @@ from framework.web import get
 from framework.web import post
 from framework.web import mapping
 
-from manage import PermissionError
 from manage import model
 from manage import cookie
 
