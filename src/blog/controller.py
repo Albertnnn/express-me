@@ -7,37 +7,40 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Blog app that display blog posts.
 '''
 
-from exweb import get
-from exweb import post
-from exweb import context
-from exweb import HttpForbiddenError
+from framework.web import NotFoundError
+from framework.web import get
+from framework.web import post
 
-from manage import shared
-from blog import blog_store as store
-from blog import blog_utils
+from framework import store
+
+from blog import model
 
 @get('/')
-def get_public_posts():
+def get_all_public_posts(**kw):
     '''
     show all public posts of blog
     '''
+    ctx = kw['context']
+    feed = '/blog/feed.xml'
+    number = 20
+    index = ctx.get_argument('index', '')
+    if index:
+        index = int(index)
+    else:
+        index = 1
+    offset = ctx.get_argument('offset', '')
+    if not offset:
+        offset = None
+    posts, next = model.get_posts(number, offset)
     return {
-            '__view__' : 'index.html',
+            '__theme__' : True,
+            '__view__' : 'index',
             'title' : 'Posts',
-            'posts' : store.get_public_posts(),
-            'feed' : blog_utils.get_feed()
-    }
-
-@get('/p/$')
-def get_posts_by_page(page):
-    '''
-    show public posts of blog at specified page.
-    '''
-    # FIXME:
-    return {
-            'title' : 'Posts',
-            'posts' : store.get_public_posts(),
-            'feed' : blog_utils.get_feed()
+            'posts' : posts,
+            'index' : index,
+            'next' : next,
+            'offset' : offset,
+            'feed' : feed,
     }
 
 @get('/t/$')
@@ -68,13 +71,14 @@ def get_post(key):
     Args:
         key: post key as string.
     '''
-    p = store.get_post(key)
-    blog_utils.assert_not_none(p)
+    post = model.get_post(key)
+    if post is None:
+        raise NotFoundError()
     return {
-            'title' : p.post_title,
-            'post' : p,
-            'comments' : shared.get_comments(key),
-            'feed' : blog_utils.get_feed()
+            '__view__' : 'posts',
+            '__title__' : post.post_title,
+            'post' : post,
+            'comments' : store.get_all_comments(post.id),
     }
 
 @get('/page/$')
@@ -85,12 +89,14 @@ def get_page(key):
     Args:
         key: page key as string.
     '''
-    p = store.get_page(key)
-    blog_utils.assert_not_none(p)
+    page = model.get_post(key, True)
+    if page is None:
+        raise NotFoundError()
     return {
-            'title' : p.post_title,
-            'page' : p,
-            'feed' : blog_utils.get_feed()
+            '__theme__' : True,
+            '__view__' : 'page',
+            '__title__' : page.title,
+            'page' : page,
     }
 
 @post('/comment')

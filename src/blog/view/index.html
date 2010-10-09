@@ -5,9 +5,9 @@
 <div id="app-blog-posts">
   #for $post in $posts
   <div style="clear:both">
-    <h3 class="blog-post-title"><a href="/blog/post/${post.key}">${post.post_title}</a></h3>
-    <div class="blog-post-info"><a href="/blog/cat/${post.post_category.key}">${post.post_category.category_name}</a>, published at $format_datetime($post.post_date)</div>
-    <div class="blog-post-content">${post.post_content__raw__}</div>
+    <h3 class="blog-post-title"><a href="/blog/post/${post.id}">${post.title}</a></h3>
+    <div class="blog-post-info"><a href="/blog/cat/${post.category.id}">${post.category.name}</a>, published at format_datetime($post.creation_date)</div>
+    <div class="blog-post-content">${post.content__raw__}</div>
   </div>
   #end for
 </div>
