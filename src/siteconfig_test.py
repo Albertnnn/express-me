@@ -34,6 +34,12 @@ class Test(unittest.TestCase):
                 ('%I:%M %p', '01:20 PM'),
         ], siteconfig.time_format_samples(dt))
 
+    def test_default_setting(self):
+        site = siteconfig.Site()
+        self.assertEquals(siteconfig.DEFAULT_DATE, site.date_format)
+        self.assertEquals(siteconfig.DEFAULT_TIME, site.time_format)
+        self.assertEquals('ExpressMe', site.title)
+
     def test_set_site_settings(self):
         site = siteconfig.Site(title='TITLE', subtitle='SUBTITLE')
         self.assertEquals('TITLE', site.title)

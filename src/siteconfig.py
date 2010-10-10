@@ -7,6 +7,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Load site info.
 '''
 
+import logging
+
 from framework import cache
 from framework import store
 
@@ -26,7 +28,7 @@ def time_format_samples(dt):
     '''
     Return time format samples with list of tuple (format, sample).
     '''
-    formats = ('%H:%M:%S', '%H:%M', '%I:%M:%S %p', '%I:%M %p')
+    formats = (DEFAULT_TIME, '%H:%M', '%I:%M:%S %p', '%I:%M %p')
     return [(f, dt.strftime(f)) for f in formats]
 
 class Site(object):
@@ -39,8 +41,8 @@ class Site(object):
     defaults = {
             'title' : 'ExpressMe',
             'subtitle' : 'just another ExpressMe web site',
-            'date_format' : '',
-            'time_format' : '',
+            'date_format' : DEFAULT_DATE,
+            'time_format' : DEFAULT_TIME,
             'time_zone' : '',
     }
 
@@ -72,9 +74,63 @@ def set_site_settings(**kw):
     store.delete_settings(SITE_GROUP)
     site = Site(**kw)
     for key in site.__slots__:
+        logging.info('%s=%s' % (key, getattr(site, key)))
         store.set_setting(key, getattr(site, key), SITE_GROUP)
     cache.delete(SITE_GROUP)
 
 def _get_from_store():
     site_dict = store.get_settings(SITE_GROUP)
-    return Site(**site_dict)
+    kw = {}
+    for k in site_dict.keys():
+        kw[str(k)] = site_dict[k]
+    return Site(**kw)
+
+def tz_list():
+    tzs = (
+            '(UTC-12:00) International Date Line West',
+            '(UTC-11:00) Coordinated Universal Time-11',
+            '(UTC-11:00) Samoa',
+            '(UTC-10:00) Hawaii',
+            '(UTC-09:00) Alaska',
+            '(UTC-08:00) Baja California',
+            '(UTC-08:00) Pacific Time (US & Canada)',
+            '(UTC-07:00) Arizona',
+            '(UTC-07:00) Chihuahua, La Paz, Mazatlan',
+            '(UTC-07:00) Mountain Time (US & Canada)',
+            '(UTC-06:00) Central America',
+            '(UTC-06:00) Central Time (US & Canada)',
+            '(UTC-06:00) Guadalajara, Mexico City, Monterrey',
+            '(UTC-06:00) Saskatchewan',
+            '(UTC-05:00) Bogota, Lima, Quito',
+            '(UTC-05:00) Eastern Time (US & Canada)',
+            '(UTC-05:00) Indiana (East)',
+            '(UTC-04:30) Caracas',
+            '(UTC-04:00) Asuncion',
+            '(UTC-04:00) Atlantic Time (Canada)',
+            '(UTC-04:00) Cuiaba',
+            '(UTC-04:00) Georgetown, La Paz, Manaus, San Juan',
+            '(UTC-04:00) Santiago',
+            '(UTC-03:30) Newfoundland',
+            '(UTC-03:00) Brasilia',
+            '(UTC-03:00) Buenos Aires',
+            '(UTC-03:00) Cayenne, Fortaleza',
+            '(UTC-03:00) Greenland',
+            '(UTC-03:00) Montevideo',
+            '(UTC-02:00) Coordinated Universal Time-02',
+            '(UTC-',
+            '(UTC-',
+            '(UTC-',
+            '(UTC-',
+            '(UTC-',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+    )
