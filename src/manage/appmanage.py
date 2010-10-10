@@ -7,8 +7,11 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 app management for user, global settings.
 '''
 
+import datetime
+
 import appconfig
 import navigation
+import siteconfig
 
 from framework import store
 
@@ -118,17 +121,29 @@ def _profile(user, app, context):
         if password_changed:
             msg = 'Your profile and password have been saved.'
         return {
-            '__view__' : 'manage_profile',
-            'info' : msg,
+                '__view__' : 'manage_profile',
+                'info' : msg,
         }
     return {
             '__view__' : 'manage_profile',
     }
+
+def _site(user, app, context):
+    if context.method=='get':
+        site = siteconfig.get_site_settings(False)
+        dt = datetime.datetime.now()
+        return {
+                '__view__' : 'manage_site',
+                'site' : site,
+                'date_formats' : siteconfig.date_format_samples(dt),
+                'time_formats' : siteconfig.time_format_samples(dt),
+        }
 
 def manage(user, app, command, context):
     map = {
            'edit_user' : _edit_user,
            'profile' : _profile,
            'navigation' : _navigation,
+           'site' : _site,
     }
     return map[command](user, app, context)

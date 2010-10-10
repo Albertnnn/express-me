@@ -1,0 +1,72 @@
+<!-- begin manage_site.html -->
+<script type="text/javascript">
+//#raw
+function validate_form(){
+    if (is_blank($('#nicename').val())) {
+        set_error('Please enter your nice name.');
+        return false;
+    }
+	set_info();
+	set_warning();
+	set_error();
+	$('#save').hide();
+	$('#loading').show();
+    return true;
+}
+//#end raw
+</script>
+<div class="panel box-round">
+  <form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
+  <input type="hidden" name="app" value="${app}" />
+  <input type="hidden" name="command" value="${command}" />
+  <div class="panel-title"><div>Site configuration</div></div>
+  <div class="panel-content">
+    <div class="form-field">
+      <div class="form-field-title">Title:</div>
+      <div class="form-field-input"><input name="title" value="${site.title}" type="text" id="title" style="width:360px" maxlength="100" /></div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Subtitle:</div>
+      <div class="form-field-input"><input name="subtitle" value="${site.subtitle}" type="text" id="subtitle" maxlength="100" style="width:360px" /></div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Date format:</div>
+      <div class="form-field-input">
+        <select name="date_format" id="date_format">
+        #for $f, $sample in $date_formats
+          <option value="${f}">${sample}</option>
+        #end for
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Time format:</div>
+      <div class="form-field-input">
+        <select name="time_format" id="time_format">
+        #for $f, $sample in $time_formats
+          <option value="${f}">${sample}</option>
+        #end for
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Time zone:</div>
+      <div class="form-field-input">
+        <select name="time_zone" id="time_zone">
+          <option value="default">Server default ()</option>
+          <option value="">yyyy-MM-dd</option>
+          <option value="">yyyy-MM-dd</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-input">
+      	<input name="password" type="hidden" id="password"/>
+        <button id="save" type="submit" name="submit">Save</button>
+        <span id="loading" class="loading">Saving, please wait...</span>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+<!-- end manage_site.html -->
