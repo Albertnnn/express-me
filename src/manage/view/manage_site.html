@@ -1,9 +1,13 @@
 <!-- begin manage_site.html -->
 <script type="text/javascript">
+jQuery(function() {
+    jQuery('\#date_format').val('${site.date_format}');
+    jQuery('\#time_format').val('${site.time_format}');
+});
 //#raw
 function validate_form(){
-    if (is_blank($('#nicename').val())) {
-        set_error('Please enter your nice name.');
+    if (is_blank($('#title').val())) {
+        set_error('Please enter site title.', true);
         return false;
     }
 	set_info();
@@ -16,7 +20,7 @@ function validate_form(){
 //#end raw
 </script>
 <div class="panel box-round">
-  <form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
+  <form name="site_form" action="/manage/" method="post" onsubmit="return validate_form()">
   <input type="hidden" name="app" value="${app}" />
   <input type="hidden" name="command" value="${command}" />
   <div class="panel-title"><div>Site configuration</div></div>
@@ -61,7 +65,6 @@ function validate_form(){
     </div>
     <div class="form-field">
       <div class="form-field-input">
-      	<input name="password" type="hidden" id="password"/>
         <button id="save" type="submit" name="submit">Save</button>
         <span id="loading" class="loading">Saving, please wait...</span>
       </div>

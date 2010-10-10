@@ -278,7 +278,15 @@ def _get_google_signin_url(redirect):
 @get('/signin')
 def show_signin(**kw):
     ctx = kw['context']
-    redirect = ctx.get_argument('redirect', '/')
+    redirect = ctx.get_argument('redirect', '')
+    if not redirect:
+        req = kw['request']
+        if 'Referer' in req.headers:
+            ref = req.headers['Referer']
+            if ref.find('/manage/singin')==(-1):
+                redirect = ref
+    if not redirect:
+        redirect = '/'
     google_signin_url = _get_google_signin_url('/manage/g_signin?redirect=' + urllib.quote(redirect))
     return {
             '__view__' : 'signin',

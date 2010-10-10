@@ -28,7 +28,7 @@ def get_menus():
             AppMenuItem(store.ROLE_SUBSCRIBER, 'Your Profile', 'profile')
     )
     setting = AppMenu('Setting',
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Site Info', 'site'),
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Site Configuration', 'site'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Theme', 'theme'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Storage', 'storage')
@@ -129,15 +129,28 @@ def _profile(user, app, context):
     }
 
 def _site(user, app, context):
-    if context.method=='get':
-        site = siteconfig.get_site_settings(False)
-        dt = datetime.datetime.now()
-        return {
-                '__view__' : 'manage_site',
-                'site' : site,
-                'date_formats' : siteconfig.date_format_samples(dt),
-                'time_formats' : siteconfig.time_format_samples(dt),
-        }
+    info = ''
+    if context.method=='post':
+        title = context.get_argument('title')
+        subtitle = context.get_argument('subtitle')
+        date_format = context.get_argument('date_format')
+        time_format = context.get_argument('time_format')
+        siteconfig.set_site_settings(
+                title=title,
+                subtitle=subtitle,
+                date_format=date_format,
+                time_format=time_format
+        )
+        info = 'Site configuration saved.'
+    site = siteconfig.get_site_settings(False)
+    dt = datetime.datetime.now()
+    return {
+            '__view__' : 'manage_site',
+            'info' : info,
+            'site' : site,
+            'date_formats' : siteconfig.date_format_samples(dt),
+            'time_formats' : siteconfig.time_format_samples(dt),
+    }
 
 def manage(user, app, command, context):
     map = {
