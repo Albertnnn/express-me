@@ -12,19 +12,36 @@ from framework import store
 
 SITE_GROUP = '__site__'
 
+DEFAULT_DATE = '%Y-%m-%d'
+DEFAULT_TIME = '%H:%M:%S'
+
+def date_format_samples(dt):
+    '''
+    Return date format samples with list of tuple (format, sample).
+    '''
+    formats = (DEFAULT_DATE, '%y-%m-%d', '%d/%m/%Y', '%d/%m/%y', '%m/%d/%Y', '%m/%d/%y', '%b %d, %Y', '%b %d, %y', '%B %d, %Y', '%B %d, %y')
+    return [(f, dt.strftime(f)) for f in formats]
+
+def time_format_samples(dt):
+    '''
+    Return time format samples with list of tuple (format, sample).
+    '''
+    formats = ('%H:%M:%S', '%H:%M', '%I:%M:%S %p', '%I:%M %p')
+    return [(f, dt.strftime(f)) for f in formats]
+
 class Site(object):
     '''
     Site object that has attributes such as 'title', 'subtitle', etc.
     '''
 
-    __slots__ = ('title', 'subtitle', 'date_format', 'time_format', 'timezone')
+    __slots__ = ('title', 'subtitle', 'date_format', 'time_format', 'time_zone')
 
     defaults = {
             'title' : 'ExpressMe',
             'subtitle' : 'just another ExpressMe web site',
             'date_format' : '',
             'time_format' : '',
-            'timezone' : '',
+            'time_zone' : '',
     }
 
     def __init__(self, **kw):
