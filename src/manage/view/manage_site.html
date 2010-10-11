@@ -3,6 +3,7 @@
 jQuery(function() {
     jQuery('\#date_format').val('${site.date_format}');
     jQuery('\#time_format').val('${site.time_format}');
+    jQuery('\#time_zone').val('${site.tz_h_offset},${site.tz_m_offset},${site.tz_dst},${site.tz_name}');
 });
 //#raw
 function validate_form(){
@@ -57,9 +58,9 @@ function validate_form(){
       <div class="form-field-title">Time zone:</div>
       <div class="form-field-input">
         <select name="time_zone" id="time_zone">
-          <option value="default">Server default ()</option>
-          <option value="">yyyy-MM-dd</option>
-          <option value="">yyyy-MM-dd</option>
+          #for $h, $m, $dst, $name in $timezones
+          <option value="${h},${m},${dst},${name}">${name}</option>
+          #end for
         </select>
       </div>
     </div>

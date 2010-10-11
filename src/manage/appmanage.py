@@ -18,6 +18,8 @@ from framework import store
 from manage.common import AppMenu
 from manage.common import AppMenuItem
 
+from util import dt
+
 def get_menus():
     '''
     Get menus for management.
@@ -135,21 +137,28 @@ def _site(user, app, context):
         subtitle = context.get_argument('subtitle')
         date_format = context.get_argument('date_format')
         time_format = context.get_argument('time_format')
+        tz = context.get_argument('time_zone')
+        ss = tz.split(',', 3)
         siteconfig.set_site_settings(
                 title=title,
                 subtitle=subtitle,
                 date_format=date_format,
-                time_format=time_format
+                time_format=time_format,
+                tz_h_offset=int(ss[0]),
+                tz_m_offset=int(ss[1]),
+                tz_dst=int(ss[2]),
+                tz_name=ss[3]
         )
         info = 'Site configuration saved.'
     site = siteconfig.get_site_settings(False)
-    dt = datetime.datetime.now()
+    now = dt.convert_datetime(datetime.datetime.now(), site.get_tzinfo())
     return {
             '__view__' : 'manage_site',
             'info' : info,
             'site' : site,
-            'date_formats' : siteconfig.date_format_samples(dt),
-            'time_formats' : siteconfig.time_format_samples(dt),
+            'date_formats' : siteconfig.date_format_samples(now),
+            'time_formats' : siteconfig.time_format_samples(now),
+            'timezones' : dt.get_timezone_list(),
     }
 
 def manage(user, app, command, context):

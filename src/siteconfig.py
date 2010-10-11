@@ -11,6 +11,7 @@ import logging
 
 from framework import cache
 from framework import store
+from util import dt
 
 SITE_GROUP = '__site__'
 
@@ -36,14 +37,17 @@ class Site(object):
     Site object that has attributes such as 'title', 'subtitle', etc.
     '''
 
-    __slots__ = ('title', 'subtitle', 'date_format', 'time_format', 'time_zone')
+    __slots__ = ('title', 'subtitle', 'date_format', 'time_format', 'tz_name', 'tz_h_offset', 'tz_m_offset', 'tz_dst')
 
     defaults = {
             'title' : 'ExpressMe',
             'subtitle' : 'just another ExpressMe web site',
             'date_format' : DEFAULT_DATE,
             'time_format' : DEFAULT_TIME,
-            'time_zone' : '',
+            'tz_name' : dt.UTC_NAME,
+            'tz_h_offset' : 0,
+            'tz_m_offset' : 0,
+            'tz_dst' : 0,
     }
 
     def __init__(self, **kw):
@@ -52,6 +56,9 @@ class Site(object):
                 setattr(self, key, kw[key])
             else:
                 setattr(self, key, Site.defaults[key])
+
+    def get_tzinfo(self):
+        return dt.UserTimeZone(self.tz_name, int(self.tz_h_offset), int(self.tz_m_offset), int(self.tz_dst))
 
 def get_site_settings(use_cache=True):
     '''
@@ -74,8 +81,7 @@ def set_site_settings(**kw):
     store.delete_settings(SITE_GROUP)
     site = Site(**kw)
     for key in site.__slots__:
-        logging.info('%s=%s' % (key, getattr(site, key)))
-        store.set_setting(key, getattr(site, key), SITE_GROUP)
+        store.set_setting(key, str(getattr(site, key)), SITE_GROUP)
     cache.delete(SITE_GROUP)
 
 def _get_from_store():
@@ -84,53 +90,3 @@ def _get_from_store():
     for k in site_dict.keys():
         kw[str(k)] = site_dict[k]
     return Site(**kw)
-
-def tz_list():
-    tzs = (
-            '(UTC-12:00) International Date Line West',
-            '(UTC-11:00) Coordinated Universal Time-11',
-            '(UTC-11:00) Samoa',
-            '(UTC-10:00) Hawaii',
-            '(UTC-09:00) Alaska',
-            '(UTC-08:00) Baja California',
-            '(UTC-08:00) Pacific Time (US & Canada)',
-            '(UTC-07:00) Arizona',
-            '(UTC-07:00) Chihuahua, La Paz, Mazatlan',
-            '(UTC-07:00) Mountain Time (US & Canada)',
-            '(UTC-06:00) Central America',
-            '(UTC-06:00) Central Time (US & Canada)',
-            '(UTC-06:00) Guadalajara, Mexico City, Monterrey',
-            '(UTC-06:00) Saskatchewan',
-            '(UTC-05:00) Bogota, Lima, Quito',
-            '(UTC-05:00) Eastern Time (US & Canada)',
-            '(UTC-05:00) Indiana (East)',
-            '(UTC-04:30) Caracas',
-            '(UTC-04:00) Asuncion',
-            '(UTC-04:00) Atlantic Time (Canada)',
-            '(UTC-04:00) Cuiaba',
-            '(UTC-04:00) Georgetown, La Paz, Manaus, San Juan',
-            '(UTC-04:00) Santiago',
-            '(UTC-03:30) Newfoundland',
-            '(UTC-03:00) Brasilia',
-            '(UTC-03:00) Buenos Aires',
-            '(UTC-03:00) Cayenne, Fortaleza',
-            '(UTC-03:00) Greenland',
-            '(UTC-03:00) Montevideo',
-            '(UTC-02:00) Coordinated Universal Time-02',
-            '(UTC-',
-            '(UTC-',
-            '(UTC-',
-            '(UTC-',
-            '(UTC-',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-    )
