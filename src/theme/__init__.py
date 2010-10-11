@@ -12,6 +12,7 @@ import logging
 
 from framework import view
 import navigation
+import siteconfig
 
 def get_themes():
     '''
@@ -43,7 +44,8 @@ def render(appname, app_model, **kw):
     # TODO...
     # prepare model for theme:
     embedded_app = view.render(appname, app_model)
-    title = 'site name'
+    site = siteconfig.get_site_settings()
+    title = site.title
     app_title = app_model.get('__title__', None)
     if app_title:
         title = app_title + ' - ' + title
@@ -53,7 +55,7 @@ def render(appname, app_model, **kw):
             'app' : appname,
             'user' : kw['current_user'],
             'title' : title,
-            'site' : { 'title' : 'ExpressMe', 'subtitle' : 'just another ExpressMe web site' },
+            'site' : site,
             'navigations' : navigation.get_navigation(),
     }
     return view.render('theme', model)
