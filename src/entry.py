@@ -12,7 +12,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 from framework.web import Dispatcher
 
-application = webapp.WSGIApplication([('^/.*$', Dispatcher)], debug=True)
+application = webapp.WSGIApplication([('^/.*$', Dispatcher)], debug=False)
 
 def main():
     run_wsgi_app(application)
