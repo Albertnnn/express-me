@@ -139,30 +139,35 @@ def get_timezone_list():
 def convert_datetime(naive_datetime, tzinfo):
     return naive_datetime.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
 
-def format_datetime(naive_dt, tzinfo, format=None):
+def format_datetime(naive_dt, tzinfo, format):
     '''
     Format datetime.
     '''
     new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
-    return new_dt.strftime(format is None and '%Y-%m-%d %H:%M:%S' or format)
+    return new_dt.strftime(format)
 
-def format_date(naive_dt, tzinfo, format=None):
+def format_date(naive_dt, tzinfo, format):
     '''
     Format date.
     '''
     new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
-    return new_dt.strftime(format is None and '%Y-%m-%d' or format)
+    return new_dt.strftime(format)
 
-def format_time(naive_dt, tzinfo, format=None):
+def format_time(naive_dt, tzinfo, format):
     '''
     Format time.
     '''
     new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
-    return new_dt.strftime(format is None and '%H:%M:%S' or format)
+    return new_dt.strftime(format)
 
-def get_runtime_utils(tzinfo, format=None):
+def get_runtime_utils(tzinfo, date_format=None, time_format=None):
+    if date_format is None:
+        date_format = '%Y-%m-%d'
+    if time_format is None:
+        time_format = '%H:%M:%S'
+    datetime_format = '%s %s' % (date_format, time_format)
     return {
-            'format_datetime' : lambda dt : format_datetime(dt, tzinfo, format),
-            'format_date' : lambda dt : format_date(dt, tzinfo, format),
-            'format_time' : lambda dt : format_time(dt, tzinfo, format),
+            'format_datetime' : lambda dt : format_datetime(dt, tzinfo, datetime_format),
+            'format_date' : lambda dt : format_date(dt, tzinfo, date_format),
+            'format_time' : lambda dt : format_time(dt, tzinfo, time_format),
     }

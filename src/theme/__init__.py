@@ -13,6 +13,7 @@ import logging
 from framework import view
 import navigation
 import siteconfig
+import runtime
 
 def get_themes():
     '''
@@ -43,8 +44,11 @@ def render(appname, app_model, **kw):
     # load widget:
     # TODO...
     # prepare model for theme:
-    embedded_app = view.render(appname, app_model)
     site = siteconfig.get_site_settings()
+    tz = site.get_tzinfo()
+    utils = runtime.get_runtime_utils(tz, str(site.date_format), str(site.time_format))
+    app_model['utils'] = utils
+    embedded_app = view.render(appname, app_model)
     title = site.title
     app_title = app_model.get('__title__', None)
     if app_title:
@@ -52,6 +56,7 @@ def render(appname, app_model, **kw):
     model = {
             '__view__' : th,
             '__app__' : embedded_app,
+            'utils' : utils,
             'app' : appname,
             'user' : kw['current_user'],
             'title' : title,

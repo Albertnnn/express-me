@@ -34,7 +34,7 @@ def get_all_public_posts(**kw):
     posts, next = model.get_posts(number, offset)
     return {
             '__theme__' : True,
-            '__view__' : 'index',
+            '__view__' : 'posts',
             '__title__' : 'Blog posts',
             'posts' : posts,
             'index' : index,
