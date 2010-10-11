@@ -35,7 +35,7 @@ def get_all_public_posts(**kw):
     return {
             '__theme__' : True,
             '__view__' : 'index',
-            'title' : 'Posts',
+            '__title__' : 'Blog posts',
             'posts' : posts,
             'index' : index,
             'next' : next,
