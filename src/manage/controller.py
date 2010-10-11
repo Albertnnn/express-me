@@ -32,13 +32,9 @@ from manage import cookie
 from manage.common import AppMenu
 
 import appconfig
+import runtime
+import siteconfig
 from version import get_version
-
-_MODEL_UTILS = {
-        'format_datetime' : lambda d : d.strftime('%Y-%m-%d %H:%M:%S'),
-        'format_date' : lambda d : d.strftime('%Y-%m-%d'),
-        'format_time' : lambda d : d.strftime('%H:%M:%S'),
-}
 
 def _get_site_info():
     return { 'name' : store.get_setting('name', 'site', 'ExpressMe') }
@@ -90,21 +86,22 @@ def do_manage(**kw):
     embed_context.arguments = lambda: req.arguments()
     app_mod = __import__(app, fromlist=['appmanage']).appmanage
     # call app's manage method and get the embed model:
-    embed_model = app_mod.manage(current_user, app, command, embed_context)
-    if isinstance(embed_model, basestring):
-        return embed_model
-    if not isinstance(embed_model, dict):
+    embedded_model = app_mod.manage(current_user, app, command, embed_context)
+    if isinstance(embedded_model, basestring):
+        return embedded_model
+    if not isinstance(embedded_model, dict):
         raise ApplicationError(r'"%s.appmanage()" must return a dict or basestring.' % app)
-    embed_model['app'] = app
-    embed_model['command'] = command
-    embed_model['user'] = current_user
-    embed_model['utils'] = _MODEL_UTILS
-    embeded = view.render(app, embed_model)
+    tz = siteconfig.get_site_settings().get_tzinfo()
+    embedded_model['app'] = app
+    embedded_model['command'] = command
+    embedded_model['user'] = current_user
+    embedded_model['utils'] = runtime.get_runtime_utils(tz)
+    embedded = view.render(app, embedded_model)
     # copy some value from embed_model:
     for key in ['info', 'warning', 'error']:
-        if key in embed_model:
-            model[key] = embed_model[key]
-    model['__embeded__'] = embeded
+        if key in embedded_model:
+            model[key] = embedded_model[key]
+    model['__embedded__'] = embedded
     model['__view__'] = 'manage'
     return model
 

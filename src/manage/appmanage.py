@@ -18,7 +18,7 @@ from framework import store
 from manage.common import AppMenu
 from manage.common import AppMenuItem
 
-from util import dt
+import runtime
 
 def get_menus():
     '''
@@ -151,14 +151,15 @@ def _site(user, app, context):
         )
         info = 'Site configuration saved.'
     site = siteconfig.get_site_settings(False)
-    now = dt.convert_datetime(datetime.datetime.now(), site.get_tzinfo())
+    tz = site.get_tzinfo()
+    now = runtime.convert_datetime(datetime.datetime.now(), tz)
     return {
             '__view__' : 'manage_site',
             'info' : info,
             'site' : site,
             'date_formats' : siteconfig.date_format_samples(now),
             'time_formats' : siteconfig.time_format_samples(now),
-            'timezones' : dt.get_timezone_list(),
+            'timezones' : runtime.get_timezone_list(),
     }
 
 def manage(user, app, command, context):
