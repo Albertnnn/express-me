@@ -7,11 +7,9 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 Load site info.
 '''
 
-import logging
-
 from framework import cache
 from framework import store
-from util import dt
+import runtime
 
 SITE_GROUP = '__site__'
 
@@ -44,7 +42,7 @@ class Site(object):
             'subtitle' : 'just another ExpressMe web site',
             'date_format' : DEFAULT_DATE,
             'time_format' : DEFAULT_TIME,
-            'tz_name' : dt.UTC_NAME,
+            'tz_name' : runtime.UTC_NAME,
             'tz_h_offset' : 0,
             'tz_m_offset' : 0,
             'tz_dst' : 0,
@@ -58,7 +56,7 @@ class Site(object):
                 setattr(self, key, Site.defaults[key])
 
     def get_tzinfo(self):
-        return dt.UserTimeZone(self.tz_name, int(self.tz_h_offset), int(self.tz_m_offset), int(self.tz_dst))
+        return runtime.UserTimeZone(self.tz_name, int(self.tz_h_offset), int(self.tz_m_offset), int(self.tz_dst))
 
 def get_site_settings(use_cache=True):
     '''

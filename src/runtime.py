@@ -4,7 +4,7 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 '''
-Date time utils.
+Runtime functions.
 '''
 
 import datetime
@@ -138,3 +138,31 @@ def get_timezone_list():
 
 def convert_datetime(naive_datetime, tzinfo):
     return naive_datetime.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
+
+def format_datetime(naive_dt, tzinfo, format=None):
+    '''
+    Format datetime.
+    '''
+    new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
+    return new_dt.strftime(format is None and '%Y-%m-%d %H:%M:%S' or format)
+
+def format_date(naive_dt, tzinfo, format=None):
+    '''
+    Format date.
+    '''
+    new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
+    return new_dt.strftime(format is None and '%Y-%m-%d' or format)
+
+def format_time(naive_dt, tzinfo, format=None):
+    '''
+    Format time.
+    '''
+    new_dt = naive_dt.replace(tzinfo=_UTC_TZ).astimezone(tzinfo)
+    return new_dt.strftime(format is None and '%H:%M:%S' or format)
+
+def get_runtime_utils(tzinfo, format=None):
+    return {
+            'format_datetime' : lambda dt : format_datetime(dt, tzinfo, format),
+            'format_date' : lambda dt : format_date(dt, tzinfo, format),
+            'format_time' : lambda dt : format_time(dt, tzinfo, format),
+    }
