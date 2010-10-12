@@ -29,7 +29,7 @@ from framework.web import mapping
 from manage import model
 from manage import cookie
 
-from manage.common import AppMenu
+from manage import AppMenu
 
 import appconfig
 import runtime

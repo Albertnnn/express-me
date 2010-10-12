@@ -15,8 +15,8 @@ from framework.encode import encode_html
 
 from blog import model
 
-from manage.common import AppMenu
-from manage.common import AppMenuItem
+from manage import AppMenu
+from manage import AppMenuItem
 
 def get_menus():
     '''
@@ -25,7 +25,9 @@ def get_menus():
     post = AppMenu('Post',
             AppMenuItem(store.ROLE_CONTRIBUTOR, 'Edit', 'edit_post'),
             AppMenuItem(store.ROLE_CONTRIBUTOR, 'Add New', 'add_post'),
-            AppMenuItem(store.ROLE_CONTRIBUTOR, 'Tags', 'tags')
+            AppMenuItem(store.ROLE_EDITOR, 'Categories', 'categories'),
+            AppMenuItem(store.ROLE_CONTRIBUTOR, 'Tags', 'tags'),
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Options', 'options')
     )
     page = AppMenu('Page',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit_page'),

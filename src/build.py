@@ -6,6 +6,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 '''
 build.py
 
+- count lines of code
+
 - pre-compile all views for speed
 
 - make package (.zip) file for publish.
@@ -13,6 +15,7 @@ build.py
 
 import re
 import os
+
 from framework import view
 
 PACKAGE_EXCLUDES = (
@@ -59,9 +62,9 @@ def _count_dir(app, path):
     py_files = [f for f in all_files if f.endswith('.py')]
     for f in py_files:
         n = _count_file(os.path.join(path, f))
-        if f.endswith('test.py'):
+        if app.endswith('test') or f.endswith('test.py') or f.endswith('gaeunit.py'):
             test_lines += n
-        else:
+        elif not f[-1] in ',{(\\':
             code_lines += n
     if app:
         print '  dir "%s" contains about %d lines: logic / test = %d / %d.' % (app, code_lines + test_lines, code_lines, test_lines)

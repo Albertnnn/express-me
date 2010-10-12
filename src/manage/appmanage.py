@@ -15,8 +15,8 @@ import siteconfig
 
 from framework import store
 
-from manage.common import AppMenu
-from manage.common import AppMenuItem
+from manage import AppMenu
+from manage import AppMenuItem
 
 import runtime
 
