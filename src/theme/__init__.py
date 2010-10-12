@@ -49,6 +49,7 @@ def render(appname, app_model, **kw):
     utils = runtime.get_runtime_utils(tz, str(site.date_format), str(site.time_format))
     app_model['utils'] = utils
     app_model['user'] = kw['current_user']
+    app_model['site'] = site
     embedded_app = view.render(appname, app_model)
     title = site.title
     app_title = app_model.get('__title__', None)
@@ -57,6 +58,8 @@ def render(appname, app_model, **kw):
     model = {
             '__view__' : th,
             '__app__' : embedded_app,
+            '__header__' : app_model.get('__header__', ''),
+            '__footer__' : app_model.get('__footer__', ''),
             'utils' : utils,
             'app' : appname,
             'user' : kw['current_user'],

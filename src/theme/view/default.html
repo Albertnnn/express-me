@@ -10,9 +10,7 @@
 <![endif]-->
 <link rel="stylesheet" href="/${app}/static/app.css" type="text/css" media="screen, projection">
 <link rel="stylesheet" href="/theme/static/simple/simple.css" type="text/css" media="screen, projection">
-#if $varExists('feed')
-<link rel="alternate" href="${feed.url}" type="application/rss+xml" title="${feed.title}" />
-#end if
+${__header____raw__}
 </head>
 <body>
   <div class="container">
@@ -50,5 +48,6 @@
     <hr/>
     <h2 class="alt">Copyright&copy;2010, powered by Express Me!</h2>
   </div>
+${__footer____raw__}
 </body>
 </html>

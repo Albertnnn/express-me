@@ -13,6 +13,7 @@ from framework.web import post
 
 from framework import store
 
+import blog
 from blog import model
 
 @get('/')
@@ -21,7 +22,6 @@ def get_all_public_posts(**kw):
     show all public posts of blog
     '''
     ctx = kw['context']
-    feed = '/blog/feed.xml'
     number = 20
     index = ctx.get_argument('index', '')
     if index:
@@ -32,15 +32,20 @@ def get_all_public_posts(**kw):
     if not offset:
         offset = None
     posts, next = model.get_posts(number, offset)
+    feed_title = store.get_setting(blog.FEED_TITLE, blog.GROUP_OPTIONS, 'Posts')
+    feed_proxy = store.get_setting(blog.FEED_PROXY, blog.GROUP_OPTIONS, '')
+    if not feed_proxy:
+        feed_proxy = '/blog/feed.xml'
+    header = r'<link href="%s" title="%s" type="application/rss+xml" rel="alternate" />' % (feed_proxy, feed_title)
     return {
             '__theme__' : True,
             '__view__' : 'posts',
             '__title__' : 'Blog posts',
+            '__header__' : header,
             'posts' : posts,
             'index' : index,
             'next' : next,
             'offset' : offset,
-            'feed' : feed,
     }
 
 @get('/t/$')

@@ -6,6 +6,10 @@ jQuery(function() {
 });
 //#raw
 function validate_form() {
+    if (is_blank($('#feed_title').val())) {
+        set_error('Please enter the feed title.', true);
+        return false;
+    }
     var url = $('#feed_proxy').val();
     if (!is_blank(url)) {
         if (url.indexOf('http://')!=0 && url.indexOf('https://')!=0) {
@@ -28,6 +32,11 @@ function validate_form() {
   <input type="hidden" name="command" value="${command}" />
   <div class="panel-title"><div>Posts options</div></div>
   <div class="panel-content">
+    <div class="form-field">
+      <div class="form-field-title">Feed Title:</div>
+      <div class="form-field-input"><input name="feed_title" value="${options.feed_title}" type="text" id="feed_title" style="width:360px" /></div>
+      <div class="form-field-input">Display as feed title that subscribers can see.</div>
+    </div>
     <div class="form-field">
       <div class="form-field-title">Feed Proxy URL <em>(leave empty if not sure)</em>:</div>
       <div class="form-field-input"><input name="feed_proxy" value="${options.feed_proxy}" type="text" id="feed_proxy" style="width:360px" /></div>
