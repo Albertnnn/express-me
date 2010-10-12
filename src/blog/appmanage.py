@@ -236,11 +236,54 @@ def _add_page(user, app, context):
         return r'json:{"add":true,"id":"%s","static":%s,"title":"%s","state":%s,"url":"/blog/%s"}' \
                 % (p.id, p.static and 'true' or 'false', encode_html(p.title), state, p.url())
 
+def __get_category_list(info=None):
+    m = {
+            '__view__' : 'manage_category_list',
+            'categories' : model.get_categories(),
+    }
+    if info:
+        m['info'] = info
+    return m
+
+def _categories(user, app, context):
+    btn = context.get_argument('btn', '')
+    if btn=='add':
+        # add category:
+        if context.method=='get':
+            return {
+                    '__view__' : 'manage_category_editor',
+                    'add' : True,
+                    'category' : model.BlogCategory(name='Unamed', description=''),
+            }
+        else:
+            name = context.get_argument('name')
+            description = context.get_argument('description', '')
+            model.create_category(name, description)
+            return __get_category_list('Category "%s" created.' % name)
+    if btn=='edit':
+        id = context.get_argument('id')
+        category = model.get_category(id)
+        if context.method=='get':
+            return {
+                    '__view__' : 'manage_category_editor',
+                    'add' : False,
+                    'category' : category,
+            }
+        else:
+            name = context.get_argument('name')
+            description = context.get_argument('description', '')
+            category.name = name
+            category.description = description
+            category.put()
+            return __get_category_list('Category "%s" updated.' % name)
+    return __get_category_list()
+
 def manage(user, app, command, context):
     map = {
            'edit_post' : _edit_post,
            'add_post' : _add_post,
            'edit_page' : _edit_page,
            'add_page' : _add_page,
+           'categories' : _categories,
     }
     return map[command](user, app, context)
