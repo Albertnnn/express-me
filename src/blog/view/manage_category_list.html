@@ -3,11 +3,12 @@
 var g_app = '${app}';
 var g_command = '${command}';
 var g_count = $categories.__len__();
+var MAX = 20;
 //#raw
 $(function() {
-    if (g_count>=20) {
+    if (g_count>=MAX) {
 		$('#add').attr('disabled', 'disabled');
-		set_warning('You have reached the limitation of maximum categories (20).');
+		set_warning('You have reached the limitation of maximum categories.');
 	}
     $('#add').click(function() {
         location.assign('/manage/?app=' + g_app + '&command=' + g_command + '&btn=add');
@@ -15,7 +16,7 @@ $(function() {
 });
 function submit_form(btn, id) {
 	if (btn=='delete') {
-		if (!confirm('Are you sure you want to delete selected categories permanently?')) {
+		if (!confirm('Are you sure you want to delete this category permanently?')) {
 			return;
 		}
 	}
@@ -25,14 +26,17 @@ function submit_form(btn, id) {
 }
 $(function() {
     $('#delete').click(function() {
-        var selected_ps = $('input.select-p:checked');
-        if (selected_ps.length==0) {
-			alert('Please select pages first.');
+        var selected_cs = $('input.select-c:checked');
+        if (selected_cs.length==0) {
+			alert('Please select categories first.');
+		}
+		else if (selected_cs.length==$('input.select-c').length) {
+            alert('You cannot delete all categories.');
 		}
 		else {
-			var msg = 'Are you sure you want to delete this page?';
-			if (selected_ps.length>1) {
-				msg = 'Are you sure you want to delete these pages?';
+			var msg = 'Are you sure you want to delete this category?';
+			if (selected_cs.length>1) {
+				msg = 'Are you sure you want to delete these categories?';
 			}
 			if (confirm(msg)) {
 				$('#btn').val('delete');

@@ -1,0 +1,56 @@
+<!-- begin manage_option.html -->
+
+<script type="text/javascript">
+jQuery(function() {
+  jQuery('\#show_abstract').val('${options.show_abstract}');
+});
+//#raw
+function validate_form() {
+    var url = $('#feed_proxy').val();
+    if (!is_blank(url)) {
+        if (url.indexOf('http://')!=0 && url.indexOf('https://')!=0) {
+            set_error('Feed proxy URL must start with "http://" or "https://".', true);
+            return false;
+        }
+    }
+	set_info();
+	set_warning();
+	set_error();
+	$('#save').hide();
+	$('#loading').show();
+    return true;
+}
+//#end raw
+</script>
+<div class="panel box-round">
+  <form name="options" action="/manage/" method="post" onsubmit="return validate_form()">
+  <input type="hidden" name="app" value="${app}" />
+  <input type="hidden" name="command" value="${command}" />
+  <div class="panel-title"><div>Posts options</div></div>
+  <div class="panel-content">
+    <div class="form-field">
+      <div class="form-field-title">Feed Proxy URL <em>(leave empty if not sure)</em>:</div>
+      <div class="form-field-input"><input name="feed_proxy" value="${options.feed_proxy}" type="text" id="feed_proxy" style="width:360px" /></div>
+      <div class="form-field-input">If you have burned your post feed with FeedBurner, or used another service to process your feed, enter the full feed URL here. ExpressMe will redirect all post feed traffic to this address. Leave this blank for no redirection.</div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Show Posts</div>
+      <div class="form-field-input">
+        <select name="show_abstract" type="text" id="show_abstract">
+          <option value="False">Full</option>
+          <option value="True">Abstract</option>
+        </select>
+      </div>
+      <div class="form-field-input">Select Full to syndicate the full content of your post. Select Short if you only wish to syndicate the first 500 characters.</div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-input">
+        <button id="save" type="submit" name="submit">Save</button>
+        <span id="loading" class="loading">Saving, please wait...</span>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+
+<!-- end manage_option.html -->

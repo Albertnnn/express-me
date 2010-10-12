@@ -278,6 +278,27 @@ def _categories(user, app, context):
             return __get_category_list('Category "%s" updated.' % name)
     return __get_category_list()
 
+POST_OPTIONS = 'blog.post.options'
+
+def _options(user, app, context):
+    info = ''
+    if context.method=='post':
+        show_abstract = context.get_argument('show_abstract')
+        feed_proxy = context.get_argument('feed_proxy')
+        store.set_setting('show_abstract', show_abstract, POST_OPTIONS)
+        store.set_setting('feed_proxy', feed_proxy, POST_OPTIONS)
+        info = 'Your options are saved.'
+    # load options:
+    options = store.get_settings(POST_OPTIONS)
+    for k, v in (('show_abstract', 'False'), ('feed_proxy', '')):
+        if not k in options:
+            options[k] = v
+    return {
+            '__view__' : 'manage_option',
+            'options' : options,
+            'info' : info,
+    }
+
 def manage(user, app, command, context):
     map = {
            'edit_post' : _edit_post,
@@ -285,5 +306,6 @@ def manage(user, app, command, context):
            'edit_page' : _edit_page,
            'add_page' : _add_page,
            'categories' : _categories,
+           'options' : _options,
     }
     return map[command](user, app, context)
