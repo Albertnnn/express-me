@@ -1,0 +1,48 @@
+<!-- begin manage_category_editor.html -->
+<script type="text/javascript">
+var g_app = '${app}';
+var g_command = '${command}';
+var g_add = '${add}'=='True';
+//#raw
+
+$(function() {
+    $('#title').html(g_add ? 'Add new category' : 'Edit category');
+    $('#btn').val(g_add ? 'add' : 'edit');
+});
+
+function validate_form(){
+    if (is_blank($('#name').val())) {
+        set_error('Please enter category name.', true);
+        return false;
+    }
+}
+//#end raw
+</script>
+
+<div class="panel box-round">
+  <div class="panel-title"><div id="title"></div></div>
+  <form id="edit_form" action="/manage/" method="post" onsubmit="return validate_form()">
+  <div class="panel-content">
+    <div class="form-field">
+      <div class="form-field-title">Name (<em>The name is how it appears on your site</em>):</div>
+      <div class="form-field-input">
+        <input type="hidden" name="app" value="${app}" />
+        <input type="hidden" name="command" value="${command}" />
+        <input type="hidden" id="btn" name="btn" value="" />
+        <input type="hidden" id="id" name="id" value="${category.id}" />
+        <input name="name" value="${category.name}" type="text" id="name" style="width:360px" maxlength="100" /></div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Description (<em>The description is not prominent by default</em>):</div>
+      <div class="form-field-input"><input name="description" value="${category.description}" type="text" id="description" maxlength="100" style="width:360px" /></div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-input">
+        <button id="save" type="submit" name="submit">Save</button>
+        <span id="loading" class="loading">Saving, please wait...</span>
+      </div>
+    </div>
+  </div>
+  </form>
+</div>
+<!-- end manage_category_editor.html -->
