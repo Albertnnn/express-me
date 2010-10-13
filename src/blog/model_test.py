@@ -42,9 +42,12 @@ class Test(GaeTestCase):
         # prepare 20 posts:
         python = model.create_category('python')
         java = model.create_category('java')
-        _create_post(10, _create_user(), 'python test', 'this is a python test', python)
-        _create_post(10, _create_user(), 'java test', 'this is a java test', java)
-        ps, cursor = model.get_posts(limit, cursor, category, published_only)
+        user = _create_user()
+        _create_post(10, user, 'python test', 'this is a python test', python)
+        _create_post(10, user, 'java test', 'this is a java test', java)
+        ps, cursor = model.get_posts(category=python)
+        self.assertEquals(10, len(ps))
+        self.assertEquals(None, cursor)
 
     def test_get_posts(self):
         # prepare 20 posts:
