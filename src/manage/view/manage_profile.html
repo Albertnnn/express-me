@@ -6,18 +6,18 @@ jQuery(function() {
 //#raw
 function validate_form(){
     if (is_blank($('#nicename').val())) {
-        set_error('Please enter your nice name.');
+        set_error('Please enter your nice name.', true);
         return false;
     }
     var p1 = $('#password1').val();
     var p2 = $('#password2').val();
     if (p1!='' && p2!='') {
         if (p1.length<6) {
-            set_error('The password should be at least 6 characters long.');
+            set_error('The password should be at least 6 characters long.', true);
             return false;
         }
         if (p1!=p2) {
-            set_error('Please enter the same password in the two password fields.');
+            set_error('Please enter the same password in the two password fields.', true);
             return false;
         }
         $('#password').val(MD5(p1));
@@ -26,13 +26,13 @@ function validate_form(){
         $('#password').val('');
     }
 	else {
-		set_error('Please enter the same password in the two password fields.');
+		set_error('Please enter the same password in the two password fields.', true);
     	return false;
 	}
 	set_info();
 	set_warning();
 	set_error();
-	$('#save_profile').hide();
+	$('#save').hide();
 	$('#loading').show();
     return true;
 }
@@ -42,7 +42,6 @@ function validate_form(){
   <form name="profile" action="/manage/" method="post" onsubmit="return validate_form()">
   <input type="hidden" name="app" value="${app}" />
   <input type="hidden" name="command" value="${command}" />
-  <input type="hidden" name="passwd" id="passwd" />
   <div class="panel-title"><div>Your Profile</div></div>
   <div class="panel-content">
     <div class="form-field">
@@ -72,7 +71,7 @@ function validate_form(){
     <div class="form-field">
       <div class="form-field-input">
       	<input name="password" type="hidden" id="password"/>
-        <button id="save_profile" type="submit" name="submit">Save</button>
+        <button id="save" type="submit" name="submit">Save</button>
         <span id="loading" class="loading">Saving, please wait...</span>
       </div>
     </div>
