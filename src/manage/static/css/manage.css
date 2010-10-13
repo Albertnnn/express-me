@@ -1,6 +1,6 @@
 @charset "utf-8";
 /* Custom CSS Document */
-body { background:#f9f9f9 url(/manage/static/bg.gif) repeat-x; font-family:'Lucida Grande', Verdana, Arial, 'Bitstream Vera Sans', sans-serif; font-size:12px; height:100%; }
+body { background:#f9f9f9 url(/manage/static/image/bg.gif) repeat-x; font-family:'Lucida Grande', Verdana, Arial, 'Bitstream Vera Sans', sans-serif; font-size:12px; height:100%; }
 
 #container { min-height: 100% }
 
