@@ -13,6 +13,7 @@ from framework import ApplicationError
 from framework import store
 from framework.encode import encode_html
 
+import blog
 from blog import model
 
 from manage import AppMenu
@@ -236,13 +237,15 @@ def _add_page(user, app, context):
         return r'json:{"add":true,"id":"%s","static":%s,"title":"%s","state":%s,"url":"/blog/%s"}' \
                 % (p.id, p.static and 'true' or 'false', encode_html(p.title), state, p.url())
 
-def __get_category_list(info=None):
+def __get_category_list(info=None, error=None):
     m = {
             '__view__' : 'manage_category_list',
             'categories' : model.get_categories(),
     }
     if info:
         m['info'] = info
+    if error:
+        m['error'] = error
     return m
 
 def _categories(user, app, context):
@@ -255,11 +258,19 @@ def _categories(user, app, context):
                     'add' : True,
                     'category' : model.BlogCategory(name='Unamed', description=''),
             }
-        else:
-            name = context.get_argument('name')
-            description = context.get_argument('description', '')
-            model.create_category(name, description)
-            return __get_category_list('Category "%s" created.' % name)
+        name = context.get_argument('name')
+        description = context.get_argument('description', '')
+        model.create_category(name, description)
+        return __get_category_list('Category "%s" created.' % name)
+
+    if btn=='delete':
+        if len(model.get_categories())==1:
+            return __get_category_list(error='You cannot delete the only 1 category.')
+        try:
+            model.delete_category(context.get_argument('id'))
+        except ApplicationError, e:
+            return __get_category_list(error=e.message)
+
     if btn=='edit':
         id = context.get_argument('id')
         category = model.get_category(id)
@@ -269,30 +280,31 @@ def _categories(user, app, context):
                     'add' : False,
                     'category' : category,
             }
-        else:
-            name = context.get_argument('name')
-            description = context.get_argument('description', '')
-            category.name = name
-            category.description = description
-            category.put()
-            return __get_category_list('Category "%s" updated.' % name)
-    return __get_category_list()
+        name = context.get_argument('name')
+        description = context.get_argument('description', '')
+        category.name = name
+        category.description = description
+        category.put()
+        return __get_category_list('Category "%s" updated.' % name)
 
-POST_OPTIONS = 'blog.post.options'
+    return __get_category_list()
 
 def _options(user, app, context):
     info = ''
     if context.method=='post':
-        show_abstract = context.get_argument('show_abstract')
-        feed_proxy = context.get_argument('feed_proxy')
-        store.set_setting('show_abstract', show_abstract, POST_OPTIONS)
-        store.set_setting('feed_proxy', feed_proxy, POST_OPTIONS)
+        feed_title = context.get_argument(blog.FEED_TITLE)
+        feed_proxy = context.get_argument(blog.FEED_PROXY)
+        feed_items = context.get_argument(blog.FEED_ITEMS)
+        show_abstract = context.get_argument(blog.SHOW_ABSTRACT)
+        # save:
+        store.set_setting(blog.FEED_TITLE, feed_title, blog.GROUP_OPTIONS)
+        store.set_setting(blog.FEED_PROXY, feed_proxy, blog.GROUP_OPTIONS)
+        store.set_setting(blog.FEED_ITEMS, feed_items, blog.GROUP_OPTIONS)
+        store.set_setting(blog.SHOW_ABSTRACT, show_abstract, blog.GROUP_OPTIONS)
         info = 'Your options are saved.'
     # load options:
-    options = store.get_settings(POST_OPTIONS)
-    for k, v in (('show_abstract', 'False'), ('feed_proxy', '')):
-        if not k in options:
-            options[k] = v
+    options = store.get_settings(blog.GROUP_OPTIONS)
+    blog.update_default_settings(options)
     return {
             '__view__' : 'manage_option',
             'options' : options,

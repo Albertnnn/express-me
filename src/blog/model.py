@@ -279,6 +279,15 @@ def create_category(name, description=''):
     cat.put()
     return cat
 
+def delete_category(key):
+    category = get_category(key)
+    if category is None:
+        raise ApplicationError('Category not exist.')
+    posts, cursor = _query_posts(1, None, category=category)
+    if len(posts)>0:
+        raise ApplicationError('You cannot delete a category that contains posts.')
+    category.delete()
+
 def get_category(key=None):
     '''
     Get category by key. if key is None, return the first category.

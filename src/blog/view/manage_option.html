@@ -2,6 +2,7 @@
 
 <script type="text/javascript">
 jQuery(function() {
+  jQuery('\#feed_items').val('${options.feed_items}');
   jQuery('\#show_abstract').val('${options.show_abstract}');
 });
 //#raw
@@ -41,6 +42,17 @@ function validate_form() {
       <div class="form-field-title">Feed Proxy URL <em>(leave empty if not sure)</em>:</div>
       <div class="form-field-input"><input name="feed_proxy" value="${options.feed_proxy}" type="text" id="feed_proxy" style="width:360px" /></div>
       <div class="form-field-input">If you have burned your post feed with FeedBurner, or used another service to process your feed, enter the full feed URL here. ExpressMe will redirect all post feed traffic to this address. Leave this blank for no redirection.</div>
+    </div>
+    <div class="form-field">
+      <div class="form-field-title">Feed Items</div>
+      <div class="form-field-input">
+        <select name="feed_items" type="text" id="feed_items">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select>
+      </div>
     </div>
     <div class="form-field">
       <div class="form-field-title">Show Posts</div>

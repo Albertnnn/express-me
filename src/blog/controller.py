@@ -16,6 +16,16 @@ from framework import store
 import blog
 from blog import model
 
+def _get_feed_html():
+    '''
+    Get feed html in <head>...</head>.
+    '''
+    feed_title = store.get_setting(blog.FEED_TITLE, blog.GROUP_OPTIONS, 'Posts')
+    feed_proxy = store.get_setting(blog.FEED_PROXY, blog.GROUP_OPTIONS, '')
+    if not feed_proxy:
+        feed_proxy = '/blog/feed'
+    return r'<link href="%s" title="%s" type="application/rss+xml" rel="alternate" />' % (feed_proxy, feed_title)
+
 @get('/')
 def get_all_public_posts(**kw):
     '''
@@ -32,16 +42,11 @@ def get_all_public_posts(**kw):
     if not offset:
         offset = None
     posts, next = model.get_posts(number, offset)
-    feed_title = store.get_setting(blog.FEED_TITLE, blog.GROUP_OPTIONS, 'Posts')
-    feed_proxy = store.get_setting(blog.FEED_PROXY, blog.GROUP_OPTIONS, '')
-    if not feed_proxy:
-        feed_proxy = '/blog/feed.xml'
-    header = r'<link href="%s" title="%s" type="application/rss+xml" rel="alternate" />' % (feed_proxy, feed_title)
     return {
             '__theme__' : True,
             '__view__' : 'posts',
             '__title__' : 'Blog posts',
-            '__header__' : header,
+            '__header__' : _get_feed_html(),
             'posts' : posts,
             'index' : index,
             'next' : next,
@@ -58,14 +63,30 @@ def get_posts_by_tag(tag_key):
             'feed' : blog_utils.get_feed()
     }
 
-@get('/c/$')
-def get_posts_by_category(cat_key):
-    category = store.get_category(cat_key)
+@get('/cat/$')
+def get_posts_by_category(cat_key, **kw):
+    ctx = kw['context']
+    category = model.get_category(cat_key)
+    number = 20
+    offset = ctx.get_argument('offset', '')
+    if not offset:
+        offset = None
+    index = ctx.get_argument('index', '')
+    if index:
+        index = int(index)
+    else:
+        index = 1
+    posts, next = model.get_posts(number, offset, category=category)
     return {
-            'title' : category.category_name,
+            '__theme__' : True,
+            '__view__' : 'posts',
+            '__title__' : 'Category %s' % category.name,
+            '__header__' : _get_feed_html(),
             'category' : category,
-            'posts' : store.get_posts_by_category(category),
-            'feed' : blog_utils.get_feed()
+            'posts' : posts,
+            'index' : index,
+            'next' : next,
+            'offset' : offset,
     }
 
 @get('/post/$')
@@ -121,18 +142,20 @@ def comment():
     return 'redirect:/blog/post/%s#%s' % (ref, key)
 
 @get('/feed')
-def feed():
+def feed(**kw):
     '''
     Generate rss feed.
     '''
-    host = context.request.host_url
-    title = shared.get_setting('blog_setting', 'feed_title', 'Rss Feed')
-    description = shared.get_setting('blog_setting', 'feed_desc', 'Subscribe Rss Feed')
+    host = kw['request'].host_url
+    options = store.get_settings(blog.GROUP_OPTIONS)
+    blog.update_default_settings(options)
+    title = options[blog.FEED_TITLE]
+    description = 'Subscribe RSS feed'
     hub = 'http://pubsubhubbub.appspot.com'
-    link = 'http://feeds.feedburner.com/expressme'
-    max = 20
-    posts = store.get_posts(limit=max)
-    response = context.response
+    link = options[blog.FEED_PROXY] or ('%s/blog/feed' % host)
+    max = int(options[blog.FEED_ITEMS])
+    posts, cursor = model.get_posts(limit=max)
+    response = kw['response']
     response.content_type = 'application/rss+xml'
     response.charset = 'utf8'
     out = response.out
@@ -153,7 +176,15 @@ def feed():
       <dc:creator>%s</dc:creator>
       <pubDate>%s</pubDate>
       <description><![CDATA[%s]]></description>
-    </item>''' % (post.post_title, host, str(post.key()), post.post_owner.user_nicename, blog_utils.format_rss_date(post.post_date), post.post_content))
+    </item>''' % (
+            post.title,
+            host,
+            post.id,
+            post.author,
+            post.creation_date.strftime('%a, %d %b %Y %H:%M:%S'),
+            post.content
+    ))
     out.write(r'''
   </channel>
-</rss>''')
+</rss>
+''')

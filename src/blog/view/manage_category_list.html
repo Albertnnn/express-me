@@ -21,7 +21,7 @@ function submit_form(btn, id) {
 		}
 	}
     $('#btn').val(btn);
-    $('#pid').val(id);
+    $('#id').val(id);
     $('#edit_form').submit();
 }
 $(function() {
@@ -79,6 +79,7 @@ $(function() {
   	<input type="hidden" name="app" value="${app}" />
   	<input type="hidden" name="command" value="${command}" />
   	<input type="hidden" id="btn" name="btn" value="" />
+  	<input type="hidden" id="id" name="id" value="" />
     <div class="th bottom-line">
       <div class="span-1"><div><input type="checkbox" id="select_all" name="select_all" /></div></div>
       <div class="span-10"><div>Name</div></div>
