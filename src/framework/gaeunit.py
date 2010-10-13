@@ -40,7 +40,12 @@ def _check_or_raise(path):
     return path
 
 # init GAE env here:
-sys.path.extend(_get_extra_path(_lookup_gae_home()))
+def init_once():
+    gae_home = _lookup_gae_home()
+    if not gae_home in sys.path:
+        sys.path.extend(_get_extra_path(_lookup_gae_home()))
+
+init_once()
 
 class GaeTestCase(unittest.TestCase):
     '''
