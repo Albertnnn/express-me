@@ -6,8 +6,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 import unittest
 import threading
 
-from framework import store
 from framework import gaeunit
+from framework import store
 
 class CounterThread(threading.Thread):
     '''

@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
         self.assertTrue(cls.find('CompiledTemplate')>=0)
 
     def test_import_compiled_template(self):
-        self.assertEquals(None, view.import_compiled_template('http_test', 'undefined'))
+        self.assertEquals(None, view.import_compiled_template('http_test.undefined'))
 
     def test_render(self):
         model = {

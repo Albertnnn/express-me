@@ -6,8 +6,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 import hashlib
 import unittest
 
-from framework import ValidationError
 from framework.gaeunit import GaeTestCase
+from framework import ValidationError
 from framework import store
 
 class Test(GaeTestCase):

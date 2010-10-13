@@ -11,6 +11,37 @@ import os
 import sys
 import unittest
 
+def _lookup_gae_home():
+    '''
+    Return GAE home. Lookup order:
+    1. Environment variable 'GAE_HOME'.
+    2. Default path depends on OS.
+    '''
+    if 'GAE_HOME' in os.environ:
+        return _check_or_raise(os.environ['GAE_HOME'])
+    if os.name=='nt':
+        return _check_or_raise(r'C:\Program Files\Google\google_appengine')
+    if os.name=='posix':
+        import getpass
+        return _check_or_raise('/home/%s/google_appengine' % getpass.getuser())
+
+def _get_extra_path(gae_home):
+    return [
+            gae_home,
+            os.path.join(gae_home, 'google', 'appengine', 'api'),
+            os.path.join(gae_home, 'google', 'appengine', 'ext'),
+            os.path.join(gae_home, 'lib', 'yaml', 'lib'),
+            os.path.join(gae_home, 'lib', 'webob'),
+    ]
+
+def _check_or_raise(path):
+    if not os.path.isdir(path):
+        raise IOError('GAE_HOME is undefined or invalid.')
+    return path
+
+# init GAE env here:
+sys.path.extend(_get_extra_path(_lookup_gae_home()))
+
 class GaeTestCase(unittest.TestCase):
     '''
     Base GAE TestCase that prepare all GAE local environment for test.
@@ -18,12 +49,6 @@ class GaeTestCase(unittest.TestCase):
 
     def setUp(self):
         super(GaeTestCase, self).setUp()
-        gae_home = self._lookup_gae_home()
-        gae_lib_path = os.pathsep.join(_get_extra_path(gae_home))
-        python_path = os.environ['PYTHONPATH']
-        if python_path.find(gae_lib_path)==(-1):
-            os.environ['PYTHONPATH'] = python_path + os.pathsep + gae_lib_path
-        #sys.path = _get_extra_path(gae_home) + sys.path
 
         from google.appengine.api import apiproxy_stub_map
 
@@ -31,25 +56,6 @@ class GaeTestCase(unittest.TestCase):
         appid = _get_app_id(yaml)
         _setup_env(appid)
         apiproxy_stub_map.apiproxy = _get_dev_apiproxy(appid)
-
-    def _lookup_gae_home(self):
-        '''
-        Return GAE home. Lookup order:
-        1. Environment variable 'GAE_HOME'.
-        2. Default path depends on OS.
-        '''
-        if 'GAE_HOME' in os.environ:
-            return self._check_or_raise(os.environ['GAE_HOME'])
-        if os.name=='nt':
-            return self._check_or_raise(r'C:\Program Files\Google\google_appengine')
-        if os.name=='posix':
-            import getpass
-            return self._check_or_raise('/home/%s/google_appengine' % getpass.getuser())
-
-    def _check_or_raise(self, path):
-        if not os.path.isdir(path):
-            raise IOError('GAE_HOME is undefined or invalid.')
-        return path
 
 def _get_app_id(app_yaml_file):
     '''
@@ -71,15 +77,6 @@ def _get_app_id(app_yaml_file):
     finally:
         if f is not None:
             f.close()
-
-def _get_extra_path(gae_home):
-    return [
-            gae_home,
-            os.path.join(gae_home, 'google', 'appengine', 'api'),
-            os.path.join(gae_home, 'google', 'appengine', 'ext'),
-            os.path.join(gae_home, 'lib', 'yaml', 'lib'),
-            os.path.join(gae_home, 'lib', 'webob'),
-    ]
 
 def _setup_env(appid):
     os.environ['APPLICATION_ID'] = appid

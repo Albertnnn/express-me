@@ -33,7 +33,6 @@ def import_compiled_template(mod_name):
     
     Args:
         mod_name: module name.
-        view_name: view's logic name.
     Return:
         CompiledTemplate class.
     '''

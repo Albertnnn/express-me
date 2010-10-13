@@ -6,8 +6,8 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 import time
 import unittest
 
-from framework import cache
 from framework import gaeunit
+from framework import cache
 
 class Test(gaeunit.GaeTestCase):
 
