@@ -21,5 +21,4 @@ class Test(unittest.TestCase):
         self.assertEquals('2008-02-20 21:30:59', runtime.format_datetime(dt, tz2, '%Y-%m-%d %H:%M:%S'))
 
 if __name__ == '__main__':
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

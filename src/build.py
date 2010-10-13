@@ -41,7 +41,7 @@ def main():
 
 def count_line(root_path):
     print 'counting lines of code...'
-    ignores = ('atom', 'Cheetah', 'compiled', 'gdata', 'static', 'Templates', 'theme')
+    ignores = ('atom', 'boto', 'Cheetah', 'compiled', 'gdata', 'static', 'Templates', 'theme')
     all_dirs = os.listdir(root_path)
     valid_dirs = [d for d in all_dirs if d not in ignores and os.path.isdir(os.path.join(root_path, d))]
     total_code = 0
@@ -62,7 +62,7 @@ def _count_dir(app, path):
     py_files = [f for f in all_files if f.endswith('.py')]
     for f in py_files:
         n = _count_file(os.path.join(path, f))
-        if app.endswith('test') or f.endswith('test.py') or f.endswith('gaeunit.py'):
+        if app.endswith('test') or f.endswith('test.py') or f.endswith('tests.py') or f.endswith('gaeunit.py'):
             test_lines += n
         elif not f[-1] in ',{(\\':
             code_lines += n
