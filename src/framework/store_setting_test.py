@@ -27,6 +27,20 @@ class Test(GaeTestCase):
         self.assertEquals(value, d[name])
         self.assertEquals(value2, d[name2])
 
+    def test_delete_settings(self):
+        group = 'test_grp'
+        for i in range(10):
+            store.set_setting('k%s' % i, 'v%s' % i, group)
+        # get settings:
+        ss = store.get_settings(group)
+        for i in range(10):
+            self.assertTrue(('k%s' % i) in ss)
+        # delete settings:
+        store.delete_settings(group)
+        # get settings again:
+        ss = store.get_settings(group)
+        self.assertEquals(0, len(ss.keys()))
+
     def test_get_settings(self):
         group = 'test_grp'
         for i in range(10):

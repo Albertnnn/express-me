@@ -317,9 +317,8 @@ def delete_settings(group):
     '''
     if not isinstance(group, basestring):
         raise ValueError('Group must be basestring.')
-    ss = get_settings(group)
-    for key in ss.keys():
-        delete_setting(key, group)
+    settings = Setting.all().filter('group =', group).fetch(100)
+    db.delete(settings)
 
 def delete_setting(name, group=DEFAULT_GROUP):
     '''
