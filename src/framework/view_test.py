@@ -12,10 +12,16 @@ class Test(unittest.TestCase):
 
     def test_get_template_path(self):
         self.assertTrue(os.path.isfile(view.get_template_path('http_test', 'main')))
-        self.assertTrue(os.path.isfile(view.get_template_path('http_test', 'rss', '.xml')))
+        self.assertTrue(os.path.isfile(view.get_template_path('http_test', 'rss', ext='.xml')))
+        self.assertTrue(os.path.isfile(view.get_template_path('http_test', 'custom', view_dir='custom_view')))
 
     def test_compile_template(self):
         cls = view.compile_template('http_test', 'main')
+        self.assertTrue(isinstance(cls, str))
+        self.assertTrue(cls.find('CompiledTemplate')>=0)
+
+    def test_compile_template2(self):
+        cls = view.compile_template('http_test', 'custom', view_dir='custom_view')
         self.assertTrue(isinstance(cls, str))
         self.assertTrue(cls.find('CompiledTemplate')>=0)
 
