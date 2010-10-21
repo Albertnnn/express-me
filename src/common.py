@@ -2,6 +2,8 @@
 Base functions and classes.
 '''
 
+DEPRECATED = True
+
 __author__ = 'Michael Liao'
 
 class Setting():

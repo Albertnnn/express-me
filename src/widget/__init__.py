@@ -17,28 +17,31 @@ class WidgetSetting(object):
     '''
     settings of a widget class, display as input.
     '''
-    __slot__ = ('default', 'required', 'description', 'value')
+    __slot__ = ('default', 'required', 'description', 'value', 'pattern')
 
-    def __init__(self, default='', required=False, description='', value=None):
+    def __init__(self, default='', required=False, description='', value=None, pattern='^.*$'):
         if not isinstance(default, basestring):
             raise ValueError('\'default\' must be str or unicode.')
         if not isinstance(required, bool):
             raise ValueError('\'required\' must be bool.')
         if not isinstance(description, basestring):
             raise ValueError('\'description\' must be str or unicode.')
+        if not isinstance(pattern, str):
+            raise ValueError('\'pattern\' must be str.')
         self.default = default
         self.required = required
         self.description = description
-        if value is None:
-            self.value = default
-        else:
+        self.pattern = pattern
+        if value:
             self.value = value
+        else:
+            self.value = default
 
     def is_modified(self):
         return self.default!=self.value
 
     def __str__(self):
-        return r'''WidgetSetting(default='%s', required=%s, description='%s', value='%s')''' % (self.default, self.required, self.description, self.value)
+        return r'''WidgetSetting(default='%s', required=%s, description='%s', value='%s', pattern='%s')''' % (self.default, self.required, self.description, self.value, self.pattern)
 
     __repr__ = __str__
 
@@ -61,7 +64,7 @@ class WidgetCheckedSetting(WidgetSetting):
         '''
         Add label.
         '''
-        super(WidgetCheckedSetting, self).__init__(default, required, description, value)
+        super(WidgetCheckedSetting, self).__init__(default, required, description, value, '^(True|False)$')
         self.label = label
 
 class WidgetPasswordSetting(WidgetSetting):

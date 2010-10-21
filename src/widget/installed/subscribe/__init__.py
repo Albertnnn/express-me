@@ -5,7 +5,6 @@
 Feed Widget that display rss or atom feed.
 '''
 
-from manage import shared
 import widget
 
 class Widget(widget.WidgetModel):

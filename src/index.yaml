@@ -12,6 +12,27 @@ indexes:
 
 - kind: BlogPost
   properties:
+  - name: category
+  - name: creation_date
+    direction: desc
+
+- kind: BlogPost
+  properties:
+  - name: category
+  - name: ref
+  - name: static
+  - name: creation_date
+    direction: desc
+
+- kind: BlogPost
+  properties:
+  - name: category
+  - name: static
+  - name: creation_date
+    direction: desc
+
+- kind: BlogPost
+  properties:
   - name: post_category
   - name: post_state
   - name: post_static
@@ -31,23 +52,28 @@ indexes:
   - name: post_date
     direction: desc
 
-- kind: BlogTag
+- kind: BlogPost
   properties:
-  - name: tag_count
+  - name: ref
+  - name: static
+  - name: creation_date
     direction: desc
-  - name: tag_name
 
-- kind: Comment
+- kind: BlogPost
   properties:
-  - name: reference_key
-  - name: comment_date
+  - name: state
+  - name: static
+  - name: creation_date
+    direction: desc
 
-- kind: WidgetInstance
+- kind: BlogPost
   properties:
-  - name: widget_group
-  - name: widget_order
+  - name: static
+  - name: creation_date
+    direction: desc
 
-- kind: WikiPage
+- kind: User
   properties:
-  - name: wiki_title
-  - name: wiki_state
+  - name: role
+  - name: creation_date
+    direction: desc

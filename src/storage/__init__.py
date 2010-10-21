@@ -29,11 +29,11 @@ class ValidateError(StandardError):
         self.message = message
 
 class ProviderSetting(object):
-    __slots__ = ('key', 'required', 'name', 'is_password')
-    def __init__(self, key, required, name, is_password=False):
+    __slots__ = ('key', 'default', 'required', 'description', 'is_password')
+    def __init__(self, key, default, required, description, is_password=False):
         self.key = key
         self.required = required
-        self.name = name
+        self.description = description
         self.is_password = is_password
 
     def validate(self, value):

@@ -15,7 +15,7 @@ import navigation
 import siteconfig
 import runtime
 
-def get_themes():
+def get_themes(use_cache=True):
     '''
     Get all themes' logic names.
     
@@ -23,10 +23,8 @@ def get_themes():
         list of themes' logic names.
     '''
     theme_root = os.path.dirname(__file__)
-    view_root = os.path.join(theme_root, 'view')
-    all_files = os.listdir(view_root)
-    themes = [f for f in all_files if f.endswith('.html') and os.path.isfile(os.path.join(view_root, f))]
-    return [f[:-5] for f in themes]
+    theme_dirs = os.listdir(theme_root)
+    return [t for t in theme_dirs if os.path.isfile(os.path.join(theme_root, t, 'template.html'))]
 
 def get_theme():
     '''
@@ -56,7 +54,7 @@ def render(appname, app_model, **kw):
     if app_title:
         title = app_title + ' - ' + title
     model = {
-            '__view__' : th,
+            '__view__' : 'template',
             '__app__' : embedded_app,
             '__header__' : app_model.get('__header__', ''),
             '__footer__' : app_model.get('__footer__', ''),
@@ -67,4 +65,4 @@ def render(appname, app_model, **kw):
             'site' : site,
             'navigations' : navigation.get_navigation(),
     }
-    return view.render('theme', model)
+    return view.render('theme', model, view_dir=th)

@@ -3,6 +3,8 @@
 
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
+DEPRECATED = True
+
 import logging
 
 from google.appengine.api import urlfetch

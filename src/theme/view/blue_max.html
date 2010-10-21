@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+#if $varExists('title')
+$title - 
+#end if
+${site.title}</title>
+<link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print">
+<!--[if lt IE 8]>
+	<link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection">
+<![endif]-->
+<link rel="stylesheet" href="/${app}/static/app.css" type="text/css" media="screen, projection">
+<link rel="stylesheet" href="/theme/blue-max/static/custom.css" type="text/css" media="screen, projection">
+#if $varExists('feed')
+<link rel="alternate" href="${feed.url}" type="application/rss+xml" title="${feed.title}" />
+#end if
+</head>
+<body style="background-color:#E5ECF1">
+  <div class="container" style="background-color:#FFF">
+    <div class="span-24 last" style="padding:3px">
+    #if $user
+      Welcome, <a href="/manage/?app=manage&action=profile" target="_blank">${user.user_nicename}</a> | <a href="/manage/signout">Sign Out</a>
+    #else
+      <a href="/manage/signin">Sign In</a> | <a href="/manage/register">Register</a>
+    #end if
+    </div>
+    <div id="site-header" class="span-24 last">
+      <h1><a href="/" title="${site.subtitle}"><span style="color:#FFF">${site.title}</span></a></h1>
+    </div>
+    <div class="span-24 last" style="background-color:#B2D487">
+      #for $t, $u in $navigations
+        <a href="${u}" class="nav">${t}</a>
+      #end for
+    </div>
+    <hr class="space"/>
+    <div class="span-17" style="padding:6px">
+    #include $app_main
+    </div>
+    <div class="span-6 last" style="border-left:1px solid #eee;padding:6px 6px 6px 16px">
+      #for $widget in $widgets
+        $show_widget__raw__($widget)
+      #end for
+    </div>
+    <div class="span-24 last" style="background-color:#E5ECF1;padding:6px;text-align:center">
+      <div>Copyright&copy;2010, powered by <a href="http://www.expressme.org" target="_blank">ExpressMe</a></div>
+    </div>
+  </div>
+</body>
+</html>

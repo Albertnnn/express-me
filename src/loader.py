@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+DEPRECATED = True
+
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 '''
@@ -9,31 +11,12 @@ Load template by theme
 
 import os
 
-from exweb import context
-
 import manage
 from manage import shared
 import widget
 
-def load_template(selected=None):
-    '''
-    Load template and return its path.
-    '''
-    themes = manage.get_themes()
-    if selected is None:
-        selected = shared.get_setting('theme', 'selected', '')
-    if not selected in themes:
-        selected = themes[0]
-    return ('theme', selected, 'template.html')
-
 def update_model(rootpath, appname, model):
-    model['site'] = {
-            'title' : shared.get_setting('global', 'site_title', 'ExpressMe'),
-            'subtitle' : shared.get_setting('global', 'site_subtitle', 'powered by ExpressMe')
-    }
-    model['navigations'] = manage.get_navigations()
-    model['user'] = context.user
-    model['app'] = appname
+
     # set current theme = 'simple':
     theme = shared.get_setting('theme', 'selected', '')
     if not theme:
@@ -49,15 +32,6 @@ def update_model(rootpath, appname, model):
     model['widgets'] = instances
     model['show_widget__raw__'] = show_widget
     logging.warning('loaded ' + str(instances))
-
-    # set app_main to path:
-    app_main = os.path.join(rootpath, 'theme', theme, appname + '.main.html')
-    if not os.path.exists(app_main):
-        app_main = os.path.join(rootpath, appname, 'main.html')
-    model['app_main'] = app_main
-    model['format_datetime'] = lambda d : d.strftime('%Y-%m-%d %H:%M:%S')
-    model['format_date'] = lambda d : d.strftime('%Y-%m-%d')
-    model['format_time'] = lambda d : d.strftime('%H:%M:%S')
 
 def show_widget(w_instance):
     import logging

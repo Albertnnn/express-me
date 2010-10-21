@@ -1,0 +1,74 @@
+<!-- blog app main template -->
+
+
+<div id="app-blog-post">
+  <div style="clear:both">
+    <h3 class="blog-post-title">${post.post_title}</h3>
+    <div class="blog-post-info"><a href="/blog/cat/${post.post_category.key}">${post.post_category.category_name}</a>, published at $format_datetime($post.post_date)</div>
+    <div class="blog-post-content">${post.post_content__raw__}</div>
+  </div>
+</div>
+
+<div id="app-comment">
+  <h3 class="comment-title">${comments.__len__} Responses</h3>
+  #for $c in $comments
+  <div style="margin:6px">
+    <div style="float:left;margin-right:10px;width:60px;height:100%;margin:0px;padding:6px;">
+      <a name="${c.key}"></a><img src="/static/image/guest.png" width="48" height="48" border="0" style="margin:0px" />
+    </div>
+    <div style="margin-right:0px;margin-left:72px">
+      ${c.comment_content}
+      <p style="font-style:italic">${c.comment_user} posted on $format_datetime($c.comment_date) from ${c.comment_ip}</p>
+    </div>
+    <div style="clear:both"></div>
+  </div>
+  #end for
+</div>
+
+<!-- begin comment -->
+<script type="text/javascript">
+function check_comment_form_is_empty(s){
+  var regex_patt=/^\s*$/g;
+  return regex_patt.test(s);
+}
+function check_comment_form(){
+  if (check_comment_form_is_empty(document.getElementById("comment_content").value)){
+    alert("You must enter comment content!");
+    return false;
+  }
+  return true;
+}
+</script>
+<div id="app-comment-post" style="padding:6px;margin:0px">
+  <h3 class="comment-title">Write a Response</h3>
+  <form name="comment" action="/blog/comment" method="post" onsubmit="return check_comment_form()">
+    <input type="hidden" name="id" value="${post.key}" />
+    <input type="hidden" name="type" value="BlogPost" />
+    <div style="clear:both">
+      <div style="float:left;width:120px;">Your name (Optional):</div>
+      <div style="margin-left:140px;margin-right:0px"><input type="text" id="comment_name" name="name" maxlength="50" style="width:360px"
+      #if $user
+        value="${user.user_nicename}"
+      #end if
+      /></div>
+    </div>
+    <div style="clear:both">
+      <div style="float:left;width:120px;">Your URL (Optional):</div>
+      <div style="margin-left:140px;margin-right:0px"><input type="text" id="comment_link" name="link" maxlength="250" style="width:360px"
+      #if $user
+        value="${user.user_website}"
+      #end if
+      /></div>
+    </div>
+    <div style="clear:both">
+      <div style="float:left;width:120px;">Your comment:</div>
+      <div style="margin-left:140px;margin-right:0px"><textarea id="comment_content" name="content" rows="8" style="width:360px"></textarea></div>
+    </div>
+    <div style="clear:both">
+      <div style="margin-left:140px;margin-right:0px"><input type="submit" name="submit" value="Save" /></div>
+    </div>
+  </form>
+</div>
+<!-- end comment -->
+
+<!-- end blog app main template -->

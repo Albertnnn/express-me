@@ -10,8 +10,6 @@ from random import randint
 from google.appengine.api import urlfetch
 from google.appengine.runtime import apiproxy_errors
 
-from exweb import HttpNotFoundError
-
 import widget
 
 IGNORE_HEADERS = frozenset([

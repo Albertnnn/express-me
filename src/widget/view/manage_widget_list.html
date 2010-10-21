@@ -1,0 +1,88 @@
+<!-- begin manage_page_list.html -->
+<script type="text/javascript">
+var g_app = '${app}';
+var g_command = '${command}';
+//#raw
+$(function() {
+    $('#select_all').change(function() {
+        if ($('#select_all').is(':checked')) {
+            $('.select-p').attr('checked', 'checked');
+            $('.tr-hover').addClass('tr-selected');
+        }
+        else {
+            $('.select-p').removeAttr('checked');
+            $('.tr-hover').removeClass('tr-selected');
+        }
+    });
+    $('.select-p').click(function() {
+        if ($(this).is(':checked')) {
+            $(this).parent().parent().parent().addClass('tr-selected');
+        }
+        else {
+            $(this).parent().parent().parent().removeClass('tr-selected');
+        }
+        if ($('input.select-p:checked').length==$('input.select-p').length) {
+            $('#select_all').attr('checked', 'checked');
+        }
+        else {
+            $('#select_all').removeAttr('checked');
+        }
+	});
+});
+//#end raw
+</script>
+<div class="panel box-round">
+  <div class="panel-title"><div>All Widgets</div></div>
+  <div class="panel-content">
+  <form id="edit_form" action="/manage/" method="post">
+  	<input type="hidden" name="app" value="${app}" />
+  	<input type="hidden" name="command" value="${command}" />
+  	<input type="hidden" id="btn" name="btn" value="" />
+  	<input type="hidden" id="pid" name="id" value="" />
+    <div class="th bottom-line">
+      <div class="span-1"><div><input type="checkbox" id="select_all" name="select_all" /></div></div>
+      <div class="span-10"><div>Title</div></div>
+      <div class="span-5"><div>Author</div></div>
+      <div class="span-1"><div><img src="/blog/static/image/comment.png" width="16" height="16" alt="Comments" title="Comments" /></div></div>
+      <div class="span-3 last"><div>Date</div></div>
+    </div>
+  #if not $ps
+    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No page found that match the filter.</div></div></div>
+  #end if
+  #for $p in $ps
+    <div class="tr tr-hover">
+      <div class="span-1"><div><input type="checkbox" name="u" class="select-p" value="${p.id}" /></div></div>
+      <div class="span-10">
+      	<div style="font-weight:bold">
+          <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">${p.title}</a>
+        </div>
+        <div>
+          #if $p.state==0
+            <strong>Published</strong>: <a href="javascript:submit_form('unpublish', '${p.id}')">Unpublish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a> | <a href="/blog/${p.url()}" target="_blank">View</a>
+          #elif $p.state==2
+            <strong>Draft</strong>: <a href="javascript:submit_form('publish', '${p.id}')">Publish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a>
+          #elif $p.state==3
+		    <strong>Deleted</strong>: <a href="javascript:submit_form('undelete', '${p.id}')">Restore</a> | <a href="javascript:submit_form('perm_delete', '${p.id}')">Delete Permanently</a>
+          #end if
+		</div>
+      </div>
+      <div class="span-5"><div>${p.author}</div></div>
+      <div class="span-1"><div>0</div></div>
+      <div class="span-3 last">
+      	<div>$utils.format_date($p.creation_date)</div>
+        <div>$utils.format_time($p.creation_date)</div>
+      </div>
+    </div>
+  #end for
+  	<div class="tr top-line">
+      <div class="span-19 last">
+        <div>
+          <button type="button" name="add" id="add">Add New</button>
+          <button type="button" name="delete" id="delete">Delete</button>
+        </div>
+      </div>
+  	</div>
+  </div>
+  </form>
+</div>
+<!-- end manage_page_list.html -->

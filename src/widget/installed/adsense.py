@@ -9,15 +9,10 @@ import widget
 
 class Widget(widget.WidgetModel):
 
-    widget_name = 'Google Adsense'
-    widget_author = 'Michael Liao'
-    widget_description = 'Display Google Adsense'
-    widget_url = 'http://michael.liaoxuefeng.com/'
-
     '''
     Display Google Adsense
     '''
-    pub_id = widget.WidgetSetting(description='Publisher ID', required=True)
+    pub_id = widget.WidgetSetting(description='Publisher ID', required=True, pattern=r'^pub\-[0-9]+$')
     ad_slot = widget.WidgetSetting(description='Ad. Slot', required=True)
     ad_width = widget.WidgetSetting(description='Ad. Width', required=True)
     ad_height = widget.WidgetSetting(description='Ad. Height', required=True)

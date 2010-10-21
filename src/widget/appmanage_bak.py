@@ -3,26 +3,24 @@
 
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
+DEPRECATED = True
+
 '''
 Blog app management.
 '''
 
-from framework import store
+import widget
+import copy
 
-from manage import AppMenu
-from manage import AppMenuItem
+from manage import shared
+from widget import store
 
-from widget import model
-
-def get_menus():
-    '''
-    Get menus for management.
-    '''
-    widget = AppMenu('Widget',
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'All Widgets', 'list'),
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit')
-    )
-    return (widget,)
+appmenus = [
+        ('Widget', [
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'List', 'list_widget'),
+                shared.AppMenuItem(shared.USER_ROLE_ADMINISTRATOR, 'Edit', 'edit_instance')
+        ])
+]
 
 def manage_nav():
     '''
@@ -33,7 +31,10 @@ def manage_nav():
     '''
     return []
 
-
+def manage_app(user, action, **args):
+    f = ''.join(['__handle_', context.method, '_', action, '()'])
+    # we are going to call function by name '__handle_' + (get or post) + _ + action
+    return eval(f)
 
 def get_default_settings(w):
     attr_list = dir(w)
@@ -144,37 +145,3 @@ def widget_setting_to_html(name, widget_setting):
     if isinstance(widget_setting, widget.WidgetPasswordSetting):
         return '<input name="%s" type="password" value="%s" maxlength="255" class="widget-input"/>' % (name, widget_setting.value)
     return '<input name="%s" type="text" value="%s" maxlength="255" class="widget-input"/>' % (name, widget_setting.value)
-
-
-
-
-
-
-
-#-----------------------------------------------------
-
-def __get_widget_class_info(cls):
-    name = getattr(cls, '__name__', cls.__module__[17:])
-    description = getattr(cls, '__description__', name)
-    author = getattr(cls, '__author__', '(unknown)')
-    url = getattr(cls, '__url__', None)
-    return {
-            'name' : name,
-            'description' : description,
-            'author' : author,
-            'url' : url,
-    }
-
-def _list(user, app, context):
-    classes = model.get_installed_widgets()
-    
-    return {
-            'view' : 'manage_widget_list',
-            'widgets' : [__get_widget_class_info(cls) for cls in classes],
-    }
-
-def manage(user, app, command, context):
-    map = {
-           'list' : _list,
-    }
-    return map[command](user, app, context)

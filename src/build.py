@@ -92,22 +92,28 @@ def compile_view(root_path):
     appdirs.sort()
     count = 0
     for app in appdirs:
-        count += _compile_dir(root_path, app)
+        if app=='theme':
+            import theme
+            themes = theme.get_themes(False)
+            for t in themes:
+                count += _compile_dir(root_path, app, view_dir=t)
+        else:
+            count += _compile_dir(root_path, app)
     # make sure __init__.py under root_path/compiled:
     _gen_init_py(os.path.join(root_path, 'compiled'))
     print 'total %d view(s) compiled.' % count
 
-def _compile_dir(root_path, app):
-    print 'compile views for app "%s"...' % app
-    all_views = os.listdir(os.path.join(root_path, app, 'view'))
-    views = [v for v in all_views if os.path.isfile(os.path.join(root_path, app, 'view', v))]
+def _compile_dir(root_path, app, view_dir='view'):
+    print 'compile views in "%s" for app "%s"...' % (view_dir, app)
+    all_views = os.listdir(os.path.join(root_path, app, view_dir))
+    views = [v for v in all_views if os.path.isfile(os.path.join(root_path, app, view_dir, v))]
     count = 0
     for v in views:
         if v.endswith('.html'):
             print '  compile "%s"...' % v
             mod_name = v[:-5]
-            content = view.compile_template(app, mod_name)
-            content_dir = os.path.join(root_path, 'compiled', app)
+            content = view.compile_template(app, mod_name, view_dir=view_dir)
+            content_dir = os.path.join(root_path, 'compiled', app, view_dir)
             _mkdirs(content_dir)
             _gen_init_py(content_dir)
             file = os.path.join(content_dir, '%s.py' % mod_name)
@@ -115,6 +121,9 @@ def _compile_dir(root_path, app):
             f.write(content)
             f.close()
             count += 1
+    app_dir = os.path.join(root_path, 'compiled', app)
+    _mkdirs(app_dir)
+    _gen_init_py(app_dir)
     print '%d view(s) compiled.' % count
     return count
 
