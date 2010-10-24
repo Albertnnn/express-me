@@ -45,7 +45,7 @@ def get_all_public_posts(**kw):
     return {
             '__theme__' : True,
             '__view__' : 'posts',
-            '__title__' : 'Blog posts',
+            '__title__' : 'All posts',
             '__header__' : _get_feed_html(),
             'posts' : posts,
             'index' : index,
@@ -80,7 +80,7 @@ def get_posts_by_category(cat_key, **kw):
     return {
             '__theme__' : True,
             '__view__' : 'posts',
-            '__title__' : 'Category %s' % category.name,
+            '__title__' : 'Posts of %s' % category.name,
             '__header__' : _get_feed_html(),
             'category' : category,
             'posts' : posts,
@@ -101,8 +101,9 @@ def get_post(key):
     if post is None:
         raise NotFoundError()
     return {
-            '__view__' : 'posts',
-            '__title__' : post.post_title,
+            '__theme__' : True,
+            '__view__' : 'post',
+            '__title__' : post.title,
             'post' : post,
             'comments' : store.get_all_comments(post.id),
     }
