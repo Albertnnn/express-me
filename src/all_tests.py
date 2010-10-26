@@ -24,7 +24,7 @@ def _search_tests(path, package, depth):
     return L
 
 if __name__ == '__main__':
-    pwd = os.path.split(__file__)[0]
+    pwd = os.path.split(os.path.abspath(__file__))[0]
     tests = _search_tests(pwd, '', 0)
     suites = [unittest.defaultTestLoader.loadTestsFromName(test) for test in tests]
     unittest.TextTestRunner().run(unittest.TestSuite(suites))
