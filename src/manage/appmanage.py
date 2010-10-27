@@ -75,7 +75,7 @@ def _edit_user(user, app, context):
             return __get_edit_user(user, app, context)
 
 def __get_navigation(context):
-    selections = [('- Select -', '#'), ('Home', '/')]
+    selections = [('- Select -', '#'), ('home', '/')]
     for appname in appconfig.apps:
         mod = __import__(appname, fromlist=['appmanage']).appmanage
         get_nav = getattr(mod, 'get_navigation', None)

@@ -1,0 +1,12 @@
+<!-- blog app posts -->
+
+<div id="app-blog-posts">
+  #for $post in $posts
+  <div style="clear:both">
+    <h3 class="blog-post-title"><a href="/blog/post/${post.id}">${post.title}</a></h3>
+    <div class="blog-post-info"><a href="/blog/cat/${post.category.id}">${post.category.name}</a>, published at ${utils.format_datetime($post.creation_date)}</div>
+  </div>
+  #end for
+</div>
+
+<!-- end blog app posts -->

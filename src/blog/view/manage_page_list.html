@@ -83,7 +83,7 @@ $(function() {
       <div class="span-3 last"><div>Date</div></div>
     </div>
   #if not $ps
-    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No page found that match the filter.</div></div></div>
+    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No page found. <a href="/manage/?app=${app}&command=add_page">Create a new page</a></div></div></div>
   #end if
   #for $p in $ps
     <div class="tr tr-hover">
