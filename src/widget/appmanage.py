@@ -24,16 +24,11 @@ def get_menus():
     )
     return (widget,)
 
-def manage_nav():
+def get_navigation():
     '''
-    Get app's navigation settings so user can customize their navigation bar.
-    
-    Returns:
-        A list contains (title, url).
+    Get navigation menu.
     '''
     return []
-
-
 
 def get_default_settings(w):
     attr_list = dir(w)
@@ -167,9 +162,8 @@ def __get_widget_class_info(cls):
 
 def _list(user, app, context):
     classes = model.get_installed_widgets()
-    
     return {
-            'view' : 'manage_widget_list',
+            '__view__' : 'manage_widget_list',
             'widgets' : [__get_widget_class_info(cls) for cls in classes],
     }
 

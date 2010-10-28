@@ -1,4 +1,4 @@
-<!-- begin manage_page_list.html -->
+<!-- begin manage_widget_list.html -->
 <script type="text/javascript">
 var g_app = '${app}';
 var g_command = '${command}';
@@ -46,32 +46,23 @@ $(function() {
       <div class="span-1"><div><img src="/blog/static/image/comment.png" width="16" height="16" alt="Comments" title="Comments" /></div></div>
       <div class="span-3 last"><div>Date</div></div>
     </div>
-  #if not $ps
-    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No page found that match the filter.</div></div></div>
+  #if not $widgets
+    <div class="tr"><div class="span-20 last"><div style="padding: 16px; text-align:center; font-style:italic;">No widget installed.</div></div></div>
   #end if
-  #for $p in $ps
+  #for $w in $widgets
     <div class="tr tr-hover">
-      <div class="span-1"><div><input type="checkbox" name="u" class="select-p" value="${p.id}" /></div></div>
+      <div class="span-1"><div><input type="checkbox" name="u" class="select-p" value="${w.name}" /></div></div>
       <div class="span-10">
       	<div style="font-weight:bold">
-          <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">${p.title}</a>
+          <a href="?app=${app}&command=${command}&btn=edit&id=${w.name}">${w.description}</a>
         </div>
         <div>
-          #if $p.state==0
-            <strong>Published</strong>: <a href="javascript:submit_form('unpublish', '${p.id}')">Unpublish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a> | <a href="/blog/${p.url()}" target="_blank">View</a>
-          #elif $p.state==2
-            <strong>Draft</strong>: <a href="javascript:submit_form('publish', '${p.id}')">Publish</a> | <a href="?app=${app}&command=${command}&btn=edit&id=${p.id}">Edit</a> | <a href="javascript:submit_form('delete', '${p.id}')">Delete</a>
-          #elif $p.state==3
-		    <strong>Deleted</strong>: <a href="javascript:submit_form('undelete', '${p.id}')">Restore</a> | <a href="javascript:submit_form('perm_delete', '${p.id}')">Delete Permanently</a>
-          #end if
+          aaa
 		</div>
       </div>
-      <div class="span-5"><div>${p.author}</div></div>
+      <div class="span-5"><div>${w.author}</div></div>
       <div class="span-1"><div>0</div></div>
-      <div class="span-3 last">
-      	<div>$utils.format_date($p.creation_date)</div>
-        <div>$utils.format_time($p.creation_date)</div>
-      </div>
+      <div class="span-3 last">wwww</div>
     </div>
   #end for
   	<div class="tr top-line">
@@ -85,4 +76,4 @@ $(function() {
   </div>
   </form>
 </div>
-<!-- end manage_page_list.html -->
+<!-- end manage_widget_list.html -->
