@@ -9,4 +9,4 @@ Configuration of web application.
 
 # installed app list:
 
-apps = ('blog', 'manage', 'theme') #('blog', 'wiki', 'manage', 'widget', 'util' )
+apps = ('blog', 'manage', 'theme', 'widget') #('blog', 'wiki', 'manage', 'widget', 'util' )
