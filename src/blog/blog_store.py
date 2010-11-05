@@ -12,12 +12,6 @@ class BlogPostMeta(db.Model):
     meta_key = db.StringProperty(required=True)
     meta_values = db.StringListProperty()
 
-class BlogTag(db.Model):
-    'a tag object'
-    tag_name = db.StringProperty(required=True)
-    tag_nicename = db.StringProperty(required=True)
-    tag_count = db.IntegerProperty(required=True, default=0)
-
 def get_tag(key):
     '''
     get tag object by key.
