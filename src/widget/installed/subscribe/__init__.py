@@ -11,10 +11,10 @@ class Widget(widget.WidgetModel):
     '''
     Show rss or atom feed
     '''
-    widget_name = 'Subscribe'
-    widget_author = 'Michael Liao'
-    widget_description = 'Subscribe the feed'
-    widget_url = 'http://michael.liaoxuefeng.com/'
+    __title__ = 'Subscribe To'
+    __author__ = 'Michael Liao'
+    __description__ = 'Subscribe the feed to readers'
+    __url__ = 'http://www.expressme.org/'
 
     def get_content(self):
         url = shared.get_setting('blog_setting', 'feed_proxy', '/blog/feed')

@@ -9,10 +9,10 @@ import widget
 
 class Widget(widget.WidgetModel):
 
-    __url__ = 'http://michael.liaoxuefeng.com'
-    __name__ = 'Google AdSense'
-    __author__ = 'Michael Liao'
+    __title__ = 'Google AdSense'
     __description__ = 'Display A.D. of your Google AdSense account.'
+    __author__ = 'Michael Liao'
+    __url__ = 'http://www.expressme.org/'
 
     widget_name = 'Google Adsense'
     widget_author = 'Michael Liao'

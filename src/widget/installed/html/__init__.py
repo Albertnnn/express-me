@@ -5,10 +5,10 @@ import widget
 
 class Widget(widget.WidgetModel):
 
-    widget_name = 'HTML Snippet'
-    widget_author = 'Michael Liao'
-    widget_description = 'Display any HTML snippet'
-    widget_url = 'http://michael.liaoxuefeng.com/'
+    __title__ = 'HTML Snippet'
+    __author__ = 'Michael Liao'
+    __description__ = 'Display any HTML snippet'
+    __url__ = 'http://www.expressme.org/'
 
     '''
     Show any html snippet.

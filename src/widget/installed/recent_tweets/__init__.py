@@ -31,10 +31,10 @@ class Widget(widget.WidgetModel):
     '''
     Show recent tweets
     '''
-    widget_name = 'Tweets'
-    widget_author = 'Michael Liao'
-    widget_description = 'Show recent tweets'
-    widget_url = 'http://michael.liaoxuefeng.com/'
+    __title__ = 'Recent Tweets'
+    __author__ = 'Michael Liao'
+    __description__ = 'Show your recent tweets'
+    __url__ = 'http://www.expressme.org/'
 
     username = widget.WidgetSetting(description='Twitter username', required=True, default='')
     recent_tweets = widget.WidgetSetting(description='How many recent tweets to display', required=True, default='20')

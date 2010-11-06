@@ -12,14 +12,16 @@ from framework import cache
 
 def get_installed_widgets():
     '''
-    Get installed widgets as list containing module name.
+    Get installed widgets as dict containing key=package_name, value=class object.
     '''
     installed_path = os.path.join(os.path.split(__file__)[0], 'installed')
     packages = os.listdir(installed_path)
     valid_packages = [pkg for pkg in packages if os.path.isfile(os.path.join(installed_path, pkg, '__init__.py'))]
-    valid_packages.sort()
-    classes = [__import__('widget.installed.%s' % name, fromlist=['Widget']).Widget for name in valid_packages]
-    return classes
+    d = {}
+    for pkg_name in valid_packages:
+        cls = __import__('widget.installed.%s' % pkg_name, fromlist=['Widget']).Widget
+        d[pkg_name] = cls
+    return d
 
 def load_widget_class(name):
     return __import__('widget.installed.%s' % name, fromlist='Widget').Widget

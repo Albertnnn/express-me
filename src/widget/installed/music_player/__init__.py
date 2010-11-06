@@ -9,10 +9,10 @@ import widget
 
 class Widget(widget.WidgetModel):
 
-    widget_name = 'Music Player'
-    widget_author = 'Michael Liao'
-    widget_description = 'Play music online'
-    widget_url = 'http://michael.liaoxuefeng.com/'
+    __title__ = 'Music Player'
+    __author__ = 'Michael Liao'
+    __description__ = 'Play a music online'
+    __url__ = 'http://www.expressme.org/'
 
     '''
     Play music

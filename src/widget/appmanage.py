@@ -4,7 +4,7 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 '''
-Blog app management.
+Widget app management.
 '''
 
 from framework import store
@@ -148,23 +148,26 @@ def widget_setting_to_html(name, widget_setting):
 
 #-----------------------------------------------------
 
-def __get_widget_class_info(cls):
-    name = getattr(cls, '__name__', cls.__module__[17:])
-    description = getattr(cls, '__description__', name)
+def __get_widget_class_info(pkg_name, cls):
+    title = getattr(cls, '__title__', pkg_name)
+    description = getattr(cls, '__description__', '(no description)')
     author = getattr(cls, '__author__', '(unknown)')
     url = getattr(cls, '__url__', None)
     return {
-            'name' : name,
+            'id' : pkg_name,
+            'title' : title,
             'description' : description,
             'author' : author,
             'url' : url,
     }
 
 def _list(user, app, context):
-    classes = model.get_installed_widgets()
+    widgets = model.get_installed_widgets()
+    widgets_infos = [__get_widget_class_info(pkg_name, cls) for pkg_name, cls in widgets.iteritems()]
+    widgets_infos.sort(cmp=lambda d1, d2: d1['title'].lower()<d2['title'].lower() and -1 or 1)
     return {
             '__view__' : 'manage_widget_list',
-            'widgets' : [__get_widget_class_info(cls) for cls in classes],
+            'widgets' : widgets_infos,
     }
 
 def manage(user, app, command, context):
