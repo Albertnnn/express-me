@@ -15,16 +15,16 @@ ${__header____raw__}
 <body>
   <div class="container">
     <hr class="space"/>
-    <div class="span-23 last" style="text-align:right">
+    <div class="span-24 last" style="text-align:right">
     #if $user
       Welcome, <a href="/manage/" target="_blank">${user.nicename}</a> | <a href="/manage/signout">Sign Out</a>
     #else
       <a href="/manage/signin">Sign In</a> | <a href="/manage/register">Register</a>
     #end if
     </div>
-    <h1><a href="/">${site.title}</a></h1>
+    <div class="span-24 last"><h1><a href="/">${site.title}</a></h1></div>
     <hr/>
-    <h2 class="alt">${site.subtitle}</h2>
+    <div class="span-24 last"><h2 class="alt">${site.subtitle}</h2></div>
     <hr/>
     <div class="span-24 last">
       <h3>
