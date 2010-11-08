@@ -20,7 +20,7 @@ def get_menus():
     '''
     widget = AppMenu('Widget',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'All Widgets', 'list'),
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit')
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Widget Bars', 'edit')
     )
     return (widget,)
 
