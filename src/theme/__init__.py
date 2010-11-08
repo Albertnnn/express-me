@@ -24,7 +24,20 @@ def get_themes(use_cache=True):
     '''
     theme_root = os.path.dirname(__file__)
     theme_dirs = os.listdir(theme_root)
-    return [t for t in theme_dirs if os.path.isfile(os.path.join(theme_root, t, 'template.html'))]
+    return [t for t in theme_dirs if os.path.isfile(os.path.join(theme_root, t, 'template.html')) and os.path.isfile(os.path.join(theme_root, t, '__init__.py'))]
+
+def get_theme_info(theme_name):
+    '''
+    Get theme info as dict.
+    '''
+    mod = __import__('theme.%s' % theme_name, fromlist=[theme_name])
+    return {
+            'id' : theme_name,
+            'title' : getattr(mod, '__title__', theme_name),
+            'designer' : getattr(mod, '__designer__', '(unknown)'),
+            'description' : getattr(mod, '__description__', '(no description)'),
+            'url' : getattr(mod, '__url__', None),
+    }
 
 def get_theme():
     '''

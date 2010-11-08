@@ -14,21 +14,24 @@ from framework import store
 from manage import AppMenu
 from manage import AppMenuItem
 
+import theme
+
 def get_menus():
     '''
     Get menus for management.
     '''
     theme = AppMenu('Theme',
-            AppMenuItem(store.ROLE_CONTRIBUTOR, 'Edit', 'edit_theme'),
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Edit', 'edit_theme'),
     )
     return (theme,)
 
 def _edit_theme(user, app, context):
     if context.method=='get':
+        themes = theme.get_themes(False)
         return {
-                '__view__' : 'manage_editor',
-                'post' : __empty_post(user, False),
-                'categories' : model.get_categories(),
+                '__view__' : 'manage_edit_theme',
+                'current' : theme.get_theme(),
+                'themes' : [theme.get_theme_info(t) for t in themes],
         }
     if context.method=='post':
         title = context.get_argument('title')

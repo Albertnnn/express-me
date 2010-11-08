@@ -1,0 +1,49 @@
+<!-- begin manage_edit_theme.html -->
+<script type="text/javascript">
+var current_theme = '${current}';
+//#raw
+$(function() {
+    $('.btn-apply').click(function() {
+        if (confirm('Do you want to use the theme "' + $(this).attr('themetitle') + '"?')) {
+            $('.btn-apply').attr('disabled', 'disabled');
+            // set default theme:
+            $(this).attr('themeid');
+        }
+    });
+    $('.btn-preview').click(function(){
+        $(this).attr('themeid');
+    });
+    $('#span-' + current_theme).show();
+    $('#theme-' + current_theme + ' .btn-apply').attr('disabled', 'disabled');
+});
+//#end raw
+</script>
+<div class="panel box-round">
+  <div class="panel-title"><div>Installed Themes</div></div>
+  <div class="panel-content">
+  	<input type="hidden" name="app" value="${app}" />
+  	<input type="hidden" name="command" value="${command}" />
+    <div class="th bottom-line">
+      <div class="span-6"><div>Snapshot</div></div>
+      <div class="span-10"><div>Details</div></div>
+      <div class="span-4 last"><div></div></div>
+    </div>
+  #for $theme in $themes
+    <div id="theme-${theme.id}" class="tr tr-hover">
+      <div class="span-6"><div><img src="/theme/${theme.id}/static/preview.png" width="200" height="100" style="border:solid 1px #ccc" /></div></div>
+      <div class="span-10">
+        <div><span style="font-weight:bold">${theme.title}</span><span id="span-${theme.id}" style="display:none"> - Your current theme</span></div>
+        <div style="font-style:italic">by ${theme.designer}</div>
+        <div>${theme.description}</div>
+      </div>
+      <div class="span-4 last"><div><button name="preview" themeid="${theme.id}" class="btn-preview">Preview</button> <button name="apply" themeid="${theme.id}" themetitle="${theme.title}" class="btn-apply">Apply</button></div></div>
+    </div>
+  #end for
+  	<div class="tr top-line">
+      <div class="span-19 last">
+        <div>Visit ExpressMe official web site to <a href="http://www.expressme.org/blog/c/themes" target="_blank">get more themes</a>.</div>
+      </div>
+  	</div>
+  </div>
+</div>
+<!-- end manage_edit_theme.html -->
