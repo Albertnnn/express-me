@@ -65,10 +65,8 @@ def do_manage(**kw):
                             selected_menu = fm
                             break
     # check permission:
-    if selected_menu_item is None:
+    if selected_menu_item is None or selected_menu_item.role < current_user.role:
         raise ApplicationError('No command found.')
-    if selected_menu_item.role < current_user.role:
-        raise PermissionError('You do not have permission to access this resource.')
     model = {
             'user' : current_user,
             'app' : app,
