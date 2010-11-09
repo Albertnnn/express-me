@@ -36,9 +36,7 @@ ${site.title}</title>
       #end for
     </div>
     <hr class="space"/>
-    <div class="span-17" style="padding:6px">
-    #include $app_main
-    </div>
+    <div class="span-17" style="padding:6px">${__app____raw__}</div>
     <div class="span-6 last" style="border-left:1px solid #eee;padding:6px 6px 6px 16px">
       #for $widget in $widgets
         $show_widget__raw__($widget)

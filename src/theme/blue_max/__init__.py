@@ -5,4 +5,4 @@ __title__ = 'Blue Max'
 __designer__ = 'Michael Liao (askxuefeng@gmail.com)'
 __description__ = 'A Blue Max theme provided by Blue Sky'
 __url__ = 'http://www.expressme.org/'
-__bars__ = 2
+__sidebars__ = 2

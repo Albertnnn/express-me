@@ -37,9 +37,10 @@ def get_theme_info(theme_name):
             'designer' : getattr(mod, '__designer__', '(unknown)'),
             'description' : getattr(mod, '__description__', '(no description)'),
             'url' : getattr(mod, '__url__', None),
+            'sidebars' : getattr(mod, '__sidebars__', 0),
     }
 
-def get_theme():
+def get_current_theme():
     '''
     Get default theme
     '''
@@ -50,7 +51,7 @@ def render(appname, app_model, **kw):
     '''
     Render model with theme.
     '''
-    th = get_theme()
+    th = get_current_theme()
     logging.info('render using theme "%s"...' % th)
     # load widget:
     # TODO...

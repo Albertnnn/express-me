@@ -30,9 +30,9 @@ $(function() {
     </div>
   #for $theme in $themes
     <div id="theme-${theme.id}" class="tr tr-hover">
-      <div class="span-6"><div><img src="/theme/${theme.id}/static/preview.png" width="200" height="100" style="border:solid 1px #ccc" /></div></div>
+      <div class="span-6"><div><img src="/theme/${theme.id}/static/preview.png" width="200" height="120" style="border:solid 1px #ccc" /></div></div>
       <div class="span-10">
-        <div><span style="font-weight:bold">${theme.title}</span><span id="span-${theme.id}" style="display:none"> - Your current theme</span></div>
+        <div><span style="font-weight:bold">${theme.title}<span id="span-${theme.id}" style="display:none"> - <span style="color:red">Your current theme</span></span></span></div>
         <div style="font-style:italic">by ${theme.designer}</div>
         <div>${theme.description}</div>
       </div>
