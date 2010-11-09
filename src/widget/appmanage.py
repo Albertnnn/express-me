@@ -13,14 +13,15 @@ from manage import AppMenu
 from manage import AppMenuItem
 
 from widget import model
+import theme
 
 def get_menus():
     '''
     Get menus for management.
     '''
     widget = AppMenu('Widget',
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'All Widgets', 'list'),
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Widget Bars', 'edit')
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'All Widgets', 'list_widget'),
+            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Sidebars', 'edit_sidebar')
     )
     return (widget,)
 
@@ -161,17 +162,30 @@ def __get_widget_class_info(pkg_name, cls):
             'url' : url,
     }
 
-def _list(user, app, context):
+def __get_widget_class_infos():
     widgets = model.get_installed_widgets()
     widgets_infos = [__get_widget_class_info(pkg_name, cls) for pkg_name, cls in widgets.iteritems()]
     widgets_infos.sort(cmp=lambda d1, d2: d1['title'].lower()<d2['title'].lower() and -1 or 1)
+    return widgets_infos
+
+def _list_widget(user, app, context):
     return {
             '__view__' : 'manage_widget_list',
-            'widgets' : widgets_infos,
+            'widgets' : __get_widget_class_infos(),
+    }
+
+def _edit_sidebar(user, app, context):
+    sidebars = []
+    return {
+            '__view__' : 'manage_sidebar',
+            'widgets' : __get_widget_class_infos(),
+            'sidebars' : sidebars,
+            'theme' : theme.get_theme_info(theme.get_current_theme()),
     }
 
 def manage(user, app, command, context):
     map = {
-           'list' : _list,
+           'list_widget' : _list_widget,
+           'edit_sidebar' : _edit_sidebar,
     }
     return map[command](user, app, context)

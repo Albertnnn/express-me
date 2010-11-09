@@ -1,0 +1,77 @@
+<!-- begin manage_widget_list.html -->
+<script type="text/javascript">
+var g_app = '${app}';
+var g_command = '${command}';
+var g_css_sidebar_show = '';
+var g_css_sidebar_hide = '';
+//#raw
+$(function() {
+});
+//#end raw
+</script>
+<div class="panel box-round">
+  <div class="panel-title"><div>All Sidebars</div></div>
+  <div class="panel-content">
+  <form id="edit_form" action="/manage/" method="post">
+  	<input type="hidden" name="app" value="${app}" />
+  	<input type="hidden" name="command" value="${command}" />
+  	<input type="hidden" id="btn" name="btn" value="" />
+  	<input type="hidden" id="pid" name="id" value="" />
+    <div class="tr">
+      <div class="span-6"><div><img src="/theme/${theme.id}/static/sidebars.png" width="200" height="120" style="border:solid 1px #ccc" /></div></div>
+      <div class="span-14 last">
+        <div>Your current theme is <span style="font-weight:bold">${theme.title}</span>. <a href="?app=theme&command=edit_theme">Change the theme</a></div>
+        <div>Your current theme has 2 sidebars.</div>
+        <div>You can <a href="">change the theme</a>.</div>
+        <div>Click to show the sidebar, then drag widgets into it.</div>
+      </div>
+    </div>
+
+    <!-- start sidebar -->
+    <div id="sidebar1" class="tr tr-hover top-line">
+      <div class="span-20 last"><div>Sidebar 1</div></div>
+    </div>
+    <div id="sidebar1-body" class="tr">
+      <!-- start widget in sidebar -->
+      <div id="w-34543" style="padding:0px;margin:6px;border:1px solid #E3E3E3;">
+        <div id="w-34543-header" style="background-color:#F1F1F1;padding:3px 6px;margin:0px;" class="app-menu-hide"><img src="/widget/installed/adsense/static/icon.png" width="16" height="16" /> <span>Title</span> - <a href="">Move Up</a> - <a href="">Move Down</a> - <a href="">Delete</a></div>
+        <div id="w-34543-body" style="border-top:1px solid #E3E3E3;padding:3px 6px;margin:0px;">
+          show settings
+          <div id="w-34543-footer" style="border-top:1px solid #E3E3E3;padding:3px 6px;margin:0px;">
+            <button name="save-widget">Save</button> <button name="cancel-widget">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <!-- end widget in sidebar -->
+      <!-- start widget in sidebar -->
+      <div id="w-34543" style="padding:0px;margin:6px;border:1px solid #E3E3E3;">
+        <div id="w-34543-header" style="background-color:#F1F1F1;padding:3px 6px;margin:0px;" class="app-menu-hide"><img src="/widget/installed/adsense/static/icon.png" width="16" height="16" /> <span>Title</span> - <a href="">Move Up</a> - <a href="">Move Down</a> - <a href="">Delete</a></div>
+        <div id="w-34543-body" style="border-top:1px solid #E3E3E3;padding:3px 6px;margin:0px;">
+          show settings
+          <div id="w-34543-footer" style="border-top:1px solid #E3E3E3;padding:3px 6px;margin:0px;">
+            <button name="save-widget">Save</button> <button name="cancel-widget">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <!-- end widget in sidebar -->
+      <div id="sidebar1-footer" style="padding:3px 6px;margin:0px;">
+        <select name="select-widget">
+          <option value="-" selected="selected">-- Select a widget --</option>
+          #for $w in $widgets
+            <option value="${w.id}">${w.title}</option>
+          #end for
+        </select>
+        <button name="add">Add Widget</button>
+      </div>
+    </div>
+    <!-- end sidebar -->
+
+  	<div class="tr top-line">
+      <div class="span-19 last">
+        <div>Visit ExpressMe official web site to <a href="http://www.expressme.org/blog/c/widgets" target="_blank">get more widgets</a>.</div>
+      </div>
+  	</div>
+  </div>
+  </form>
+</div>
+<!-- end manage_widget_list.html -->
