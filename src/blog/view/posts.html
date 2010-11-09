@@ -8,6 +8,9 @@
     <div class="blog-post-content">${post.content__raw__}</div>
   </div>
   #end for
+  #if not $posts
+  <div>Oh, there is no any post yet!</div>
+  #end if
 </div>
 
 <!-- end blog app posts -->
