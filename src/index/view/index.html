@@ -7,6 +7,9 @@
     <div class="blog-post-info"><a href="/blog/cat/${post.category.id}">${post.category.name}</a>, published at ${utils.format_datetime($post.creation_date)}</div>
   </div>
   #end for
+  #if not $posts
+  <div>Oh, there is no any post yet!</div>
+  #end if
 </div>
 
 <!-- end blog app posts -->
