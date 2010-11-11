@@ -103,7 +103,9 @@ def _navigation(user, app, context):
             if title and url:
                 L.append((title, url,))
         navigation.set_navigation(L)
-        return __get_navigation(context)
+        r = __get_navigation(context)
+        r['info'] = 'Your navigation menu has been saved.'
+        return r
 
 def _profile(user, app, context):
     if context.method=='post':
