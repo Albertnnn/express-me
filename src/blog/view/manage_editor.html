@@ -102,7 +102,13 @@ function validate_form() {
   </div>
   <div class="panel-content">
     <div class="form-field">
-      <div class="form-field-title">Title:</div>
+      <div class="form-field-title">
+        #if $post.static
+          Title of the page:
+        #else
+          Title of the post:
+        #end if
+      </div>
       <div class="form-field-input"><input name="title" type="text" id="title" maxlength="100" style="width:100%" value="${post.title}" /></div>
     </div>
     #if not $post.static

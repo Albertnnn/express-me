@@ -32,7 +32,6 @@ def get_menus():
     setting = AppMenu('Setting',
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Site Configuration', 'site'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Navigation', 'navigation'),
-            AppMenuItem(store.ROLE_ADMINISTRATOR, 'Theme', 'theme'),
             AppMenuItem(store.ROLE_ADMINISTRATOR, 'Storage', 'storage')
     )
     return (user, setting,)
