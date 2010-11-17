@@ -14,11 +14,6 @@ class Widget(widget.WidgetModel):
     __author__ = 'Michael Liao'
     __url__ = 'http://www.expressme.org/'
 
-    widget_name = 'Google Adsense'
-    widget_author = 'Michael Liao'
-    widget_description = 'Display Google Adsense'
-    widget_url = 'http://michael.liaoxuefeng.com/'
-
     '''
     Display Google Adsense
     '''
