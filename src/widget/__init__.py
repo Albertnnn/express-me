@@ -73,7 +73,7 @@ class WidgetCheckedSetting(WidgetSetting):
         '''
         Add label.
         '''
-        default = bool(kw.get('default', False))
+        default = kw.get('default', 'False')
         super(WidgetCheckedSetting, self).__init__(default=default, required=kw.get('required', False), description=kw.get('description', ''), value=kw.get('value'), pattern='^(True|False)$')
         self.label = kw.get('label', '')
 
