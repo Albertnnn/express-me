@@ -2,10 +2,40 @@
 <script type="text/javascript">
 var g_app = '${app}';
 var g_command = '${command}';
-var g_css_sidebar_show = '';
-var g_css_sidebar_hide = '';
+var g_edit_mode = false;
 //#raw
 $(function() {
+  $('.sidebar-title').hover(function(){
+    if (g_edit_mode)
+      $(this).removeClass('hand');
+    else
+      $(this).addClass('hand');
+  },function(){
+    $(this).removeClass('hand');
+  });
+
+  $('.widget-title').hover(function(){
+    if (g_edit_mode)
+      $(this).removeClass('hand');
+    else
+      $(this).addClass('hand');
+  },function(){
+    $(this).removeClass('hand');
+  });
+
+  $('.sidebar-title').click(function(){
+    if (g_edit_mode)
+      return;
+    $('.sidebar-content').hide();
+    $('#' + $(this).parent().attr('id') + ' .sidebar-content').show();
+  });
+
+  $('.widget-title').click(function(){
+    if (g_edit_mode)
+      return;
+    $('.widget-content').hide();
+    $($(this).parent().children().get(1)).show();
+  });
 });
 //#end raw
 </script>
@@ -29,11 +59,93 @@ $(function() {
 
     <!-- start sidebar -->
     <div style="width:770px;margin:0px 10px 10px 10px">
-      <div class="panel" style="width:770px">
-        <div class="panel-title" style="width:770px"><div>Sidebar 1</div></div>
-        <div class="panel-content" style="width:770px">
+      <div id="sidebar0" class="panel sidebar" style="width:770px">
+        <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar 1</div></div>
+        <div class="panel-content sidebar-content" style="width:770px">
           <div class="tr" style="width:770px">
+
             <!-- start widget -->
+            <div style="width:736px;margin:10px">
+              <div class="panel widget" style="width:736px">
+                <div class="panel-title widget-title" style="width:736px"><div>G AdSense</div></div>
+                <div class="panel-content widget-content" style="width:736px">
+                  <div class="form-field">
+                    <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
+                    <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
+                    <div class="form-field-title">Slot (Your Ad slot like <em>123456789</em>):</div>
+                    <div class="form-field-input"><input type="text" name="slot" value="" /></div>
+                    <div class="form-field-title">Size (Your Ad size):</div>
+                    <div class="form-field-input">
+                      <select name="size">
+                        <optgroup label="Recommended">
+                          <option value="300x250">300 x 250 Medium Rectangle</option>
+                          <option value="336x280">336 x 280 Large Rectangle</option>
+                          <option value="728x90">728 x 90 Leaderboard</option>
+                          <option value="160x600">160 x 600 Wide Skyscraper</option>
+                        </optgroup>
+                        <optgroup label="Other - Horizontal">
+                          <option value="468x60">468 x 60 Banner</option>
+                          <option value="234x60">234 x 60 Half Banner</option>
+                        </optgroup>
+                        <optgroup label="Other - Vertical">
+                          <option value="120x600">120 x 600 Skyscraper</option>
+                          <option value="120x240">120 x 240 Vertical Banner</option>
+                        </optgroup>
+                        <optgroup label="Other - Square">
+                          <option value="250x250">250 x 250 Square</option>
+                          <option value="200x200">200 x 200 Small Square</option>
+                          <option value="180x150">180 x 150 Small Rectangle</option>
+                          <option value="125x125">125 x 125 Button</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-field-input"><input type="button" name="save" value="Save" /><input type="button" name="cancel" value="Cancel" /></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end widget -->
+
+            <!-- start widget -->
+            <div style="width:736px;margin:10px">
+              <div class="panel widget" style="width:736px">
+                <div class="panel-title widget-title" style="width:736px"><div>GOOGLE Ad.</div></div>
+                <div class="panel-content widget-content" style="width:736px">
+                  <div class="form-field">
+                    <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
+                    <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
+                    <div class="form-field-title">Slot (Your Ad slot like <em>123456789</em>):</div>
+                    <div class="form-field-input"><input type="text" name="slot" value="" /></div>
+                    <div class="form-field-title">Size (Your Ad size):</div>
+                    <div class="form-field-input">
+                      <select name="size">
+                        <optgroup label="Recommended">
+                          <option value="300x250">300 x 250 Medium Rectangle</option>
+                          <option value="336x280">336 x 280 Large Rectangle</option>
+                          <option value="728x90">728 x 90 Leaderboard</option>
+                          <option value="160x600">160 x 600 Wide Skyscraper</option>
+                        </optgroup>
+                        <optgroup label="Other - Horizontal">
+                          <option value="468x60">468 x 60 Banner</option>
+                          <option value="234x60">234 x 60 Half Banner</option>
+                        </optgroup>
+                        <optgroup label="Other - Vertical">
+                          <option value="120x600">120 x 600 Skyscraper</option>
+                          <option value="120x240">120 x 240 Vertical Banner</option>
+                        </optgroup>
+                        <optgroup label="Other - Square">
+                          <option value="250x250">250 x 250 Square</option>
+                          <option value="200x200">200 x 200 Small Square</option>
+                          <option value="180x150">180 x 150 Small Rectangle</option>
+                          <option value="125x125">125 x 125 Button</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-field-input"><input type="button" name="save" value="Save" /><input type="button" name="cancel" value="Cancel" /></div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- end widget -->
           </div>
         </div>
@@ -43,9 +155,9 @@ $(function() {
 
     <!-- start sidebar -->
     <div style="width:770px;margin:0px 10px 10px 10px">
-      <div class="panel" style="width:770px">
-        <div class="panel-title" style="width:770px"><div>Sidebar 2</div></div>
-        <div class="panel-content" style="width:770px">
+      <div id="sidebar1" class="panel sidebar" style="width:770px">
+        <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar 2</div></div>
+        <div class="panel-content sidebar-content" style="width:770px">
           <div class="tr" style="width:770px">
             <!-- start widget -->
             <div style="width:736px;margin:10px">

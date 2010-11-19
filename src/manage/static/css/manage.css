@@ -144,6 +144,8 @@ button.normal:hover {
 
 .info { font-size:1.1em;font-weight:bold;background-color:#f}
 
+.hand { cursor: pointer; }
+
 span.loading {
 	background-image:url(/manage/static/image/loading.gif);
 	background-repeat:no-repeat;
