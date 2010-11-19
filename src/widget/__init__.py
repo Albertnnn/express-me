@@ -19,7 +19,16 @@ class WidgetSetting(object):
     '''
     __slot__ = ('default', 'required', 'description', 'value', 'pattern')
 
-    def __init__(self, default='', required=False, description='', value=None, pattern='^.*$'):
+    def __init__(self, **kw):
+        '''
+        Init WidgetSetting by kw args that support default='', required=False, 
+        description='', value=None, pattern='^.*$'.
+        '''
+        default = kw.get('default', '')
+        required = kw.get('required', False)
+        description = kw.get('description', '')
+        value = kw.get('value', None)
+        pattern = kw.get('pattern', '^.*$')
         if not isinstance(default, basestring):
             raise ValueError('\'default\' must be str or unicode.')
         if not isinstance(required, bool):
@@ -49,23 +58,24 @@ class WidgetSelectSetting(WidgetSetting):
     '''
     Display as a select input.
     '''
-    def __init__(self, selections, default='', required=False, description='', value=None):
+    def __init__(self, **kw):
         '''
-        Add selections as a list that contains (key, value).
+        Add selections as kw args that contains list of (key, value, group=None).
         '''
-        super(WidgetSelectSetting, self).__init__(default, required, description, value)
-        self.selections = selections
+        super(WidgetSelectSetting, self).__init__(**kw)
+        self.selections = kw.get('selections', [])
 
 class WidgetCheckedSetting(WidgetSetting):
     '''
     Display as a checked input.
     '''
-    def __init__(self, label, default='False', required=False, description='', value=None):
+    def __init__(self, **kw):
         '''
         Add label.
         '''
-        super(WidgetCheckedSetting, self).__init__(default, required, description, value, '^(True|False)$')
-        self.label = label
+        default = bool(kw.get('default', False))
+        super(WidgetCheckedSetting, self).__init__(default=default, required=kw.get('required', False), description=kw.get('description', ''), value=kw.get('value'), pattern='^(True|False)$')
+        self.label = kw.get('label', '')
 
 class WidgetPasswordSetting(WidgetSetting):
     '''
