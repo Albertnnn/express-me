@@ -36,17 +36,25 @@ $(function() {
     $('.widget-content').hide();
     $($(this).parent().children().get(1)).show();
   });
+
+  $('.btn-add-widget').click(function(){
+    var index=$(this).attr('index');
+    var sel = $('#select_widget_' + index);
+    var widget_id = sel.val();
+    if (widget_id=='') {
+      alert('Please select a widget to add.');
+      return;
+    }
+    if (confirm('Add widget \"' + $('#select_widget_'+index+' option:selected').attr('text') + '\"?')) {
+      location.assign('/manage/?app='+g_app+'&command='+g_command+'&btn=add&sidebar='+index+'&widget_id='+widget_id);
+    }
+  });
 });
 //#end raw
 </script>
 <div class="panel box-round">
   <div class="panel-title"><div>All Sidebars</div></div>
   <div class="panel-content">
-  <form id="edit_form" action="/manage/" method="post">
-  	<input type="hidden" name="app" value="${app}" />
-  	<input type="hidden" name="command" value="${command}" />
-  	<input type="hidden" id="btn" name="btn" value="" />
-  	<input type="hidden" id="pid" name="id" value="" />
     <div class="tr">
       <div class="span-6"><div><img src="/theme/${theme.id}/static/sidebars.png" width="200" height="120" style="border:solid 1px #ccc" /></div></div>
       <div class="span-14 last">
@@ -66,7 +74,7 @@ $(function() {
             <div style="width:736px;margin:10px">
               <div class="panel widget" style="width:736px">
                 <div class="panel-title widget-title" style="width:736px"><div>G AdSense</div></div>
-                <div class="panel-content widget-content" style="width:736px">
+                <div class="panel-content widget-content" style="width:736px;display:none">
                   <div class="form-field">
                     <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
                     <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
@@ -108,7 +116,7 @@ $(function() {
             <div style="width:736px;margin:10px">
               <div class="panel widget" style="width:736px">
                 <div class="panel-title widget-title" style="width:736px"><div>GOOGLE Ad.</div></div>
-                <div class="panel-content widget-content" style="width:736px">
+                <div class="panel-content widget-content" style="width:736px;display:none">
                   <div class="form-field">
                     <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
                     <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
@@ -145,6 +153,16 @@ $(function() {
               </div>
             </div>
             <!-- end widget -->
+
+            <div style="width:736px;margin:10px 20px;">
+              <select id="select_widget_0" name="select_widget">
+              #for $w in $widgets
+                <option value="${w.id}">${w.title}</option>
+              #end for
+              </select>
+              <button name="add_widget" index="0" type="button" class="btn-add-widget">Add Widget</button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -155,13 +173,13 @@ $(function() {
     <div style="width:770px;margin:0px 10px 10px 10px">
       <div id="sidebar1" class="panel sidebar" style="width:770px">
         <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar 2</div></div>
-        <div class="panel-content sidebar-content" style="width:770px">
+        <div class="panel-content sidebar-content" style="width:770px;display:none">
           <div class="tr" style="width:770px">
             <!-- start widget -->
             <div style="width:736px;margin:10px">
               <div class="panel" style="width:736px">
                 <div class="panel-title" style="width:736px"><div>Google AdSense</div></div>
-                <div class="panel-content" style="width:736px">
+                <div class="panel-content" style="width:736px;display:none">
                   <div class="form-field">
                     <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
                     <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
@@ -256,6 +274,5 @@ $(function() {
       </div>
   	</div>
   </div>
-  </form>
 </div>
 <!-- end manage_widget_list.html -->

@@ -26,44 +26,54 @@ def get_installed_widgets():
 def load_widget_class(name):
     return __import__('widget.installed.%s' % name, fromlist='Widget').Widget
 
-DEFAULT_COLUMN = 0
-
 class WidgetInstance(db.Model):
     '''
     Store widget instance that can display in a widget bar.
     
     A widget instance has 3 properties:
     
-    column: index (0-9) of the widget column that this widget belongs to. Default to DEFAULT_COLUMN (0).
-    name: the widget module name.
+    sidebar: index (0-9) of the sidebar that this widget belongs to. Default to 0.
+    name: the widget module name (or widget id).
     display_order: the widget display order.
     '''
-    column = db.IntegerProperty(required=True, default=DEFAULT_COLUMN)
+    sidebar = db.IntegerProperty(required=True, default=0)
     name = db.StringProperty(required=True)
     display_order = db.IntegerProperty(required=True)
 
     def __str__(self):
-        return 'WidgetInstance(name=%s)' % self.name
+        return 'WidgetInstance(name=%s, sidebar=%s)' % (self.name, self.name)
 
     __repr__ = __str__
 
-def get_instances(column, use_cache=True):
+def create_widget_instance(name, sidebar):
     '''
-    Get widget instances of the given column.
+    Create a new widget instance.
+    
+    Returns:
+      The created WidgetInstance object.
+    '''
+    count = 1
+    w = WidgetInstance(name=name, sidebar=sidebar, display_order=count)
+    w.put()
+    return w
+
+def get_instances(sidebar, use_cache=True):
+    '''
+    Get widget instances of the given sidebar.
     
     Args:
-      column: index of the column, 0-9.
+      sidebar: index of the sidebar, 0-9.
       use_cache: True if fetch from cache first. Default to True.
     Returns:
       List of widget instances, as well as settings attached with each widget instance.
     '''
     def _load():
-        instances = WidgetInstance.all().filter('column =', column).order('display_order')
+        instances = WidgetInstance.all().filter('sidebar =', sidebar).order('display_order')
         for instance in instances:
             instance.settings = get_instance_settings(instance)
         return instances
     if use_cache:
-        return cache.get('__widget_column_%s__' % column, _load)
+        return cache.get('__widget_sidebar_%s__' % sidebar, _load)
     return _load()
 
 def get_instance_settings(widget_instance):
