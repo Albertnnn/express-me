@@ -39,14 +39,13 @@ $(function() {
 
   $('.btn-add-widget').click(function(){
     var index=$(this).attr('index');
-    var sel = $('#select_widget_' + index);
-    var widget_id = sel.val();
-    if (widget_id=='') {
+    var widget_name = $('#select_widget_' + index).val();
+    if (widget_name=='') {
       alert('Please select a widget to add.');
       return;
     }
     if (confirm('Add widget \"' + $('#select_widget_'+index+' option:selected').attr('text') + '\"?')) {
-      location.assign('/manage/?app='+g_app+'&command='+g_command+'&btn=add&sidebar='+index+'&widget_id='+widget_id);
+      location.assign('/manage/?app='+g_app+'&command='+g_command+'&btn=add&sidebar='+index+'&widget_name='+widget_name);
     }
   });
 });

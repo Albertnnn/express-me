@@ -183,15 +183,15 @@ def _edit_sidebar(user, app, context):
     btn = context.get_argument('btn', '')
     if btn=='add':
         # add a new widget instance:
-        widget_id = context.get_argument('widget_id')
+        widget_name = context.get_argument('widget_name')
         sidebar = int(context.get_argument('sidebar'))
         title = None
         for w in widgets:
-            if w['id']==widget_id:
+            if w['id']==widget_name:
                 title = w['title']
                 break
         info = 'A new widget "%s" was added to sidebar %s.' % (title,(sidebar+1),)
-        model.create_widget_instance(widget_id, sidebar)
+        model.create_widget_instance(widget_name, sidebar)
     return {
             'info' : info,
             '__view__' : 'manage_sidebar',

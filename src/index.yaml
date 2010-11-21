@@ -85,3 +85,8 @@ indexes:
   - name: role
   - name: creation_date
     direction: desc
+
+- kind: WidgetInstance
+  properties:
+  - name: sidebar
+  - name: display_order

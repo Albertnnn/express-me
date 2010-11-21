@@ -86,7 +86,7 @@ def get_instance_settings(widget_instance):
     Return:
       Dict (name=value) as settings of WidgetInstance.
     '''
-    return store.get_settings('widget_instance_%s' % widget_instance.id)
+    return store.get_settings('widget_instance_%s' % widget_instance.name)
 
 def save_instance_settings(widget_instance, setting_as_dict):
     '''
