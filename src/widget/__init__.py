@@ -85,7 +85,7 @@ class WidgetPasswordSetting(WidgetSetting):
 
 class WidgetModel(object):
 
-    title = WidgetSetting(description='Widget title (leave empty to hide title)', default='')
+    title = WidgetSetting(description='Widget title (leave empty to hide title)', default='Widget')
 
     def handle_request(self, request, response, parameters):
         '''

@@ -23,10 +23,14 @@ def get_installed_widgets():
         d[pkg_name] = cls
     return d
 
+def get_default_settings(widget_class):
+    d = {}
+    return d
+
 def load_widget_class(name):
     return __import__('widget.installed.%s' % name, fromlist='Widget').Widget
 
-class WidgetInstance(db.Model):
+class WidgetInstance(store.BaseModel):
     '''
     Store widget instance that can display in a widget bar.
     
@@ -41,7 +45,7 @@ class WidgetInstance(db.Model):
     display_order = db.IntegerProperty(required=True)
 
     def __str__(self):
-        return 'WidgetInstance(name=%s, sidebar=%s)' % (self.name, self.name)
+        return 'WidgetInstance(name=%s, sidebar=%s, display_order=%s)' % (self.name, self.sidebar, self.display_order)
 
     __repr__ = __str__
 
@@ -52,12 +56,14 @@ def create_widget_instance(name, sidebar):
     Returns:
       The created WidgetInstance object.
     '''
-    count = 1
+    count = WidgetInstance.all().filter('sidebar =', sidebar).count(101)
+    if count>=100:
+        raise StandardError('Maximum widgets exceeded in a sidebar.')
     w = WidgetInstance(name=name, sidebar=sidebar, display_order=count)
     w.put()
     return w
 
-def get_instances(sidebar, use_cache=True):
+def get_widget_instances(sidebar, use_cache=True):
     '''
     Get widget instances of the given sidebar.
     
@@ -68,15 +74,15 @@ def get_instances(sidebar, use_cache=True):
       List of widget instances, as well as settings attached with each widget instance.
     '''
     def _load():
-        instances = WidgetInstance.all().filter('sidebar =', sidebar).order('display_order')
+        instances = WidgetInstance.all().filter('sidebar =', sidebar).order('display_order').fetch(100)
         for instance in instances:
-            instance.settings = get_instance_settings(instance)
+            instance.settings = get_widget_instance_settings(instance)
         return instances
     if use_cache:
         return cache.get('__widget_sidebar_%s__' % sidebar, _load)
     return _load()
 
-def get_instance_settings(widget_instance):
+def get_widget_instance_settings(widget_instance):
     '''
     Get widget instance settings.
     
@@ -86,19 +92,20 @@ def get_instance_settings(widget_instance):
     Return:
       Dict (name=value) as settings of WidgetInstance.
     '''
-    return store.get_settings('widget_instance_%s' % widget_instance.name)
+    return store.get_settings('widget_instance_%s' % widget_instance.id)
 
-def save_instance_settings(widget_instance, setting_as_dict):
+def save_widget_instance_settings(instance, setting_as_dict):
     '''
     Update instance settings.
     
     Args:
-      widget_instance: WidgetInstance object.
+      instance: WidgetInstance object.
       setting_as_dict: new settings as dict contains key as str and value as str or unicde.
     Returns:
       None
     '''
-    group = 'widget_instance_%s' % widget_instance.id
+    group = 'widget_instance_%s' % instance.id
+    cache.delete('__widget_sidebar_%s__' % instance.sidebar)
     store.delete_settings(group)
     for k, v in setting_as_dict.items():
         store.set_setting(k, v, group)
@@ -114,5 +121,6 @@ def delete_widget_instance(key):
     '''
     instance = WidgetInstance.get(key)
     if instance is not None:
+        cache.delete('__widget_sidebar_%s__' % instance.sidebar)
         instance.delete()
         store.delete_settings('widget_instance_%s' % key)
