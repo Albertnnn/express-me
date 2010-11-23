@@ -4,11 +4,14 @@
 __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import os
+import copy
 
 from google.appengine.ext import db
 
 from framework import store
 from framework import cache
+
+from widget import WidgetSetting
 
 def get_installed_widgets():
     '''
@@ -40,8 +43,8 @@ class WidgetInstance(store.BaseModel):
     name: the widget module name (or widget id).
     display_order: the widget display order.
     '''
-    sidebar = db.IntegerProperty(required=True, default=0)
     name = db.StringProperty(required=True)
+    sidebar = db.IntegerProperty(required=True, default=0)
     display_order = db.IntegerProperty(required=True)
 
     def __str__(self):
@@ -75,24 +78,30 @@ def get_widget_instances(sidebar, use_cache=True):
     '''
     def _load():
         instances = WidgetInstance.all().filter('sidebar =', sidebar).order('display_order').fetch(100)
+        widgets = get_installed_widgets()
         for instance in instances:
-            instance.settings = get_widget_instance_settings(instance)
+            if instance.name in widgets:
+                instance.settings = get_widget_instance_settings(instance, widgets[instance.name])
         return instances
     if use_cache:
         return cache.get('__widget_sidebar_%s__' % sidebar, _load)
     return _load()
 
-def get_widget_instance_settings(widget_instance):
+def get_widget_instance_settings(widget_instance, widget_class):
     '''
     Get widget instance settings.
     
     Args:
-      Widget instance object.
+      widget_instance: Widget instance object.
+      widget_class: Widget class object.
     
     Return:
       Dict (name=value) as settings of WidgetInstance.
     '''
-    return store.get_settings('widget_instance_%s' % widget_instance.id)
+    d = store.get_settings('widget_instance_%s' % widget_instance.id)
+    settings = get_widget_class_settings(widget_class)
+    
+    return d
 
 def save_widget_instance_settings(instance, setting_as_dict):
     '''
@@ -124,3 +133,28 @@ def delete_widget_instance(key):
         cache.delete('__widget_sidebar_%s__' % instance.sidebar)
         instance.delete()
         store.delete_settings('widget_instance_%s' % key)
+
+def get_widget_class_settings(widget_class):
+    '''
+    Get widget class settings.
+    
+    Args:
+      Widget class.
+    
+    Return:
+      List contains WidgetSetting object.
+    '''
+    attrs = [getattr(widget_class, attr) for attr in dir(widget_class)]
+    return [copy.copy(attr) for attr in attrs if isinstance(attr, WidgetSetting)]
+
+def xxx____():
+    attr_list = dir(widget_class)
+    import logging
+    logging.warning(str(attr_list))
+    settings = {}
+    for attr in attr_list:
+        setting = getattr(widget_class, attr)
+        if isinstance(setting, WidgetSetting):
+            settings[attr] = setting
+    logging.info('get widget settings:\n' + str(settings))
+    return settings

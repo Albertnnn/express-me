@@ -9,10 +9,6 @@ __author__ = 'Michael Liao (askxuefeng@gmail.com)'
 
 import os
 
-from widget.store import DEFAULT_GROUP
-from widget.store import WidgetInstance
-from widget.store import WidgetInstanceSetting
-
 class WidgetSetting(object):
     '''
     settings of a widget class, display as input.
@@ -134,104 +130,6 @@ class WidgetModel(object):
                 '</p>'
         ])
 
-# helper class for db models:
-
-def get_installed_widget(widget_id):
-    '''
-    Get a installed widget class by id (parent package name)
-    
-    Args:
-      widget_id: widget id, the same as module name.
-    
-    Returns:
-      Widget class.
-    '''
-    if isinstance(widget_id, unicode):
-        widget_id = widget_id.encode('utf-8')
-    return __import__('widget.installed.' + widget_id, fromlist=[widget_id]).Widget
-
-def get_installed_widgets():
-    '''
-    Get all widgets installed in under /widget/installed/.
-    
-    Args:
-        None
-    
-    Returns:
-        Dict that contains widget id (parent package name) as key and Widget class as value.
-    '''
-    root = os.path.split(os.path.dirname(__file__))[0]
-    widget_root = os.path.join(root, 'widget', 'installed')
-    widgets = os.listdir(widget_root)
-    valid_widgets = [w for w in widgets if __is_valid_widget(widget_root, w)]
-    dict = {}
-    for w in valid_widgets:
-        dict[w] = __import__('widget.installed.' + w, fromlist=[w])
-    return dict
-
-def __is_valid_widget(widget_root, widget):
-    'detect if this dir contains a valid widget'
-    dir = os.path.join(widget_root, widget)
-    return os.path.isdir(dir) and os.path.isfile(os.path.join(dir, '__init__.py'))
-
-def get_widget_count(group=DEFAULT_GROUP):
-    '''
-    Get how many widgets in a group.
-    
-    Args:
-      group: group name, default to DEFAULT_GROUP ('default').
-    
-    Return:
-      int. How many widgets.
-    '''
-    return WidgetInstance.all().filter('widget_group ==', group).count(100)
-
-def create_widget_instance(id, settings=None, group=DEFAULT_GROUP):
-    '''
-    Create a new widget instance.
-    
-    Args:
-      widget_id: Widget id (same as parent package name).
-      settings: List of WidgetSetting. default to None.
-      widget_group: Group name. default to DEFAULT_GROUP.
-    
-    Return:
-      A WidgetInstance object stored in db.
-    '''
-    instance = WidgetInstance(
-            widget_id=id,
-            widget_group=group,
-            widget_order=get_widget_count(group)
-    )
-    instance.put()
-    if settings:
-        for setting in settings:
-            ws = WidgetInstanceSetting(
-                    widget_group=group,
-                    widget_instance=instance,
-                    setting_name=setting.name,
-                    setting_value=setting.value
-            )
-            ws.put()
-    return instance
-
-def get_widget_instance(key):
-    '''
-    Get widget instance by key.
-    '''
-    return WidgetInstance.get(key)
-
-def get_widget_instances(widget_group=DEFAULT_GROUP):
-    '''
-    get widget instances as list contains WidgetInstance objects by group name.
-    
-    Args:
-        widget_group: group name, default to DEFAULT_GROUP.
-    Returns:
-        list of WidgetInstance objects.
-    '''
-    return WidgetInstance.all().filter('widget_group ==', widget_group).order('widget_order').fetch(100)
-
 def get_widget_settings(widget_class):
     '''
     Get widget settings.
@@ -276,17 +174,6 @@ def bind_instance_model(instances, settings):
         list = d_settings.pop(key, [])
         logging.warning('Prepare instance settings: ' + str(list))
         instance.model = merge_settings(widget_class, list)
-
-def get_all_instances_settings(group=DEFAULT_GROUP):
-    '''
-    Get widget instances settings.
-    
-    Args:
-      Group name, default to DEFAULT_GROUP.
-    Returns:
-      List of WidgetInstanceSetting objects.
-    '''
-    return WidgetInstanceSetting.all().filter('widget_group', group).fetch(1000)
 
 def merge_settings(widget_class, instance_settings):
     '''
