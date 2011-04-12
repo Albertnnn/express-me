@@ -9,7 +9,7 @@ Handle index page '/'.
 
 from framework.web import get
 
-from blog import controller as blog_controller
+import blog
 from blog import model as blog_model
 
 @get('/')
@@ -24,6 +24,6 @@ def index(**kw):
             '__theme__' : True,
             '__view__' : 'index',
             '__title__' : 'Home',
-            '__header__' : blog_controller.get_feed_html(),
+            '__header__' : blog.get_feed_html(),
             'posts' : posts,
     }

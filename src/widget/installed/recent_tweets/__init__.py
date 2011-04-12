@@ -36,15 +36,19 @@ class Widget(widget.WidgetModel):
     __description__ = 'Show your recent tweets'
     __url__ = 'http://www.expressme.org/'
 
-    username = widget.WidgetSetting(description='Twitter username', required=True, default='')
-    recent_tweets = widget.WidgetSetting(description='How many recent tweets to display', required=True, default='20')
+    @staticmethod
+    def get_settings():
+        return [
+                widget.WidgetSetting(key='username', description='Twitter username', required=True, default=''),
+                widget.WidgetSetting(key='recent_tweets', description='How many recent tweets to display', required=True, default='20'),
+        ]
 
 #    title = widget.WidgetSetting()
 #    username = widget.WidgetSetting()
 #    recent_tweets = widget.WidgetSetting()
 #    show_follow_me = widget.WidgetSetting()
 
-    def get_content(self):
+    def get_content__raw__(self):
         self.cache = '600'
         id = 'tw_' + self.__id__
         url = 'http://api_twitter_com/1/statuses/user_timeline/%s.json%%3Fcount=%s?__cache__=%s' % (self.username, self.recent_tweets, self.cache)

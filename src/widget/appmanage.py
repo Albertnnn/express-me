@@ -178,6 +178,8 @@ def _edit_sidebar(user, app, context):
     widgets = __get_widget_class_infos()
     sidebars = [
             model.get_widget_instances(0, False),
+            [], [], [], [], [],
+            [], [], [], []
     ]
     info = ''
     btn = context.get_argument('btn', '')

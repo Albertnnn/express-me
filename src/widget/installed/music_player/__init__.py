@@ -8,21 +8,25 @@ Music Widget that play music online.
 import widget
 
 class Widget(widget.WidgetModel):
+    '''
+    Play music
+    '''
 
     __title__ = 'Music Player'
     __author__ = 'Michael Liao'
     __description__ = 'Play a music online'
     __url__ = 'http://www.expressme.org/'
 
-    '''
-    Play music
-    '''
-    music_title = widget.WidgetSetting(description='Music Title', required=False, default='')
-    music_url = widget.WidgetSetting(description='Music URL', required=True, default='http://')
-    auto_play = widget.WidgetCheckedSetting(label='Auto play when load', description='Auto play', default='True')
-    repeat = widget.WidgetCheckedSetting(label='Play repeatly', description='Play repeatly', default='False')
+    @staticmethod
+    def get_settings():
+        return [
+                widget.WidgetSetting(key='music_title', description='Music Title', required=False, default=''),
+                widget.WidgetSetting(key='music_url', description='Music URL', required=True, default='http://'),
+                widget.WidgetCheckedSetting(key='auto_play', label='Auto play when load', description='Auto play', default='True'),
+                widget.WidgetCheckedSetting(key='repeat', label='Play repeatly', description='Play repeatly', default='False'),
+        ]
 
-    def get_content(self):
+    def get_content__raw__(self):
         # http://shop.zzaza.com/content/mp3/burning.mp3
         # http://listen.idj.126.net/uf/130/40ef517cda864fc98886a26f7c01caa2.mp3
         auto_start = self.auto_play=='True'

@@ -1565,7 +1565,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         "Use one or the other.")
                 source = unicodeDirectiveRE.sub('', source)
                 if isinstance(source, str):
-                    encoding = unicodeMatch.group(1) or 'ascii'
+                    encoding = unicodeMatch.group(1) or 'utf-8'
                     source = unicode(source, encoding)
             elif encodingMatch:
                 encodings = encodingMatch.groups()

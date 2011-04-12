@@ -26,10 +26,6 @@ def get_installed_widgets():
         d[pkg_name] = cls
     return d
 
-def get_default_settings(widget_class):
-    d = {}
-    return d
-
 def load_widget_class(name):
     return __import__('widget.installed.%s' % name, fromlist='Widget').Widget
 
@@ -40,7 +36,7 @@ class WidgetInstance(store.BaseModel):
     A widget instance has 3 properties:
     
     sidebar: index (0-9) of the sidebar that this widget belongs to. Default to 0.
-    name: the widget module name (or widget id).
+    name: the widget module name (equals to widget id).
     display_order: the widget display order.
     '''
     name = db.StringProperty(required=True)
@@ -74,15 +70,23 @@ def get_widget_instances(sidebar, use_cache=True):
       sidebar: index of the sidebar, 0-9.
       use_cache: True if fetch from cache first. Default to True.
     Returns:
-      List of widget instances, as well as settings attached with each widget instance.
+      List of widget instances, as well as each instance has:
+        settings: instance settings as dict,
+        widget_class: widget class object.
     '''
     def _load():
         instances = WidgetInstance.all().filter('sidebar =', sidebar).order('display_order').fetch(100)
         widgets = get_installed_widgets()
+        r = []
         for instance in instances:
             if instance.name in widgets:
-                instance.settings = get_widget_instance_settings(instance, widgets[instance.name])
-        return instances
+                instance.widget_class = widgets[instance.name]
+                instance.settings = get_widget_instance_settings(instance, instance.widget_class)
+                instance.widget = instance.widget_class()
+                for k, v in instance.settings.iteritems():
+                    instance.widget[k] = v
+                r.append(instance)
+        return r
     if use_cache:
         return cache.get('__widget_sidebar_%s__' % sidebar, _load)
     return _load()

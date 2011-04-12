@@ -1,4 +1,4 @@
-<!-- begin manage_widget_list.html -->
+<!-- begin manage_sidebar.html -->
 <script type="text/javascript">
 var g_app = '${app}';
 var g_command = '${command}';
@@ -36,19 +36,16 @@ $(function() {
     $('.widget-content').hide();
     $($(this).parent().children().get(1)).show();
   });
+});
 
-  $('.btn-add-widget').click(function(){
-    var index=$(this).attr('index');
+function ask_before_add_widget(index) {
     var widget_name = $('#select_widget_' + index).val();
     if (widget_name=='') {
       alert('Please select a widget to add.');
-      return;
+      return false;
     }
-    if (confirm('Add widget \"' + $('#select_widget_'+index+' option:selected').attr('text') + '\"?')) {
-      location.assign('/manage/?app='+g_app+'&command='+g_command+'&btn=add&sidebar='+index+'&widget_name='+widget_name);
-    }
-  });
-});
+    return confirm('Add widget \"' + $('#select_widget_'+index+' option:selected').attr('text') + '\"?');
+}
 //#end raw
 </script>
 <div class="panel box-round">
@@ -62,14 +59,16 @@ $(function() {
       </div>
     </div>
 
-    <!-- start sidebar -->
+#for $index in range(9)
+    <!-- start sidebar ${index} -->
     <div style="width:770px;margin:0px 10px 10px 10px">
-      <div id="sidebar0" class="panel sidebar" style="width:770px">
-        <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar 1</div></div>
+      <div id="sidebar${index}" class="panel sidebar" style="width:770px">
+        <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar ${index+1}</div></div>
         <div class="panel-content sidebar-content" style="width:770px">
           <div class="tr" style="width:770px">
 
             <!-- start widget -->
+            <!-- SAMPLE WIDGET
             <div style="width:736px;margin:10px">
               <div class="panel widget" style="width:736px">
                 <div class="panel-title widget-title" style="width:736px"><div>G AdSense</div></div>
@@ -109,20 +108,25 @@ $(function() {
                 </div>
               </div>
             </div>
-            <!-- end widget -->
+            -->
 
-            #for $wi in $sidebars[0]
+            #for $wi in $sidebars[$index]
             <!-- start widget -->
             <div style="width:736px;margin:10px">
               <div class="panel widget" style="width:736px">
-                <div class="panel-title widget-title" style="width:736px"><div>$wi</div></div>
+                <div class="panel-title widget-title" style="width:736px"><div>${wi.widget_class.__title__}</div></div>
+                <div class="panel-content widget-content" style="width:736px">
+                  <div class="form-field">
+                    ${wi.widget.get_content__raw__()}
+                  </div>
+                </div>
                 <div class="panel-content widget-content" style="width:736px;display:none">
                   <div class="form-field">
                   #for $setting in $wi.settings
                     <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
                     <div class="form-field-input"><input type="text" name="slot" value="" /></div>
                   #end for
-                    <div class="form-field-input"><input type="button" name="save" value="Save" /><input type="button" name="cancel" value="Cancel" /></div>
+                    <div class="form-field-input"><input type="button" name="save" value="Save" /> <input type="button" name="cancel" value="Cancel" /></div>
                   </div>
                 </div>
               </div>
@@ -131,12 +135,21 @@ $(function() {
             #end for
 
             <div style="width:736px;margin:10px 20px;">
-              <select id="select_widget_0" name="select_widget">
+            <form name="add_widget_form" action="/manage/" method="post" onsubmit="return ask_before_add_widget(${index})">
+              <input type="hidden" name="app" value="${app}" />
+              <input type="hidden" name="command" value="${command}" />
+              <input type="hidden" name="sidebar" value="${index}" />
+              <select id="select_widget_${index}" name="widget_name">
+              <!--
               #for $w in $widgets
+              -->
                 <option value="${w.id}">${w.title}</option>
+              <!--
               #end for
+              -->
               </select>
-              <button name="add_widget" index="0" type="button" class="btn-add-widget">Add Widget</button>
+              <button name="btn" type="submit" class="btn-add-widget" value="add">Add Widget</button>
+            </form>
             </div>
 
           </div>
@@ -144,105 +157,7 @@ $(function() {
       </div>
     </div>
     <!-- end sidebar -->
-
-    <!-- start sidebar -->
-    <div style="width:770px;margin:0px 10px 10px 10px">
-      <div id="sidebar1" class="panel sidebar" style="width:770px">
-        <div class="panel-title sidebar-title" style="width:770px"><div>Sidebar 2</div></div>
-        <div class="panel-content sidebar-content" style="width:770px;display:none">
-          <div class="tr" style="width:770px">
-            <!-- start widget -->
-            <div style="width:736px;margin:10px">
-              <div class="panel" style="width:736px">
-                <div class="panel-title" style="width:736px"><div>Google AdSense</div></div>
-                <div class="panel-content" style="width:736px;display:none">
-                  <div class="form-field">
-                    <div class="form-field-title">Pub ID (Your AdSense pub id like <em>pub-123456789</em>):</div>
-                    <div class="form-field-input"><input type="text" name="pub_id" value="" /></div>
-                    <div class="form-field-title">Slot (Your Ad slot like <em>123456789</em>):</div>
-                    <div class="form-field-input"><input type="text" name="slot" value="" /></div>
-                    <div class="form-field-title">Size (Your Ad size):</div>
-                    <div class="form-field-input">
-                      <select name="size">
-                        <optgroup label="Recommended">
-                          <option value="300x250">300 x 250 Medium Rectangle</option>
-                          <option value="336x280">336 x 280 Large Rectangle</option>
-                          <option value="728x90">728 x 90 Leaderboard</option>
-                          <option value="160x600">160 x 600 Wide Skyscraper</option>
-                        </optgroup>
-                        <optgroup label="Other - Horizontal">
-                          <option value="468x60">468 x 60 Banner</option>
-                          <option value="234x60">234 x 60 Half Banner</option>
-                        </optgroup>
-                        <optgroup label="Other - Vertical">
-                          <option value="120x600">120 x 600 Skyscraper</option>
-                          <option value="120x240">120 x 240 Vertical Banner</option>
-                        </optgroup>
-                        <optgroup label="Other - Square">
-                          <option value="250x250">250 x 250 Square</option>
-                          <option value="200x200">200 x 200 Small Square</option>
-                          <option value="180x150">180 x 150 Small Rectangle</option>
-                          <option value="125x125">125 x 125 Button</option>
-                        </optgroup>
-                      </select>
-                    </div>
-                    <div class="form-field-input"><input type="button" name="save" value="Save" /><input type="button" name="cancel" value="Cancel" /></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- end widget -->
-            <!-- start widget -->
-            <div style="width:736px;margin:10px">
-              <div class="panel" style="width:736px">
-                <div class="panel-title" style="width:736px"><div>Google AdSense [Move Up | Move Down]</div></div>
-                <div class="panel-content" style="width:736px;display:none">
-                </div>
-              </div>
-            </div>
-            <!-- end widget -->
-            <!-- start widget -->
-            <div style="width:736px;margin:10px">
-              <div class="panel" style="width:736px">
-                <div class="panel-title" style="width:736px"><div>Subscribe</div></div>
-                <div class="panel-content" style="width:736px;display:none">
-                </div>
-              </div>
-            </div>
-            <!-- end widget -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end sidebar -->
-
-    <!-- start sidebar -->
-    <div style="width:770px;margin:0px 10px 10px 10px">
-      <div class="panel" style="width:770px">
-        <div class="panel-title" style="width:770px"><div>Sidebar 3</div></div>
-        <div class="panel-content" style="width:770px;display:none">
-          <div class="tr" style="width:770px">
-            <!-- start widget -->
-            <!-- end widget -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end sidebar -->
-
-    <!-- start sidebar -->
-    <div style="width:770px;margin:0px 10px 10px 10px">
-      <div class="panel" style="width:770px">
-        <div class="panel-title" style="width:770px"><div>Sidebar 4</div></div>
-        <div class="panel-content" style="width:770px;display:none">
-          <div class="tr" style="width:770px">
-            <!-- start widget -->
-            <!-- end widget -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end sidebar -->
+#end for
 
   	<div class="tr top-line">
       <div class="span-19 last">
@@ -251,4 +166,4 @@ $(function() {
   	</div>
   </div>
 </div>
-<!-- end manage_widget_list.html -->
+<!-- end manage_sidebar.html -->

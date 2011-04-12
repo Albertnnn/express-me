@@ -16,16 +16,6 @@ from framework import store
 import blog
 from blog import model
 
-def get_feed_html():
-    '''
-    Get feed html in <head>...</head>.
-    '''
-    feed_title = store.get_setting(blog.FEED_TITLE, blog.GROUP_OPTIONS, 'Posts')
-    feed_proxy = store.get_setting(blog.FEED_PROXY, blog.GROUP_OPTIONS, '')
-    if not feed_proxy:
-        feed_proxy = '/blog/feed'
-    return r'<link href="%s" title="%s" type="application/rss+xml" rel="alternate" />' % (feed_proxy, feed_title)
-
 @get('/')
 def get_all_public_posts(**kw):
     '''
@@ -46,7 +36,7 @@ def get_all_public_posts(**kw):
             '__theme__' : True,
             '__view__' : 'posts',
             '__title__' : 'All posts',
-            '__header__' : get_feed_html(),
+            '__header__' : blog.get_feed_html(),
             'posts' : posts,
             'index' : index,
             'next' : next,
@@ -81,7 +71,7 @@ def get_posts_by_category(cat_key, **kw):
             '__theme__' : True,
             '__view__' : 'posts',
             '__title__' : 'Posts of %s' % category.name,
-            '__header__' : get_feed_html(),
+            '__header__' : blog.get_feed_html(),
             'category' : category,
             'posts' : posts,
             'index' : index,

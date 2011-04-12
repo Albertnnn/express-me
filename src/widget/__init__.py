@@ -13,18 +13,23 @@ class WidgetSetting(object):
     '''
     settings of a widget class, display as input.
     '''
-    __slot__ = ('default', 'required', 'description', 'value', 'pattern')
+    __slot__ = ('key', 'default', 'required', 'description', 'value', 'pattern')
 
     def __init__(self, **kw):
         '''
         Init WidgetSetting by kw args that support default='', required=False, 
         description='', value=None, pattern='^.*$'.
         '''
+        key = kw.get('key', '')
         default = kw.get('default', '')
         required = kw.get('required', False)
         description = kw.get('description', '')
         value = kw.get('value', None)
         pattern = kw.get('pattern', '^.*$')
+        if not isinstance(key, basestring):
+            raise ValueError('\'key\' must be str or unicode.')
+        if not key:
+            raise ValueError('\'key\' must not be empty.')
         if not isinstance(default, basestring):
             raise ValueError('\'default\' must be str or unicode.')
         if not isinstance(required, bool):
@@ -44,6 +49,10 @@ class WidgetSetting(object):
 
     def is_modified(self):
         return self.default!=self.value
+
+    def html(self):
+        'To html input'
+        return ''
 
     def __str__(self):
         return r'''WidgetSetting(default='%s', required=%s, description='%s', value='%s', pattern='%s')''' % (self.default, self.required, self.description, self.value, self.pattern)
@@ -114,11 +123,11 @@ class WidgetModel(object):
             buffer.append(self.title)
             buffer.append('</h3>')
         buffer.append('<div class="widget-content">')
-        buffer.append(self.get_content())
+        buffer.append(self.get_content__raw__())
         buffer.append('</div></div>')
         return ''.join(buffer)
 
-    def get_content(self):
+    def get_content__raw__(self):
         '''
         Expect to override by subclass.
         '''
@@ -149,59 +158,6 @@ def get_widget_settings(widget_class):
         if isinstance(setting, WidgetSetting):
             settings[attr] = setting
     logging.info('get widget settings:\n' + str(settings))
-    return settings
-
-def bind_instance_model(instances, settings):
-    '''
-    Bind models to instances. Each instance object will attach a 'model' field which is 
-    a dict.
-    '''
-    # build setting map, key=instance.key, value=[list of instance_setting]
-    d_settings = {}
-    import logging
-    for setting in settings:
-        key = str(setting.widget_instance.key())
-        logging.warning('Process setting for instance: ' + key)
-        if key in d_settings:
-            d_settings[key].append(setting)
-        else:
-            d_settings[key] = [setting]
-    logging.warning('Processed settings map: ' + str(d_settings))
-    for instance in instances:
-        widget_class = get_installed_widget(instance.widget_id)
-        instance.widget_class = widget_class
-        key = str(instance.key())
-        list = d_settings.pop(key, [])
-        logging.warning('Prepare instance settings: ' + str(list))
-        instance.model = merge_settings(widget_class, list)
-
-def merge_settings(widget_class, instance_settings):
-    '''
-    Merge settings of dict of WidgetSetting and list of WidgetInstanceSetting. 
-    Instance settings will override widget settings.
-    
-    Args:
-      widget_class: Widget class.
-      instance_settings: list of InstanceSetting.
-    
-    Returns:
-      Dict contains key, value of settings.
-    '''
-    setting_dict = get_widget_settings(widget_class)
-    import logging
-    logging.warning('Load widget class setting for ' + str(widget_class))
-    logging.warning('Settings: ' + str(setting_dict))
-    settings = {}
-    # set default value of all settings:
-    for key in setting_dict:
-        settings[key] = setting_dict[key].default
-    logging.warning('Init settings: ' + str(settings))
-    # override instance settings:
-    for instance_setting in instance_settings:
-        key = instance_setting.setting_name
-        if key in settings:
-            settings[key] = instance_setting.setting_value
-    logging.warning('Override settings: ' + str(settings))
     return settings
 
 ############ TODO #################

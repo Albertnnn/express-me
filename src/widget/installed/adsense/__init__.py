@@ -8,21 +8,30 @@ Adsense Widget that display Google Adsense.
 import widget
 
 class Widget(widget.WidgetModel):
+    '''
+    Display Google Adsense
+    '''
 
     __title__ = 'Google AdSense'
     __description__ = 'Display A.D. of your Google AdSense account.'
     __author__ = 'Michael Liao'
     __url__ = 'http://www.expressme.org/'
 
-    '''
-    Display Google Adsense
-    '''
-    pub_id = widget.WidgetSetting(description='Publisher ID', required=True)
-    ad_slot = widget.WidgetSetting(description='Ad. Slot', required=True)
-    ad_width = widget.WidgetSetting(description='Ad. Width', required=True)
-    ad_height = widget.WidgetSetting(description='Ad. Height', required=True)
+    @staticmethod
+    def get_settings():
+        return [
+                widget.WidgetSetting(key='pub_id', description='Publisher ID', required=True),
+                widget.WidgetSetting(key='ad_slot',description='Ad. Slot', required=True),
+                widget.WidgetSetting(key='ad_width',description='Ad. Width', required=True),
+                widget.WidgetSetting(key='ad_height',description='Ad. Height', required=True),
+        ]
 
-    def get_content(self):
+#    pub_id = widget.WidgetSetting(description='Publisher ID', required=True)
+#    ad_slot = widget.WidgetSetting(description='Ad. Slot', required=True)
+#    ad_width = widget.WidgetSetting(description='Ad. Width', required=True)
+#    ad_height = widget.WidgetSetting(description='Ad. Height', required=True)
+
+    def get_content__raw__(self):
         if not self.pub_id:
             return '<p>error: missing pub_id</p>'
         if not self.ad_slot:
