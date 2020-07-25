@@ -24,7 +24,7 @@ def test_path():
     s = plugin.render(values, template_file='simple1')
     assert s.strip() == 'This is a test: VV'
     # Make sure we pick up subdirectories:
-    s = plugin.render(values, template_file='sub/master')
+    s = plugin.render(values, template_file='sub/main')
     assert s.strip() == 'sub1: 1'
 
 def test_search():
@@ -35,8 +35,8 @@ def test_search():
     # Pick up from third entry:
     s = plugin.render(values, template_file='simple1')
     assert s.strip() == 'This is a test: VV'
-    # Pick up from sub/master, non-ambiguous:
-    s = plugin.render(values, template_file='master')
+    # Pick up from sub/main, non-ambiguous:
+    s = plugin.render(values, template_file='main')
     assert s.strip() == 'sub1: 1'
     # Pick up from sub/page, inherit from sub/template:
     s = plugin.render(values, template_file='page')
